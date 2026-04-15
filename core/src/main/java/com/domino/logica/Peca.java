@@ -1,0 +1,58 @@
+package com.domino.logica;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Peca {
+    private Tipo tipo1;
+    private Tipo tipo2;
+    private boolean lado1Ocupado;
+    private Object info1;
+    private Object info2;
+    private boolean lado2Ocupado;
+
+    private Map<Object, Tipo> peca = new HashMap<>();
+
+    public Peca(Object info1, Tipo tipo1, Object info2, Tipo tipo2) {
+        this.info1 = info1;
+        this.tipo1 = tipo1;
+        this.info2 = info2;
+        this.tipo2 = tipo2;
+    }
+
+    public Object getInfo1() {
+        return this.info1;
+    }
+    public Object getInfo2() {
+        return this.info2;
+    }
+
+    public boolean isLado1Ocupado() {
+        return lado1Ocupado;
+    }
+    public void setLado1Ocupado(boolean lado1Ocupado) {this.lado1Ocupado = lado1Ocupado;}
+
+    public boolean isLado2Ocupado() {
+        return lado2Ocupado;
+    }
+    public void setLado2Ocupado(boolean lado2Ocupado) {this.lado2Ocupado = lado2Ocupado;}
+
+    public Tipo getTipo1(){
+        return this.tipo1;
+    }
+    public Tipo getTipo2(){
+        return this.tipo2;
+    }
+    public Tipo getConexoes1(){
+        return this.tipo1.getConexoes();
+    }
+    public Tipo getConexoes2(){
+        return this.tipo2.getConexoes();
+    }
+
+    @Override
+    public String toString(){
+        return String.format("%s (%s)| %s (%s)", info1, isLado1Ocupado(), info2, isLado2Ocupado());
+    }
+
+}
