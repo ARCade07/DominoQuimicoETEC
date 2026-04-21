@@ -23,6 +23,9 @@ public class Tabuleiro {
         if (validarPeca(peca, noFinal)){
             if (noFinal) pecasNoTabuleiro.addLast(peca);
             else pecasNoTabuleiro.addFirst(peca);
+            System.out.println(String.format("Peça colocada: [ %s | %s ]", peca.getInfo1(), peca.getInfo2()));
+            System.out.println(this.getPecasNoTabuleiro());
+
             return true;
         }
 

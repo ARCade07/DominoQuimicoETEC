@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -17,6 +18,9 @@ import com.domino.atores.ZonaDeSoltarPeca;
 import com.domino.logica.Peca;
 import com.domino.logica.Tabuleiro;
 import com.domino.logica.Tipo;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class GameScreen implements Screen {
     private final Stage stage;
@@ -163,6 +167,43 @@ public class GameScreen implements Screen {
                 }
             }
         });
+
+        HorizontalGroup pecasNaMao = new  HorizontalGroup();
+        pecasNaMao.space(15);
+        pecasNaMao.setPosition(stage.getWidth() / 2, 250 - 50);
+        stage.addActor(pecasNaMao);
+
+        List<Peca> pecasTeste = Arrays.asList(
+            new Peca("HCl", Tipo.ACIDO, "NaOH", Tipo.BASE),   // Peça normal [Ácido | Base]
+            new Peca("HCl", Tipo.ACIDO, "NaOH", Tipo.BASE),   // Peça normal [Ácido | Base]
+            new Peca("H2SO4", Tipo.ACIDO, "HNO3", Tipo.ACIDO),// BUCHA [Ácido | Ácido] (Deve ficar de pé)
+            new Peca("KOH", Tipo.BASE, "LiOH", Tipo.BASE)     // BUCHA [Base | Base]
+        );
+        for (Peca cerebro : pecasTeste) {
+            PecaVisual pecaVisual = new PecaVisual(cerebro, texturaTeste);
+
+            pecasNaMao.addActor(pecaVisual);
+
+            // Configura o drag and drop pra cada peça
+            dragAndDrop.addSource(new DragAndDrop.Source(pecaVisual) {
+                @Override
+                public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                    payload.setObject(pecaVisual);
+
+                    Image fantasma = new Image(texturaTeste);
+                    fantasma.setSize(100, 200);
+                    fantasma.setColor(1, 1, 1, 0.5f);
+
+                    // Centraliza o fantasma no mouse (dependendo de onde você clica na peça)
+                    dragAndDrop.setDragActorPosition(fantasma.getWidth()/2, -fantasma.getHeight()/2);
+                    payload.setDragActor(fantasma);
+
+                    return payload;
+                }
+            });
+        }
+
     }
 
     @Override
