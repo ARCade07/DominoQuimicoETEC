@@ -11,13 +11,17 @@ public class Peca {
     private Object info2;
     private boolean lado2Ocupado;
 
-    private Map<Object, Tipo> peca = new HashMap<>();
+    private boolean isBucha;
+
+    private int rotacao;
 
     public Peca(Object info1, Tipo tipo1, Object info2, Tipo tipo2) {
         this.info1 = info1;
         this.tipo1 = tipo1;
         this.info2 = info2;
         this.tipo2 = tipo2;
+
+        if (info1.equals(info2)) this.isBucha = true;
     }
 
     public Object getInfo1() {
@@ -48,6 +52,17 @@ public class Peca {
     }
     public Tipo getConexoes2(){
         return this.tipo2.getConexoes();
+    }
+
+    public boolean isBucha(){
+        return this.isBucha;
+    }
+
+    public int getRotacao(){
+        return this.rotacao;
+    }
+    public void setRotacao(int rotacao){
+        this.rotacao = rotacao;
     }
 
     @Override

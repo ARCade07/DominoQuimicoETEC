@@ -10,8 +10,7 @@ public class ZonaDeSoltarPeca extends Image {
     public ZonaDeSoltarPeca(boolean isLadoDireito, Texture textura) {
         super(textura);
         this.isLadoDireito = isLadoDireito;
-        this.setSize(120, 220); // Um pouco maior que a peça
-        this.setColor(Color.FIREBRICK); // Pinta de vermelho para diferenciar
+        this.setSize(220, 320); // Um pouco maior que a peça
     }
 
     public boolean isLadoDireito() {
