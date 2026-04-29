@@ -30,6 +30,12 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
+    // Texturas
+    Texture texturaZonas;
+    Texture texturaPeca_a_a;
+    Texture texturaPeca_a_b;
+    Texture texturaPeca_b_b;
+
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
         stage = new Stage(new FitViewport(1920, 1080));
@@ -42,11 +48,7 @@ public class GameScreen implements Screen {
         stage.addActor(background);
 
         // Inicia texturas
-        Texture texturaZonas = new Texture("libgdx.png");
-        Texture texturaPeca_a_a = new Texture("peca_a_a.png");
-        Texture texturaPeca_a_b = new Texture("peca_a_b.png");
-        Texture texturaPeca_b_b = new Texture("peca_b_b.png");
-
+        this.inicilizarTexturas();
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
@@ -67,14 +69,14 @@ public class GameScreen implements Screen {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 // O mouse passou por cima. Fica verde só para visualização
-                getActor().setColor(Color.GREEN);
+                getActor().setColor(Color.WHITE);
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
                 // O mouse saiu de cima.
-                getActor().setColor(Color.FIREBRICK);
+                getActor().setColor(Color.BLACK);
             }
 
             @Override
@@ -86,9 +88,13 @@ public class GameScreen implements Screen {
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), true)){
                     // Para debug
                     System.out.println("Compatível");
+
                     // Move a peça e atualiza a zona
-                    pecaSolta.setPosition(alvoDireita.getX() + (pecaSolta.getWidth() / 2), alvoDireita.getY());
+                    pecaSolta.setPosition(alvoDireita.getX(), alvoDireita.getY());
                     alvoDireita.setPosition(alvoDireita.getX() + pecaSolta.getWidth(), alvoDireita.getY());
+
+                    // Atualiza a rotação da peça (atualizada na classe Tabuleiro)
+                    pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -111,13 +117,13 @@ public class GameScreen implements Screen {
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoEsquerda) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                getActor().setColor(Color.GREEN);
+                getActor().setColor(Color.WHITE);
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                getActor().setColor(Color.FIREBRICK);
+                getActor().setColor(Color.BLACK);
             }
 
             @Override
@@ -129,9 +135,12 @@ public class GameScreen implements Screen {
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), false)){
                     // Para debug
                     System.out.println("Compatível");
+
                     // Move a peça e atualiza a zona
-                    pecaSolta.setPosition(alvoEsquerda.getX() + (pecaSolta.getWidth() / 2), alvoEsquerda.getY());
-                    alvoEsquerda.setPosition(alvoEsquerda.getX() + pecaSolta.getWidth(), alvoEsquerda.getY());
+                    pecaSolta.setPosition(alvoEsquerda.getX(), alvoEsquerda.getY());
+                    alvoEsquerda.setPosition(alvoEsquerda.getX() - pecaSolta.getWidth(), alvoEsquerda.getY());
+
+                    pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -151,7 +160,17 @@ public class GameScreen implements Screen {
 
             }
         });
+        this.inicializarPecas();
+    }
 
+    private void inicilizarTexturas(){
+        this.texturaZonas = new Texture("libgdx.png");
+        this.texturaPeca_a_a = new Texture("peca_a_a.png");
+        this.texturaPeca_a_b = new Texture("peca_a_b.png");
+        this.texturaPeca_b_b = new Texture("peca_b_b.png");
+    }
+
+    private void inicializarPecas(){
         HorizontalGroup pecasNaMao = new  HorizontalGroup();
         pecasNaMao.space(15);
         pecasNaMao.setPosition(stage.getWidth() / 3, 200);
@@ -191,7 +210,6 @@ public class GameScreen implements Screen {
                 }
             });
         }
-
     }
 
     @Override

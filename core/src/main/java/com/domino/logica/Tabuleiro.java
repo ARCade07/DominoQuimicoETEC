@@ -16,12 +16,6 @@ public class Tabuleiro {
 
     public boolean colocarPeca(Peca peca, boolean noFinal){
         if (validarPeca(peca, noFinal)){
-            if (!pecasNoTabuleiroVerificacao.add(peca)){
-                System.out.println("Essa mensagem nunca deve aparecer na sua tela. Se isso acontecer, largue tudo e fuja para as montanhas.");
-                return false;
-            }
-            if (noFinal) pecasNoTabuleiro.addLast(peca);
-            else pecasNoTabuleiro.addFirst(peca);
             System.out.println(String.format("Peça colocada: [ %s | %s ]", peca.getInfo1(), peca.getInfo2()));
             System.out.println(this.getPecasNoTabuleiro());
 
@@ -33,19 +27,24 @@ public class Tabuleiro {
 
     private boolean validarPeca(Peca peca, boolean noFinal){
         if (pecasNoTabuleiro.isEmpty()){
+            if (!this.pecasNoTabuleiroVerificacao.add(peca)) return false;
+            this.pecasNoTabuleiro.add(peca);
+
+            peca.setRotacao(90);
+
             return true;
         }
         List<Tipo> tiposCompativeis = new ArrayList<>();
         if (noFinal){
             // Informações da última peça do tabuleiro
             Peca ultimaPeca =  pecasNoTabuleiro.getLast();
+            Tipo tipoCompativelLado1 = ultimaPeca.getConexoes1();
+            Tipo tipoCompativelLado2 = ultimaPeca.getConexoes2();
 
             if (!ultimaPeca.isLado1Ocupado()){
-                Tipo tipoCompativelLado1 = ultimaPeca.getConexoes1();
                 tiposCompativeis.add(tipoCompativelLado1);
             }
             if (!ultimaPeca.isLado2Ocupado()){
-                Tipo tipoCompativelLado2 = ultimaPeca.getConexoes2();
                 tiposCompativeis.add(tipoCompativelLado2);
             }
 
@@ -53,49 +52,105 @@ public class Tabuleiro {
             Tipo tipo1Peca = peca.getTipo1();
             Tipo tipo2Peca = peca.getTipo2();
 
-            if (tiposCompativeis.contains(tipo1Peca) && tiposCompativeis.contains(tipo2Peca)){
-                // Peça encaixa em qualquer lado
-                // TODO
-            }
-            else if (tiposCompativeis.contains(tipo1Peca)){
-                // Lado 1 está disponível
-                // (false) [ 2 | 1 ] (true)
-                ultimaPeca.setLado1Ocupado(true);
-            }
-            else if (tiposCompativeis.contains(tipo2Peca)){
-                // Lado 2 está disponível
-                // (false) [ 1 | 2 ] (true)
-                ultimaPeca.setLado2Ocupado(true);
-                //TODO
-            }
+            //if (tiposCompativeis.contains(tipo1Peca) && tiposCompativeis.contains(tipo2Peca)){}
+            if (tiposCompativeis.contains(tipo1Peca)){
+                // Peça é compatível, mas não sabemos o lado que está disponível
 
-            if (!pecasNoTabuleiro.getLast().isLado2Ocupado()) {
-                var tipoCompativel = ultimaPeca.getConexoes2();
-
-                if (peca.getTipo1() == tipoCompativel) {
-                    ultimaPeca.setLado2Ocupado(true);
-                    peca.setLado1Ocupado(true);
-                    return true;
+                if (!this.pecasNoTabuleiroVerificacao.add(peca)){
+                    System.out.println("Erro: Peça repetida.");
+                    return false;
                 }
-                if (peca.getTipo2() == tipoCompativel) {
-                    ultimaPeca.setLado2Ocupado(true);
-                    peca.setLado2Ocupado(true);
-                    return true;
-                }
-            }
-        }
-        var primeiraPeca =  pecasNoTabuleiro.getFirst();
-        if (!pecasNoTabuleiro.getFirst().isLado1Ocupado()) {
-            var tipoCompativel = primeiraPeca.getConexoes1();
 
-            if (peca.getTipo1() == tipoCompativel) {
-                primeiraPeca.setLado1Ocupado(true);
+                // Ocupa os lados da peça
                 peca.setLado1Ocupado(true);
+                if (tipoCompativelLado1.equals(tipo1Peca)){
+                    ultimaPeca.setLado1Ocupado(true);
+                    peca.setRotacao(90);
+                }
+                else ultimaPeca.setLado2Ocupado(true);
+
+                pecasNoTabuleiro.addLast(peca);
+
+                // Girar a peça para encaixar visualmente
+                peca.setRotacao(90);
+
                 return true;
             }
-            if (peca.getTipo2() == tipoCompativel) {
-                primeiraPeca.setLado1Ocupado(true);
+            else if (tiposCompativeis.contains(tipo2Peca)){
+                // Peça é compatível, mas não sabemos o lado que está disponível
+
+                if (!this.pecasNoTabuleiroVerificacao.add(peca)){
+                    System.out.println("Erro: Peça repetida.");
+                    return false;
+                }
+
+                // Ocupa os lados da peça
                 peca.setLado2Ocupado(true);
+                if (tipoCompativelLado1.equals(tipo1Peca)) ultimaPeca.setLado1Ocupado(true);
+                else ultimaPeca.setLado2Ocupado(true);
+
+                pecasNoTabuleiro.addLast(peca);
+
+                // Girar a peça para encaixar visualmente
+                peca.setRotacao(-90);
+
+                return true;
+            }
+        } else  /* No começo */ {
+            // Informações da primeira peça do tabuleiro
+            Peca primeiraPeca =  pecasNoTabuleiro.getFirst();
+            Tipo tipoCompativelLado1 = primeiraPeca.getConexoes1();
+            Tipo tipoCompativelLado2 = primeiraPeca.getConexoes2();
+
+            if (!primeiraPeca.isLado1Ocupado()){
+                tiposCompativeis.add(tipoCompativelLado1);
+            }
+            if (!primeiraPeca.isLado2Ocupado()){
+                tiposCompativeis.add(tipoCompativelLado2);
+            }
+
+            // Informações da peça que vai ser colocada no tabuleiro
+            Tipo tipo1Peca = peca.getTipo1();
+            Tipo tipo2Peca = peca.getTipo2();
+
+            if (tiposCompativeis.contains(tipo1Peca)){
+                // Peça é compatível, mas não sabemos o lado que está disponível
+
+                if (!this.pecasNoTabuleiroVerificacao.add(peca)){
+                    System.out.println("Erro: Peça repetida.");
+                    return false;
+                }
+
+                // Ocupa os lados da peça
+                peca.setLado1Ocupado(true);
+                if (tipoCompativelLado1.equals(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
+                else primeiraPeca.setLado2Ocupado(true);
+
+                pecasNoTabuleiro.addFirst(peca);
+
+                // Girar a peça para encaixar visualmente
+                peca.setRotacao(-90);
+
+                return true;
+            }
+            else if (tiposCompativeis.contains(tipo2Peca)){
+                // Peça é compatível, mas não sabemos o lado que está disponível
+
+                if (!this.pecasNoTabuleiroVerificacao.add(peca)){
+                    System.out.println("Erro: Peça repetida.");
+                    return false;
+                }
+
+                // Ocupa os lados da peça
+                peca.setLado2Ocupado(true);
+                if (tipoCompativelLado1.equals(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
+                else primeiraPeca.setLado2Ocupado(true);
+
+                pecasNoTabuleiro.addFirst(peca);
+
+                // Girar a peça para encaixar visualmente
+                peca.setRotacao(90);
+
                 return true;
             }
         }

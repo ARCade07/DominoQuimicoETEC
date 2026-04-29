@@ -17,8 +17,11 @@ public class PecaVisual extends Image {
 
         // Define um tamanho padrão para a peça (100 de largura por 200 de altura)
         this.setSize(100, 200);
+        this.setOrigin(this.getWidth() / 2, this.getHeight() / 2);
     }
 
+
+    //TODO: possível conflito de rotação
     @Override
     public void draw(Batch batch, float parentAlpha){
         if (this.pecaLogica.getInfo1().equals(this.pecaLogica.getInfo2())){
