@@ -18,8 +18,6 @@ import com.domino.atores.ZonaDeSoltarPeca;
 import com.domino.logica.*;
 import com.domino.texturas.Background;
 
-//import com.domino.textures.Background;
-
 import java.util.List;
 
 public class GameScreen implements Screen {
@@ -31,10 +29,10 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoDireita;
 
     // Texturas
-    Texture texturaZonas;
-    Texture texturaPeca_a_a;
-    Texture texturaPeca_a_b;
-    Texture texturaPeca_b_b;
+    private Texture texturaZonas;
+    private Texture texturaPeca_a_a;
+    private Texture texturaPeca_a_b;
+    private Texture texturaPeca_b_b;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -52,10 +50,10 @@ public class GameScreen implements Screen {
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
-        alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, stage.getHeight() / 2);
+        alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3));
 
         alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
-        alvoDireita.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
+        alvoDireita.setPosition(stage.getWidth() / 2, (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3));
 
         stage.addActor(alvoEsquerda);
         stage.addActor(alvoDireita);
@@ -82,19 +80,36 @@ public class GameScreen implements Screen {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 System.out.println("Peça solta no lado direito");
-
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), true)){
                     // Para debug
                     System.out.println("Compatível");
 
-                    // Move a peça e atualiza a zona
-                    pecaSolta.setPosition(alvoDireita.getX(), alvoDireita.getY());
-                    alvoDireita.setPosition(alvoDireita.getX() + pecaSolta.getWidth(), alvoDireita.getY());
+                    // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
+                    stage.addActor(pecaSolta);
 
-                    // Atualiza a rotação da peça (atualizada na classe Tabuleiro)
+                    // Atualiza rotação da peça (atualizada na classe Tabuleiro)
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
+
+                    final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
+
+                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
+                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
+                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
+                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : 0;
+
+                    //TODO: corrigir eixo Y: deixar peça no meio da zona
+
+                    // Move a peça
+                    pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+
+                    // Atualiza a zona
+                    //if (tabuleiro.primeiraJogada()){
+                        // Se for a primeira jogada, atualiza a outra zona também
+                        //alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoDireita.getY());
+                    //}
+                    alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, alvoDireita.getY());
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -129,18 +144,35 @@ public class GameScreen implements Screen {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 System.out.println("Peça solta no lado esquerdo");
-
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), false)){
                     // Para debug
                     System.out.println("Compatível");
 
-                    // Move a peça e atualiza a zona
-                    pecaSolta.setPosition(alvoEsquerda.getX(), alvoEsquerda.getY());
-                    alvoEsquerda.setPosition(alvoEsquerda.getX() - pecaSolta.getWidth(), alvoEsquerda.getY());
+                    // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
+                    stage.addActor(pecaSolta);
 
+                    // Atualiza rotação
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
+
+                    final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
+
+                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
+                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
+                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
+                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : 0;
+
+                    // Move a peça
+                    pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+
+                    // Atualiza a zona
+                    //if (tabuleiro.primeiraJogada()){
+                    // Se for a primeira jogada, atualiza a outra zona também
+                    //alvoDireita.setPosition(alvoDireita.getX() - larguraVisual, alvoEsquerda.getY());
+                    //}
+                    alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoEsquerda.getY());
+
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -173,7 +205,7 @@ public class GameScreen implements Screen {
     private void inicializarPecas(){
         HorizontalGroup pecasNaMao = new  HorizontalGroup();
         pecasNaMao.space(15);
-        pecasNaMao.setPosition(stage.getWidth() / 3, 200);
+        pecasNaMao.setPosition(stage.getWidth() / 4, 200);
         stage.addActor(pecasNaMao);
 
         // Processo pode ser otimizado. Isso é uma solução prática para poder testar as conexões rapidamente.
@@ -185,8 +217,18 @@ public class GameScreen implements Screen {
         PecaVisual peca_a_b = new PecaVisual(logicaPeca_a_b, texturaPeca_a_b);
         PecaVisual peca_b_b = new PecaVisual(logicaPeca_b_b, texturaPeca_b_b);
 
+        Peca logicaPeca_a_b2 = new Peca("A", Tipo.ACIDO, "B", Tipo.BASE);
+        PecaVisual peca_a_b2 = new PecaVisual(logicaPeca_a_b2, texturaPeca_a_b);
 
-        List<PecaVisual> pecaVisualNaMao = List.of(peca_a_a, peca_a_b, peca_b_b);
+        Peca logicaPeca_a_a2 = new Peca("A", Tipo.ACIDO, "A", Tipo.ACIDO);
+        PecaVisual peca_a_a2 = new PecaVisual(logicaPeca_a_a2, texturaPeca_a_a);
+
+        Peca logicaPeca_a_a3 = new Peca("A", Tipo.ACIDO, "A", Tipo.ACIDO);
+        PecaVisual peca_a_a3 = new PecaVisual(logicaPeca_a_a3, texturaPeca_a_a);
+
+
+        List<PecaVisual> pecaVisualNaMao = List.of(peca_a_a, peca_a_b, peca_b_b, peca_a_a2, peca_a_b2, peca_a_a3);
+
 
         for (PecaVisual pecaVisual : pecaVisualNaMao) {
             pecasNaMao.addActor(pecaVisual);

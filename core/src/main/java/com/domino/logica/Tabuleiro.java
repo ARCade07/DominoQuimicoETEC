@@ -21,7 +21,6 @@ public class Tabuleiro {
 
             return true;
         }
-
         return false;
     }
 
@@ -155,5 +154,9 @@ public class Tabuleiro {
             }
         }
         return false;
+    }
+
+    public boolean primeiraJogada(){
+        return this.pecasNoTabuleiro.size() == 1;
     }
 }

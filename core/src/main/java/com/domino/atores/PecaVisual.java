@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+
 import com.domino.logica.Peca;
 
 public class PecaVisual extends Image {
@@ -11,7 +12,8 @@ public class PecaVisual extends Image {
     private final Sprite sprite;
 
     public PecaVisual(Peca pecaLogica, Texture textura) {
-        super(textura); // O LibGDX já desenha a imagem automaticamente! AINDA BEM
+        // Passa a textura pra desenhar
+        super(textura);
         this.pecaLogica = pecaLogica;
         this.sprite = new Sprite(textura);
 
@@ -21,19 +23,10 @@ public class PecaVisual extends Image {
     }
 
 
-    //TODO: possível conflito de rotação
+
     @Override
     public void draw(Batch batch, float parentAlpha){
-        if (this.pecaLogica.getInfo1().equals(this.pecaLogica.getInfo2())){
-            // Bucha
-            this.setRotation(0);
-        }
-        else if (pecaLogica.isLado2Ocupado() && !pecaLogica.isLado1Ocupado()){
-            this.setRotation(90);
-        }
-        else {
-            this.setRotation(0);
-        }
+        if (this.getPecaLogica().isBucha()) this.setRotation(0);
 
         super.draw(batch, parentAlpha);
     }
