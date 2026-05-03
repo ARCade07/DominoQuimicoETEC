@@ -9,9 +9,13 @@ public class Usuario {
     private String email;
     private String senha;
     private String role;
+    private Estatisticas estat;
 
     // Construtor vazio para o objeto ser recriado quando foi lido do bd
-    public Usuario(){}
+    public Usuario(){
+        // Criano o sub-documento de estatísticas dentro do doc de Usuário no bd
+        this.estat = new Estatisticas();
+    }
 
     // O próprio bd gerá o id
     public Usuario(String nome, String email, String senha, String role) {
@@ -19,6 +23,7 @@ public class Usuario {
         this.email = email;
         this.senha = senha;
         this.role = role;
+        this.estat = new Estatisticas();
     }
 
     public ObjectId getId() {
@@ -59,5 +64,13 @@ public class Usuario {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Estatisticas getEstat() {
+        return estat;
+    }
+
+    public void setEstat(Estatisticas estat) {
+        this.estat = estat;
     }
 }
