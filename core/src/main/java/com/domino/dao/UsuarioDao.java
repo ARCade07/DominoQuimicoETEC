@@ -11,6 +11,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.util.UUID;
 
@@ -98,6 +99,23 @@ public class UsuarioDao {
         }
 
         return converterDocumentoParaUsuario(doc);
+    }
+
+    public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
+        var atualizacoes = Updates.combine(
+            Updates.inc("estatisticas.partidasJogadas", 1),
+            Updates.inc("estatisticas.acertos", quantAcertos),
+            Updates.inc("estatisticas.erros", quantErros)
+        );
+
+        if (ganhou) {
+            atualizacoes = Updates.combine(atualizacoes, Updates.inc("estatisticas.partidasGanhas", 1));
+        }
+        else {
+            atualizacoes = Updates.combine(atualizacoes, Updates.inc("estatisticas.partidasPerdidas", 1));
+        }
+
+        docsUsuarios.updateOne(Filters.eq("_id", idUsuario), atualizacoes);
     }
 
     // metodo para converter BSON (Documento) para Objeto java
