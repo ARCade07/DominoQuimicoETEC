@@ -9,7 +9,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
+
+import java.util.UUID;
 
 public class UsuarioDao {
     // Onde os documentos BSON serão guardados:
@@ -59,6 +62,32 @@ public class UsuarioDao {
             }
             throw e;
         }
+    }
+
+    public Usuario realizarLogin(String email, String senhaDigitada) {
+
+        Usuario usuario = buscarPorEmail(email);
+
+        if (usuario != null) {
+            BCrypt.Result senhaVerificada = BCrypt.verifyer().verify(senhaDigitada.toCharArray(), usuario.getSenha());
+
+            if(senhaVerificada.verified){
+                // Se a senha estiver correta gera um Token único
+                String novoToken = UUID.randomUUID().toString();
+
+                // Token antigo é substituido pelo novo
+                docsUsuarios.updateOne(
+                    Filters.eq("_id", usuario.getId()),
+                    Updates.set("tokenSessao", novoToken)
+                );
+
+                usuario.setTokenSessao(novoToken);
+
+                return usuario;
+            }
+        }
+        // email não existe ou a senha não bate com a do banco
+        return null;
     }
 
     public Usuario buscarPorEmail(String email) {
