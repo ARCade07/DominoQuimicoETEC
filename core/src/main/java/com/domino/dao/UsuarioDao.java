@@ -6,6 +6,7 @@ import com.domino.modelos.Estatisticas;
 import com.domino.modelos.Usuario;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
@@ -58,6 +59,16 @@ public class UsuarioDao {
             }
             throw e;
         }
+    }
+
+    public Usuario buscarPorEmail(String email) {
+        Document doc = docsUsuarios.find(Filters.eq("email", email)).first();
+
+        if (doc == null){
+            return null;
+        }
+
+        return converterDocumentoParaUsuario(doc);
     }
 
     // metodo para converter BSON (Documento) para Objeto java
