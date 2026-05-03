@@ -10,6 +10,7 @@ public class Usuario {
     private String senha;
     private String role;
     private Estatisticas estat;
+    private String tokenSessao;
 
     // Construtor vazio para o objeto ser recriado quando foi lido do bd
     public Usuario(){
@@ -72,5 +73,13 @@ public class Usuario {
 
     public void setEstat(Estatisticas estat) {
         this.estat = estat;
+    }
+
+    public String getTokenSessao() {
+        return tokenSessao;
+    }
+
+    public void setTokenSessao(String tokenSessao) {
+        this.tokenSessao = tokenSessao;
     }
 }
