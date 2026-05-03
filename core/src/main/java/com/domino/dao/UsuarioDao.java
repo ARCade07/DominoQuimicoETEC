@@ -22,4 +22,32 @@ public class UsuarioDao {
         IndexOptions opcoes = new IndexOptions().unique(true);
         this.docsUsuarios.createIndex(Indexes.ascending("email"), opcoes);
     }
+
+
+    // metodo para converter BSON (Documento) para Objeto java
+    private Usuario converterDocumentoParaUsuario(Document doc) {
+        Usuario u = new Usuario();
+
+        // Pega os campos do bd
+        u.setId(doc.getObjectId("_id"));
+        u.setNome(doc.getString("nome"));
+        u.setEmail(doc.getString("email"));
+        u.setSenha(doc.getString("senha"));
+
+        // Pega o sub-documento de estatísticas do bd
+        Document docEstat = (Document) doc.get("estatisticas");
+
+        if(docEstat != null){
+            Estatisticas estat = new Estatisticas();
+            // Pega atributos de estat. O valor padrao é 0 (caso não tenha outro valor).
+            estat.setPartidasJogadas(docEstat.getInteger("partidasJogadas", 0));
+            estat.setPartidasGanhas(docEstat.getInteger("partidasGanhas", 0));
+            estat.setPartidasPerdidas(docEstat.getInteger("partidasPerdidas", 0));
+            estat.setErros(docEstat.getInteger("erros", 0));
+            estat.setAcertos(docEstat.getInteger("acertos", 0));
+
+            u.setEstat(estat);
+        }
+        return u;
+    }
 }
