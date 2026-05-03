@@ -109,6 +109,7 @@ public class UsuarioDao {
         u.setNome(doc.getString("nome"));
         u.setEmail(doc.getString("email"));
         u.setSenha(doc.getString("senha"));
+        u.setTokenSessao(doc.getString("tokenSessao"));
 
         // Pega o sub-documento de estatísticas do bd
         Document docEstat = (Document) doc.get("estatisticas");
