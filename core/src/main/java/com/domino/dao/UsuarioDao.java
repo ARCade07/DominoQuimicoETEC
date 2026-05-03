@@ -1,5 +1,6 @@
 package com.domino.dao;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.domino.bd.ConnectionFactory;
 import com.domino.modelos.Estatisticas;
 import com.domino.modelos.Usuario;
@@ -23,6 +24,41 @@ public class UsuarioDao {
         this.docsUsuarios.createIndex(Indexes.ascending("email"), opcoes);
     }
 
+    public boolean registrarUsuario(Usuario usuario) {
+        // Hash para proteger a senha antes de salvar no banco de dados
+        String hashSenha = BCrypt.withDefaults().hashToString(12, usuario.getSenha().toCharArray());
+
+        // Cria o formato documentos (em BSON) para as estatísticas
+        Document docEstatisticas = new Document("partidasJogadas", 0)
+            .append("partidasGanhas", 0)
+            .append("partidasPerdidas", 0)
+            .append("erros", 0)
+            .append("acertos", 0);
+
+        // Documento para o Usuário
+        Document doc = new Document("nome", usuario.getNome())
+            .append("email", usuario.getEmail())
+            .append("senha", hashSenha)
+            .append("role", usuario.getRole())
+            .append("estatisticas", docEstatisticas);
+
+        try {
+            // Salvo o documento inteiro no banco
+            docsUsuarios.insertOne(doc);
+            // Geração do ID e atribuição ao usuário (objeto java)
+            usuario.setId(doc.getObjectId("_id"));
+            usuario.setSenha(hashSenha);
+            // Cadastro ocorreu sem problemas
+            return true;
+
+        } catch (MongoWriteException e){
+            if (e.getError().getCode() == 11000) {
+                System.out.println("O e-mail " + usuario.getEmail() + " já está em uso.");
+                return false;
+            }
+            throw e;
+        }
+    }
 
     // metodo para converter BSON (Documento) para Objeto java
     private Usuario converterDocumentoParaUsuario(Document doc) {
