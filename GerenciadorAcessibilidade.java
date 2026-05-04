@@ -13,7 +13,7 @@ public class GerenciadorAcessibilidade {
 
     public static ModoVisao modoVisaoAtual = ModoVisao.PADRAO;
 
-    public static Color obterCorFundoPadrao() {
+    public static Color getCorFundoPadrao() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
                 return Color.BLACK;
@@ -25,7 +25,7 @@ public class GerenciadorAcessibilidade {
         }
     }
 
-    public static Color obterCorTextoPadrao() {
+    public static Color getCorTextoPadrao() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
                 return Color.valueOf("FFFF00"); //amarelo brilhante
@@ -34,7 +34,7 @@ public class GerenciadorAcessibilidade {
         }
     }
 
-    public static Color obterCorDestaqueErro() {
+    public static Color getCorDestaqueErro() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
                 return Color.RED;
@@ -47,7 +47,7 @@ public class GerenciadorAcessibilidade {
         }
     }
 
-    public static Color obterCorDestaqueSucesso() {
+    public static Color getCorDestaqueSucesso() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
                 return Color.GREEN;
