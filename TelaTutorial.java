@@ -131,6 +131,23 @@ public class TelaTutorial implements Screen {
         conteudo.add(colunaDireita).width(Value.percentWidth(0.55f, raiz)).top().pad(20).padRight(30);
 
         raiz.add(conteudo).grow().top();
+
+        //teste da acessibilidade, apagar depois
+        TextButton btnTesteAcessibilidade = new TextButton("MODO: " + GerenciadorAcessibilidade.modoVisaoAtual, estiloBotao);
+        btnTesteAcessibilidade.getLabel().setFontScale(0.8f / MULTIPLICADOR_HD);
+
+        btnTesteAcessibilidade.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                int totalModos = GerenciadorAcessibilidade.ModoVisao.values().length;
+                int proximoIndice = (GerenciadorAcessibilidade.modoVisaoAtual.ordinal() + 1) % totalModos;
+                GerenciadorAcessibilidade.modoVisaoAtual = GerenciadorAcessibilidade.ModoVisao.values()[proximoIndice];
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaTutorial());
+            }
+        });
+
+        cabecalho.getCell(lblTitulo).padRight(0);
+        cabecalho.add(btnTesteAcessibilidade).size(230, 50).pad(20).right();
     }
 
 
@@ -290,6 +307,7 @@ public class TelaTutorial implements Screen {
 
         return domino;
     }
+
 
     @Override
     public void render(float delta) {
