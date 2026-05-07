@@ -13,7 +13,8 @@ public class GerenciadorAcessibilidade {
 
     public static ModoVisao modoVisaoAtual = ModoVisao.PADRAO;
 
-    public static Color getCorFundoPadrao() {
+    //cor de fundo de tela
+    public static Color getCorFundoTela() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
                 return Color.BLACK;
@@ -23,6 +24,46 @@ public class GerenciadorAcessibilidade {
             default:
                 return Color.valueOf("F5F5F5"); //branco
         }
+    }
+
+    public static Color getCorFundoCartao() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.BLACK : Color.WHITE;
+    }
+
+    public static Color getCorFundoCaixaDestaqueErro() {
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.BLACK;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("FFE8D6");
+            case TRITANOPIA: return Color.valueOf("FFD9D9");
+            default: return Color.valueOf("FEE1E1");
+        }
+    }
+
+    //cor das bordas e separadores
+    public static Color getCorBordaCartao() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.WHITE : Color.valueOf("D1D5DB");
+    }
+
+    public static Color getCorBordaForte() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.valueOf("333333");
+    }
+
+    //cor do botao
+    public static Color getCorFundoBotaoNormal() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.BLACK : Color.WHITE;
+    }
+
+    public static Color getCorFundoBotaoHover() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.valueOf("333333") : Color.valueOf("E8ECEF");
+    }
+
+    public static Color getCorFundoBotaoDown() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.valueOf("555555") : Color.valueOf("D1D5DB");
+    }
+
+    //cores de texto
+    public static Color getCorTextoTitulo() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.BLACK;
     }
 
     public static Color getCorTextoPadrao() {
