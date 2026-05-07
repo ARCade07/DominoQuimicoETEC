@@ -42,8 +42,6 @@ public class TelaTutorial implements Screen {
         tema = new Skin();
 
 
-
-
         //geradores de fontes
         //cria uma fonte gigante para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNormal = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Medium.ttf"));
@@ -57,7 +55,7 @@ public class TelaTutorial implements Screen {
         BitmapFont fonteNormal = geradorNormal.generateFont(parametroNormal);
         geradorNormal.dispose();
 
-        // Desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
+        //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNormal.setUseIntegerPositions(false);
 
         //cria uma fonte gigante em negrito para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
@@ -72,39 +70,38 @@ public class TelaTutorial implements Screen {
         BitmapFont fonteNegrito = geradorNegrito.generateFont(parametroNegrito);
         geradorNegrito.dispose();
 
-        // Desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
+        //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNegrito.setUseIntegerPositions(false);
 
         //estilos de texto
-        Label.LabelStyle estiloTitulo = new Label.LabelStyle(fonteNegrito, Color.BLACK);
-        Label.LabelStyle estiloSubtitulo = new Label.LabelStyle(fonteNegrito, Color.BLACK);
-        Label.LabelStyle estiloTexto = new Label.LabelStyle(fonteNormal, Color.valueOf("333333"));
-        Label.LabelStyle estiloVerde = new Label.LabelStyle(fonteNormal, Color.valueOf("2E7D32"));
-        Label.LabelStyle estiloVermelho = new Label.LabelStyle(fonteNormal, Color.valueOf("7D0000"));
+        Label.LabelStyle estiloTitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
+        Label.LabelStyle estiloSubtitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
+        Label.LabelStyle estiloTexto = new Label.LabelStyle(fonteNormal, GerenciadorAcessibilidade.getCorTextoPadrao());
+        Label.LabelStyle estiloVerde = new Label.LabelStyle(fonteNormal, GerenciadorAcessibilidade.getCorDestaqueSucesso());
+        Label.LabelStyle estiloVermelho = new Label.LabelStyle(fonteNormal, GerenciadorAcessibilidade.getCorDestaqueErro());
 
         //layout principal
         Table raiz = new Table();
         raiz.setFillParent(true);
-        raiz.setBackground(criarTexturaCor(Color.valueOf("F5F5F5")));
+        raiz.setBackground(criarTexturaCor(GerenciadorAcessibilidade.getCorFundoTela()));
         palco.addActor(raiz);
 
         Table cabecalho = new Table();
 
 
-
         //tudo do botao voltar
         TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
         estiloBotao.font = fonteNegrito;
-        estiloBotao.fontColor = Color.valueOf("7D0000");
+        estiloBotao.fontColor = GerenciadorAcessibilidade.getCorDestaqueErro();
 
         //Botao normal
-        estiloBotao.up = criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("7D0000"), 8, 2);
+        estiloBotao.up = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
 
         //Botao com o mouse em Cima
-        estiloBotao.over = criarBordaArredondadaTextura(Color.valueOf("E8ECEF"), Color.valueOf("7D0000"), 8, 2);
+        estiloBotao.over = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoHover(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
 
         //Botao ao ser clicado
-        estiloBotao.down = criarBordaArredondadaTextura(Color.valueOf("D1D5DB"), Color.valueOf("7D0000"), 8, 2);
+        estiloBotao.down = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoDown(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
 
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotao);
         btnVoltar.getLabel().setFontScale(1f / MULTIPLICADOR_HD);
@@ -158,7 +155,7 @@ public class TelaTutorial implements Screen {
     // componentes da tela, tudo pra baixo sao os cartoes pra colocar os textos
     private Table criarCartaoTexto(String titulo, String texto, Label.LabelStyle estiloTitulo, Label.LabelStyle estiloTexto) {
         Table cartao = new Table();
-        cartao.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("D1D5DB"), 12, 2));
+        cartao.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaCartao(), 12, 2));
         cartao.pad(15);
 
         Label lblTitulo = criarRotulo(titulo, estiloTitulo, 1.0f);
@@ -194,10 +191,10 @@ public class TelaTutorial implements Screen {
         coluna.add(t2).left().padBottom(20).row();
 
         Table caixaDestaque = new Table();
-        caixaDestaque.setBackground(criarBordaArredondadaTextura(Color.valueOf("F9EBEA"), Color.valueOf("922B21"), 12, 2));
+        caixaDestaque.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCaixaDestaqueErro(), GerenciadorAcessibilidade.getCorDestaqueErro(), 12, 2));
         caixaDestaque.pad(15);
 
-        Label.LabelStyle estiloTituloVermelho = new Label.LabelStyle(fonteOriginal, Color.valueOf("922B21"));
+        Label.LabelStyle estiloTituloVermelho = new Label.LabelStyle(fonteOriginal, GerenciadorAcessibilidade.getCorDestaqueErro());
         Label lblCaixaTitulo = criarRotulo("A REGRA MAIS IMPORTANTE:", estiloTituloVermelho, 1.0f);
         lblCaixaTitulo.setAlignment(Align.center);
         caixaDestaque.add(lblCaixaTitulo).row();
@@ -278,13 +275,13 @@ public class TelaTutorial implements Screen {
 
     private Table criarDomino(String textoEsquerda, String textoDireita, Label.LabelStyle estilo) {
         Table domino = new Table();
-        domino.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("333333"), 12, 2));
+        domino.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaForte(), 12, 2));
 
         Label lblEsquerda = criarRotuloComQuebra(textoEsquerda, estilo, 0.70f);
         lblEsquerda.setAlignment(Align.center);
         domino.add(lblEsquerda).expand().fill().pad(5);
 
-        Image separador = new Image(criarTexturaCor(Color.valueOf("333333")));
+        Image separador = new Image(criarTexturaCor(GerenciadorAcessibilidade.getCorBordaForte()));
         domino.add(separador).width(2).growY();
 
         Label lblDireita = criarRotuloComQuebra(textoDireita, estilo, 0.70f);
@@ -296,7 +293,8 @@ public class TelaTutorial implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.96f, 0.96f, 0.96f, 1);
+        Color corFundo = GerenciadorAcessibilidade.getCorFundoTela();
+        Gdx.gl.glClearColor(corFundo.r, corFundo.g, corFundo.b, corFundo.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         palco.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
