@@ -94,17 +94,37 @@ public class TelaTutorial implements Screen {
         estiloBotao.font = fonteNegrito;
         estiloBotao.fontColor = GerenciadorAcessibilidade.getCorDestaqueErro();
 
-        //Botao normal
+        //botao normal
         estiloBotao.up = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
 
-        //Botao com o mouse em Cima
+        //botao com o mouse em Cima
         estiloBotao.over = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoHover(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
 
-        //Botao ao ser clicado
+        //botao ao ser clicado
         estiloBotao.down = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoDown(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+
+        //botao ao ser focado pelo teclado
+        estiloBotao.focused = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorDestaqueFoco(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+        estiloBotao.focusedFontColor = Color.BLACK;
+
+
+
+
+
 
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotao);
         btnVoltar.getLabel().setFontScale(1f / MULTIPLICADOR_HD);
+        GerenciadorAcessibilidade.aplicarFoco(btnVoltar);
+
+
+
+
+
+
+
+
+
+
 
         //teste pra ver se funciona, tirar isso depois
         btnVoltar.addListener(new ClickListener() {
@@ -113,6 +133,10 @@ public class TelaTutorial implements Screen {
                 System.out.println("Voltar funcionando");
             }
         });
+
+
+
+
 
 
 
@@ -132,9 +156,16 @@ public class TelaTutorial implements Screen {
 
         raiz.add(conteudo).grow().top();
 
+
+
+
+
+
+
         //teste da acessibilidade, apagar depois
         TextButton btnTesteAcessibilidade = new TextButton("MODO: " + GerenciadorAcessibilidade.modoVisaoAtual, estiloBotao);
         btnTesteAcessibilidade.getLabel().setFontScale(0.8f / MULTIPLICADOR_HD);
+        GerenciadorAcessibilidade.aplicarFoco(btnTesteAcessibilidade);
 
         btnTesteAcessibilidade.addListener(new ClickListener() {
             @Override
@@ -148,6 +179,17 @@ public class TelaTutorial implements Screen {
 
         cabecalho.getCell(lblTitulo).padRight(0);
         cabecalho.add(btnTesteAcessibilidade).size(230, 50).pad(20).right();
+        GerenciadorAcessibilidade.configurarNavegacao(palco, btnVoltar, btnTesteAcessibilidade);
+
+
+
+
+
+
+
+
+
+
     }
 
 
