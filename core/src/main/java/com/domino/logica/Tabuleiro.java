@@ -29,10 +29,13 @@ public class Tabuleiro {
             if (!this.pecasNoTabuleiroVerificacao.add(peca)) return false;
             this.pecasNoTabuleiro.add(peca);
 
-            peca.setRotacao(90);
+            if (!peca.isBucha()) peca.setRotacao(90);
 
             return true;
         }
+        boolean primeiraJogada = false;
+        if (this.primeiraJogada()) primeiraJogada = true;
+
         List<Tipo> tiposCompativeis = new ArrayList<>();
         if (noFinal){
             // Informações da última peça do tabuleiro
@@ -44,6 +47,12 @@ public class Tabuleiro {
                 tiposCompativeis.add(tipoCompativelLado1);
             }
             if (!ultimaPeca.isLado2Ocupado()){
+                tiposCompativeis.add(tipoCompativelLado2);
+            }
+
+            if (primeiraJogada){
+                // Só olha pro lado direito (final = true)
+                tiposCompativeis.clear();
                 tiposCompativeis.add(tipoCompativelLado2);
             }
 
@@ -62,16 +71,13 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado1Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo1Peca)){
-                    ultimaPeca.setLado1Ocupado(true);
-                    peca.setRotacao(90);
-                }
+                if (tipoCompativelLado1.equals(tipo1Peca)) ultimaPeca.setLado1Ocupado(true);
                 else ultimaPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addLast(peca);
 
                 // Girar a peça para encaixar visualmente
-                peca.setRotacao(90);
+                if(!peca.isBucha()) peca.setRotacao(90);
 
                 return true;
             }
@@ -91,7 +97,7 @@ public class Tabuleiro {
                 pecasNoTabuleiro.addLast(peca);
 
                 // Girar a peça para encaixar visualmente
-                peca.setRotacao(-90);
+                if(!peca.isBucha()) peca.setRotacao(-90);
 
                 return true;
             }
@@ -106,6 +112,12 @@ public class Tabuleiro {
             }
             if (!primeiraPeca.isLado2Ocupado()){
                 tiposCompativeis.add(tipoCompativelLado2);
+            }
+
+            if (primeiraJogada){
+                // Só olha pro lado esquerdo (final = false)
+                tiposCompativeis.clear();
+                tiposCompativeis.add(tipoCompativelLado1);
             }
 
             // Informações da peça que vai ser colocada no tabuleiro
@@ -128,7 +140,7 @@ public class Tabuleiro {
                 pecasNoTabuleiro.addFirst(peca);
 
                 // Girar a peça para encaixar visualmente
-                peca.setRotacao(-90);
+                if(!peca.isBucha()) peca.setRotacao(-90);
 
                 return true;
             }
@@ -148,7 +160,7 @@ public class Tabuleiro {
                 pecasNoTabuleiro.addFirst(peca);
 
                 // Girar a peça para encaixar visualmente
-                peca.setRotacao(90);
+                if(!peca.isBucha()) peca.setRotacao(90);
 
                 return true;
             }

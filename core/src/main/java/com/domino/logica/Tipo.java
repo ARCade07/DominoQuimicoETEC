@@ -5,13 +5,13 @@ public enum Tipo {
     ACIDO("Ácido"){
         @Override
         public Tipo getConexoes(){
-            return Tipo.BASE;
+            return Tipo.ACIDO;
         }
     },
     BASE("Base"){
         @Override
         public Tipo getConexoes(){
-            return Tipo.ACIDO;
+            return Tipo.BASE;
         }
     };
 
