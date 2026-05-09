@@ -1,6 +1,7 @@
 package com.domino.rede;
 
 import com.domino.logica.Tipo;
+import com.domino.rede.packets.PacketJogada;
 import com.esotericsoftware.kryo.Kryo;
 
 public class Registro {
@@ -8,7 +9,7 @@ public class Registro {
     public static void registrarClasses(Kryo kryo){
         // informações sobre o enum de tipo
         kryo.register(Tipo.class);
-        
+        kryo.register(PacketJogada.class);
     }
 
 }
