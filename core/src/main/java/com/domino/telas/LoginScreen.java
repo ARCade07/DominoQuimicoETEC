@@ -20,6 +20,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.domino.bd.ConnectionFactory;
+import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Usuario;
 
 public class LoginScreen implements Screen {
 
@@ -129,7 +132,21 @@ public class LoginScreen implements Screen {
         botaoEntrar.addListener(new ClickListener() {
             //Adicionar função para verificar usuario e senha no banco
             public void clicked(InputEvent event, float x, float y) {
+                String emailDigitado = campoUsername.getText();
+                String senhaDigitada = campoSenha.getText();
 
+                ConnectionFactory conexao = new ConnectionFactory();
+                UsuarioDao usuarioDao = new UsuarioDao(conexao);
+                Usuario usuarioLogado = usuarioDao.realizarLogin(emailDigitado, senhaDigitada);
+                if (usuarioLogado != null) {
+                    System.out.println("Login bem-sucedido! Token: " + usuarioLogado.getTokenSessao());
+
+                    // Vai para a tela do jogo
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new GameScreen());
+                } else {
+                    System.out.println("Erro: E-mail ou senha incorretos!");
+                    campoSenha.setText("");
+                }
             }
         });
         cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(20).center().row();
