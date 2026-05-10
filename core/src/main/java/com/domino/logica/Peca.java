@@ -67,6 +67,22 @@ public class Peca {
         this.rotacao = rotacao;
     }
 
+    public void setTipo1(Tipo tipo1) {
+        this.tipo1 = tipo1;
+    }
+
+    public void setTipo2(Tipo tipo2) {
+        this.tipo2 = tipo2;
+    }
+
+    public void setInfo1(Object info1) {
+        this.info1 = info1;
+    }
+
+    public void setInfo2(Object info2) {
+        this.info2 = info2;
+    }
+
     @Override
     public String toString(){
         return String.format("%s (%s)| %s (%s)", info1, isLado1Ocupado(), info2, isLado2Ocupado());
