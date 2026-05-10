@@ -18,4 +18,14 @@ public class PecaDao {
     public PecaDao(ConnectionFactory connection) {
         this.docsPecas = connection.getDatabase().getCollection("pecas");
     }
+    public Peca converterDocumentoParaPeca(Document doc) {
+        Peca p = new Peca();
+
+        p.setInfo1(doc.getString("info1"));
+        p.setTipo1(Tipo.valueOf(doc.getString("tipo1")));
+        p.setInfo2(doc.getString("info2"));
+        p.setTipo2(Tipo.valueOf(doc.getString("tipo2")));
+
+        return p;
+    }
 }
