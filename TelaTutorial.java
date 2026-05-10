@@ -41,12 +41,11 @@ public class TelaTutorial implements Screen {
         Gdx.input.setInputProcessor(palco);
         tema = new Skin();
 
-
         //geradores de fontes
         //cria uma fonte gigante para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNormal = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Medium.ttf"));
         FreeTypeFontParameter parametroNormal = new FreeTypeFontParameter();
-        parametroNormal.size = (int) (24 * MULTIPLICADOR_HD); // Tamanho real 72
+        parametroNormal.size = (int) (24 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
         parametroNormal.color = Color.WHITE;
         parametroNormal.genMipMaps = true;
         parametroNormal.minFilter = Texture.TextureFilter.MipMapLinearLinear;
@@ -61,7 +60,7 @@ public class TelaTutorial implements Screen {
         //cria uma fonte gigante em negrito para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
         FreeTypeFontParameter parametroNegrito = new FreeTypeFontParameter();
-        parametroNegrito.size = (int) (24 * MULTIPLICADOR_HD); // Tamanho real 72
+        parametroNegrito.size = (int) (24 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
         parametroNegrito.color = Color.WHITE;
         parametroNegrito.genMipMaps = true;
         parametroNegrito.minFilter = Texture.TextureFilter.MipMapLinearLinear;
@@ -86,10 +85,7 @@ public class TelaTutorial implements Screen {
         raiz.setBackground(criarTexturaCor(GerenciadorAcessibilidade.getCorFundoTela()));
         palco.addActor(raiz);
 
-        Table cabecalho = new Table();
-
-
-        //tudo do botao voltar
+        //tudo do botao
         TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
         estiloBotao.font = fonteNegrito;
         estiloBotao.fontColor = GerenciadorAcessibilidade.getCorDestaqueErro();
@@ -107,26 +103,10 @@ public class TelaTutorial implements Screen {
         estiloBotao.focused = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorDestaqueFoco(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
         estiloBotao.focusedFontColor = Color.BLACK;
 
-
-
-
-
-
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotao);
         btnVoltar.getLabel().setFontScale(1f / MULTIPLICADOR_HD);
         GerenciadorAcessibilidade.aplicarFoco(btnVoltar);
 
-
-
-
-
-
-
-
-
-
-
-        //teste pra ver se funciona, tirar isso depois
         btnVoltar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -134,35 +114,7 @@ public class TelaTutorial implements Screen {
             }
         });
 
-
-
-
-
-
-
-        Label lblTitulo = criarRotulo("COMO JOGAR", estiloTitulo, 2.0f);
-
-        cabecalho.add(btnVoltar).size(150, 50).pad(20).left();
-        cabecalho.add(lblTitulo).expandX().center().padRight(150);
-        raiz.add(cabecalho).growX().top().row();
-
-        Table conteudo = new Table();
-
-        Table colunaEsquerda = criarColunaEsquerda(estiloSubtitulo, estiloTexto);
-        Table colunaDireita = criarColunaDireita(estiloSubtitulo, estiloTexto, estiloVerde, estiloVermelho, fonteNormal);
-
-        conteudo.add(colunaEsquerda).width(Value.percentWidth(0.40f, raiz)).top().pad(20).padLeft(30);
-        conteudo.add(colunaDireita).width(Value.percentWidth(0.55f, raiz)).top().pad(20).padRight(30);
-
-        raiz.add(conteudo).grow().top();
-
-
-
-
-
-
-
-        //teste da acessibilidade, apagar depois
+        //teste das cores de daltonismo apagar depois
         TextButton btnTesteAcessibilidade = new TextButton("MODO: " + GerenciadorAcessibilidade.modoVisaoAtual, estiloBotao);
         btnTesteAcessibilidade.getLabel().setFontScale(0.8f / MULTIPLICADOR_HD);
         GerenciadorAcessibilidade.aplicarFoco(btnTesteAcessibilidade);
@@ -177,24 +129,50 @@ public class TelaTutorial implements Screen {
             }
         });
 
-        cabecalho.getCell(lblTitulo).padRight(0);
-        cabecalho.add(btnTesteAcessibilidade).size(230, 50).pad(20).right();
-        GerenciadorAcessibilidade.configurarNavegacao(palco, btnVoltar, btnTesteAcessibilidade);
+        //teste do tamanho das letras apagar depois
+        TextButton btnTesteTamanho = new TextButton("FONTE: " + GerenciadorAcessibilidade.tamanhoFonteAtual, estiloBotao);
+        btnTesteTamanho.getLabel().setFontScale(0.8f / MULTIPLICADOR_HD);
+        GerenciadorAcessibilidade.aplicarFoco(btnTesteTamanho);
 
+        btnTesteTamanho.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                int totalTamanhos = GerenciadorAcessibilidade.TamanhoFonte.values().length;
+                int proximoIndice = (GerenciadorAcessibilidade.tamanhoFonteAtual.ordinal() + 1) % totalTamanhos;
+                GerenciadorAcessibilidade.tamanhoFonteAtual = GerenciadorAcessibilidade.TamanhoFonte.values()[proximoIndice];
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaTutorial());
+            }
+        });
 
+        Table cabecalho = new Table();
+        Label lblTitulo = criarRotulo("COMO JOGAR", estiloTitulo, 2.0f);
 
+        Table caixaEsquerda = new Table();
+        caixaEsquerda.add(btnVoltar).size(150, 50).expandX().left().padLeft(20);
 
+        Table caixaDireita = new Table();
+        caixaDireita.add(btnTesteAcessibilidade).size(230, 50).expandX().right().padRight(20).row();
+        caixaDireita.add(btnTesteTamanho).size(230, 50).expandX().right().padRight(20).padTop(10);
 
+        cabecalho.add(caixaEsquerda).width(300).padTop(20).padBottom(20);
+        cabecalho.add(lblTitulo).expandX().center();
+        cabecalho.add(caixaDireita).width(300).padTop(20).padBottom(20);
 
+        raiz.add(cabecalho).growX().top().row();
 
+        Table conteudo = new Table();
 
+        Table colunaEsquerda = criarColunaEsquerda(estiloSubtitulo, estiloTexto);
+        Table colunaDireita = criarColunaDireita(estiloSubtitulo, estiloTexto, estiloVerde, estiloVermelho, fonteNormal);
 
+        conteudo.add(colunaEsquerda).width(Value.percentWidth(0.40f, raiz)).top().pad(20).padLeft(30);
+        conteudo.add(colunaDireita).width(Value.percentWidth(0.55f, raiz)).top().pad(20).padRight(30);
 
+        raiz.add(conteudo).grow().top();
+
+        GerenciadorAcessibilidade.configurarNavegacao(palco, btnVoltar, btnTesteAcessibilidade, btnTesteTamanho);
     }
 
-
-
-    // daqui ate as proximas tres linhas sem nada em sequencia tem somente ajustes no texto
     // ajusta a qualidade das letras
     private Label criarRotulo(String texto, Label.LabelStyle estilo, float escalaDesejada) {
         Label rotulo = new Label(texto, estilo);
@@ -208,8 +186,6 @@ public class TelaTutorial implements Screen {
         rotulo.setWrap(true);
         return rotulo;
     }
-
-
 
     // componentes da tela, tudo pra baixo sao os cartoes pra colocar os textos
     private Table criarCartaoTexto(String titulo, String texto, Label.LabelStyle estiloTitulo, Label.LabelStyle estiloTexto) {
@@ -231,9 +207,9 @@ public class TelaTutorial implements Screen {
         coluna.top().left();
 
         Label t1 = criarRotulo("1. REGRAS BÁSICAS", estiloSubtitulo, 1.3f);
-        coluna.add(t1).left().padBottom(20).row(); // Espaço alinhado ao topo
+        coluna.add(t1).left().padBottom(20).row();
 
-        // Cartoes alinhados com o conteudo da direita
+        //cartoes alinhados com o conteudo da direita
         coluna.add(criarCartaoTexto("1. OBJETIVO DO JOGO", "Ser o primeiro jogador a ficar sem peças ou ter a maior pontuação final.", estiloSubtitulo, estiloTexto)).growX().padBottom(35).row();
         coluna.add(criarCartaoTexto("2. DISTRIBUIÇÃO E MONTE", "Cada jogador começa com 7 peças. As restantes formam o Monte no canto esquerdo da mesa.", estiloSubtitulo, estiloTexto)).growX().padBottom(30).row();
         coluna.add(criarCartaoTexto("3. O TURNO", "Encaixe uma peça compatível em uma das pontas. Se não tiver, compre do Monte.", estiloSubtitulo, estiloTexto)).growX().row();
@@ -268,6 +244,7 @@ public class TelaTutorial implements Screen {
         coluna.add(criarRotulo("As duas pontas são da função Ácido.", estiloTexto, 1.0f)).left().padBottom(10).row();
 
         Table tabelaAcerto = new Table();
+
         tabelaAcerto.add(criarDomino("Ácido", "HCl", estiloSubtitulo)).size(210, 70);
         tabelaAcerto.add(criarRotulo(" ↔ ", estiloVerde, 1.0f)).pad(10);
         tabelaAcerto.add(criarDomino("Ácido\nClorídrico", "Base", estiloSubtitulo)).size(210, 70);
@@ -277,6 +254,7 @@ public class TelaTutorial implements Screen {
         coluna.add(criarRotulo("NaOH é uma Base e não se conecta com Óxido.", estiloTexto, 1.0f)).left().padBottom(10).row();
 
         Table tabelaErro = new Table();
+
         tabelaErro.add(criarDomino("Sal", "NaOH", estiloSubtitulo)).size(210, 70);
         tabelaErro.add(criarRotulo(" ↔ ", estiloVermelho, 1.0f)).pad(10);
         tabelaErro.add(criarDomino("Óxido", "NaCl", estiloSubtitulo)).size(210, 70);
@@ -350,13 +328,11 @@ public class TelaTutorial implements Screen {
         return domino;
     }
 
-
     @Override
     public void render(float delta) {
         Color corFundo = GerenciadorAcessibilidade.getCorFundoTela();
         Gdx.gl.glClearColor(corFundo.r, corFundo.g, corFundo.b, corFundo.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         palco.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         palco.draw();
     }
