@@ -5,6 +5,11 @@ dependencies {
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
+  implementation 'org.mongodb:mongodb-driver-sync:5.0.0'
+  implementation 'io.github.cdimascio:dotenv-java:3.2.0'
+  implementation 'at.favre.lib:bcrypt:0.10.2'
+  implementation 'com.sun.mail:jakarta.mail:2.0.2'
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
