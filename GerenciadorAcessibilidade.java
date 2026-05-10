@@ -23,7 +23,6 @@ public class GerenciadorAcessibilidade {
 
     public static ModoVisao modoVisaoAtual = ModoVisao.PADRAO;
 
-    //cor de fundo de tela
     public static Color getCorFundoTela() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE:
@@ -34,6 +33,21 @@ public class GerenciadorAcessibilidade {
             default:
                 return Color.valueOf("F5F5F5"); //branco
         }
+    }
+
+    public enum TamanhoFonte {
+        PEQUENO(0.75f),
+        MEDIO(0.85f),
+        GRANDE(1.0f);
+
+        public final float fator;
+        TamanhoFonte(float fator) { this.fator = fator; }
+    }
+
+    public static TamanhoFonte tamanhoFonteAtual = TamanhoFonte.GRANDE;
+
+    public static float getEscalaFonteUsuario() {
+        return tamanhoFonteAtual.fator;
     }
 
     public static Color getCorFundoCartao() {
