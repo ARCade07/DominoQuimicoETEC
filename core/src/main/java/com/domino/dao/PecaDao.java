@@ -18,6 +18,27 @@ public class PecaDao {
     public PecaDao(ConnectionFactory connection) {
         this.docsPecas = connection.getDatabase().getCollection("pecas");
     }
+
+    // Qntd é a quantidade de peças iniciais na mão do jogador
+    public List<Peca> buscarPecasAleatorias(int qntd) {
+        List<Peca> listaDePecas = new ArrayList<>();
+        // try with resources para que a conexão com o banco seja fechada automaticamente.
+        // Aggregate é uma alternativa ao find. Além disso, nele os dados podem passam por diversas etapas
+        // antes de voltar.
+        try (MongoCursor<Document> cursor = docsPecas.aggregate(
+            // Sample é a etapa para pegar aleatoriamente os docs
+            List.of(Aggregates.sample(qntd))).iterator()) {
+            while (cursor.hasNext()){
+                Document doc = cursor.next();
+                Peca peca = converterDocumentoParaPeca(doc);
+                listaDePecas.add(peca);
+            }
+        }
+
+        return listaDePecas;
+
+    }
+
     public Peca converterDocumentoParaPeca(Document doc) {
         Peca p = new Peca();
 
