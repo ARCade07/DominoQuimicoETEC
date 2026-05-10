@@ -15,6 +15,8 @@ public class Peca {
 
     private int rotacao;
 
+    public Peca(){}
+
     public Peca(Object info1, Tipo tipo1, Object info2, Tipo tipo2) {
         this.info1 = info1;
         this.tipo1 = tipo1;
