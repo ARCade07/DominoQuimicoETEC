@@ -276,6 +276,12 @@ public class GameScreen implements Screen {
             dragAndDrop.addSource(new DragAndDrop.Source(pecaVisual) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+
+                    if(!cliente.minhaVez){
+                        System.out.println("Vez de adversário");
+                        return null;
+                    }
+
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(pecaVisual);
 
