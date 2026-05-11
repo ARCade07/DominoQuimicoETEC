@@ -139,12 +139,19 @@ public class LoginScreen implements Screen {
         grupoUsername.add(campoUsername).expandX().fillX().padRight(15);
         cartaoLogin.add(grupoUsername).width(340).height(50).padBottom(40).row();
 
+        //Imagem Senha
+        Texture texturePassword = new Texture(Gdx.files.internal("Cadeado.png"));
 
         //Campo Senha
-        TextField campoSenha = new TextField("", estiloCampoTexto);
+        Table grupoSenha = new Table();
+        grupoSenha.setBackground(criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 8, 2));
+        Image iconeSenhaCampo = new Image(texturePassword);
+        grupoSenha.add(iconeSenhaCampo).size(24, 24).padLeft(5).padRight(10);
+        TextField campoSenha = new TextField("", estiloCampoSemFundo);
         campoSenha.setPasswordMode(true);
         campoSenha.setPasswordCharacter('*');
-        cartaoLogin.add(campoSenha).width(340).height(50).padBottom(20).row();
+        grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
+        cartaoLogin.add(grupoSenha).width(340).height(50).padBottom(40).row();
 
         //Botão Entrar
         TextButton botaoEntrar = new TextButton("Entrar", estiloBotaoEntrar);
