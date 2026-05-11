@@ -21,7 +21,16 @@ public class Servidor {
         Registro.registrarClasses(servidor.getKryo());
 
         servidor.addListener(new Listener(){
+            @Override
+            public void received(Connection connection, Object object) {
+                if (object instanceof PacketJogada) {
+                    PacketJogada jogada = (PacketJogada) object;
 
+
+                    // envia a jogada para todos os jogadores, menos o que enviou
+                    servidor.sendToAllExceptTCP(connection.getID(), jogada);
+                }
+            }
         });
     }
 
