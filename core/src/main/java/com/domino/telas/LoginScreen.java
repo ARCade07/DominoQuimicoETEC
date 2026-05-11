@@ -129,8 +129,16 @@ public class LoginScreen implements Screen {
         cartaoLogin.add(titulo).left().padBottom(40).row();
 
         //Campo Username
-        TextField campoUsername = new TextField("", estiloCampoTexto);
-        cartaoLogin.add(campoUsername).width(340).height(50).padBottom(40).row();
+        Table grupoUsername = new Table();
+        grupoUsername.setBackground(criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 8, 2));
+        Image iconeUserCampo = new Image(texture);
+        grupoUsername.add(iconeUserCampo).size(24, 24).padLeft(5).padRight(10);
+        TextField.TextFieldStyle estiloCampoSemFundo = new TextField.TextFieldStyle(estiloCampoTexto);
+        estiloCampoSemFundo.background = criarTexturaCor(new Color(0, 0, 0, 0));
+        TextField campoUsername = new TextField("", estiloCampoSemFundo);
+        grupoUsername.add(campoUsername).expandX().fillX().padRight(15);
+        cartaoLogin.add(grupoUsername).width(340).height(50).padBottom(40).row();
+
 
         //Campo Senha
         TextField campoSenha = new TextField("", estiloCampoTexto);
