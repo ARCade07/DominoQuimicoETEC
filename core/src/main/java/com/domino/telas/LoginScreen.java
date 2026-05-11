@@ -106,8 +106,7 @@ public class LoginScreen implements Screen {
         //Cria cartão de login
         Table cartaoLogin = new Table();
         cartaoLogin.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("616161"), 8, 2));
-        cartaoLogin.pad(40);
-
+        cartaoLogin.pad(60, 80, 60, 80);
 
         //Título
         Label titulo =  criarRotulo("Login", estiloTextoNormal, 1.8f);
