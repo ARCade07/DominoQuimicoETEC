@@ -15,18 +15,14 @@ public class Cliente {
     Client cliente = new Client();
     private GameScreen gameScreen;
     private String enderecoIP;
+    public boolean minhaVez = false;
 
     public Cliente (GameScreen tela, String enderecoIP){
         this.gameScreen = tela;
         this.enderecoIP = enderecoIP;
 
-
-
-
         // inicia a thread do cliente
         cliente.start();
-
-
 
         try{
             cliente.connect(5000, enderecoIP, 54555, 54777);
@@ -45,6 +41,8 @@ public class Cliente {
                 if(objeto instanceof PacketJogada){
                     final PacketJogada jogada = (PacketJogada) objeto;
 
+                    minhaVez = (jogada.proximoAJogar == conexao.getID());
+
                     // acessa a thread principal do lib e envia para ela a alteração no tabuleiro
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
@@ -60,6 +58,7 @@ public class Cliente {
 
     public void enviarJogada(PacketJogada jogada){
         cliente.sendTCP(jogada);
+        minhaVez = false;
     }
 
     public void fechar(){

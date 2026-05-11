@@ -28,6 +28,8 @@ public class Main extends Game {
                 System.out.println("IP do servidor: " + ip);
                 Cliente cliente = new Cliente(telaJogo, "localhost");
 
+                cliente.minhaVez = true;
+
                 telaJogo.setServidor(servidor);
                 telaJogo.setCliente(cliente);
 

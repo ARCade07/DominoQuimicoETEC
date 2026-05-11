@@ -8,4 +8,5 @@ public class PacketJogada {
     public Tipo tipo1;
     public Tipo tipo2;
     public boolean noFinal;
+    public int proximoAJogar;
 }
