@@ -293,6 +293,63 @@ public class GameScreen implements Screen {
         }
     }
 
+    // pega a textura da peça que foi jogada pelo oponente
+    private Texture getTextura(String info1, String info2) {
+        // caso a peça seja uma bucha
+        if (info1.equals("A") && info2.equals("A")) return texturaPeca_a_a;
+        if (info1.equals("B") && info2.equals("B")) return texturaPeca_b_b;
+
+        // caso mão seja uma bucha
+        if ((info1.equals("A") && info2.equals("B")) || (info1.equals("B") && info2.equals("A"))) {
+            return texturaPeca_a_b;
+        }
+
+        return null;
+    }
+
+    public void receberJogadaRede(PacketJogada jogada) {
+        Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
+
+        if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
+
+            Texture textura = getTextura(jogada.info1, jogada.info2);
+            PecaVisual visualAdversario = new PecaVisual(pecaAdversario, textura);
+
+            stage.addActor(visualAdversario);
+            visualAdversario.setRotation(pecaAdversario.getRotacao());
+
+            // dimensionamento
+            final boolean estaDeitada = visualAdversario.getRotation() == 90 || visualAdversario.getRotation() == -90;
+            final float larguraVisual = estaDeitada ? visualAdversario.getHeight() : visualAdversario.getWidth();
+
+            // posicionamento da peça e da zona
+            if (jogada.noFinal) {
+                final float deslocamentoX = estaDeitada ? (visualAdversario.getWidth() / 2f) : 0;
+                final float deslocamentoY = estaDeitada ? -(visualAdversario.getWidth() / 2f) : -(visualAdversario.getHeight() / 4f);
+
+                alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
+                visualAdversario.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+                alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+
+            } else {
+                final float deslocamentoX = estaDeitada ? (visualAdversario.getWidth() / 2f) : visualAdversario.getWidth();
+                final float deslocamentoY = estaDeitada ? -(visualAdversario.getWidth() / 2f) : -(visualAdversario.getHeight() / 4f);
+
+                alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
+                visualAdversario.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+                alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+            }
+        }
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public void setServidor(Servidor servidor) {
+        this.servidor = servidor;
+    }
+
     @Override
     public void render(float delta) {
         // Limpa a tela com uma cor de fundo (cinza escuro)
@@ -311,6 +368,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        if (cliente != null) cliente.fechar();
+//        if (servidor != null) servidor.fechar();
         stage.dispose(); // Libera a memória ao fechar a tela
     }
 

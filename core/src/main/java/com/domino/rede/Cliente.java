@@ -46,7 +46,14 @@ public class Cliente {
                 if(objeto instanceof PacketJogada){
                     final PacketJogada jogada = (PacketJogada) objeto;
 
-                    
+                    // acessa a thread principal do lib e envia para ela a alteração no tabuleiro
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            // metodo da tela principal que vai receber a jogada do adversário
+                            gameScreen.receberJogadaRede(jogada);
+                        }
+                    });
                 }
             }
         });
