@@ -5,9 +5,12 @@ import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.telas.GameScreen;
 
+import java.util.Scanner;
+
 public class Main extends Game {
 
     private int modoEscolhido; // 1 para Host, 2 para Cliente
+    Scanner scanner = new Scanner(System.in);
 
     public Main(int modoEscolhido) {
         this.modoEscolhido = modoEscolhido;
@@ -21,14 +24,18 @@ public class Main extends Game {
             if (modoEscolhido == 1) {
                 System.out.println("Iniciando como HOST...");
                 Servidor servidor = new Servidor();
-                Cliente cliente = new Cliente(telaJogo);
+                String ip = servidor.obterIPLocal();
+                System.out.println("IP do servidor: " + ip);
+                Cliente cliente = new Cliente(telaJogo, "localhost");
 
                 telaJogo.setServidor(servidor);
                 telaJogo.setCliente(cliente);
 
             } else if (modoEscolhido == 2) {
                 System.out.println("Iniciando como CLIENTE...");
-                Cliente cliente = new Cliente( telaJogo);
+                System.out.println("Digite o IP da sala: ");
+                String ip = scanner.next();
+                Cliente cliente = new Cliente( telaJogo, ip);
                 telaJogo.setCliente(cliente);
             }
         } catch (Exception e) {
@@ -36,7 +43,6 @@ public class Main extends Game {
             e.printStackTrace();
         }
 
-        // Coloca a tela na janela do jogo
         this.setScreen(telaJogo);
     }
 }
