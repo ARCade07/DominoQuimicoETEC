@@ -29,6 +29,8 @@ public class LoginScreen implements Screen {
     private BitmapFont fonteNormal;
     private BitmapFont fonteNegrito;
 
+    private Texture texture;
+
     @Override
     public void show() {
 
@@ -108,6 +110,20 @@ public class LoginScreen implements Screen {
         cartaoLogin.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("616161"), 8, 2));
         cartaoLogin.pad(60, 80, 60, 80);
 
+        //Imagem User
+        texture = new Texture(Gdx.files.internal("User.png"));
+        Image imagemUsuario = new Image(texture);
+        //Fundo da imagem user
+        NinePatchDrawable fundoArredondadoUsuario = criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"),45, 2);
+        Image fundoUsuario = new Image(fundoArredondadoUsuario);
+        //Junta o fundo com a imagem em um stack
+        Stack stackUsuario = new Stack();
+        stackUsuario.add(fundoUsuario);
+        Table tabelaIcone = new Table();
+        tabelaIcone.add(imagemUsuario).size(60, 60);
+        stackUsuario.add(tabelaIcone);
+        cartaoLogin.add(stackUsuario).width(90).height(90).center().padBottom(20).row();
+
         //Título
         Label titulo =  criarRotulo("Login", estiloTextoNormal, 1.8f);
         cartaoLogin.add(titulo).left().padBottom(40).row();
@@ -160,6 +176,7 @@ public class LoginScreen implements Screen {
         stage.dispose();
         if (fonteNormal != null) fonteNormal.dispose();
         if (fonteNegrito != null) fonteNegrito.dispose();
+        if (texture != null) texture.dispose();
     }
 
     private Label criarRotulo(String texto, Label.LabelStyle estilo, float escalaDesejada) {
