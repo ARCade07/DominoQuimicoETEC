@@ -16,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.domino.atores.PecaVisual;
 import com.domino.atores.ZonaDeSoltarPeca;
 import com.domino.logica.*;
+import com.domino.rede.Cliente;
+import com.domino.rede.Servidor;
+import com.domino.rede.packets.PacketJogada;
 import com.domino.texturas.Background;
 
 import java.util.List;
@@ -28,11 +31,17 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
+    private float yOriginalAlvoEsquerda;
+    private float yOriginalAlvoDireita;
+
     // Texturas
     private Texture texturaZonas;
     private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
     private Texture texturaPeca_b_b;
+
+    private Cliente cliente;
+    private Servidor servidor;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -50,11 +59,11 @@ public class GameScreen implements Screen {
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
-        float yOriginalAlvoEsquerda = (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
+        yOriginalAlvoEsquerda = (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
         alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, yOriginalAlvoEsquerda);
 
         alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
-        float yOriginalAlvoDireita = (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3);
+        yOriginalAlvoDireita = (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3);
         alvoDireita.setPosition(stage.getWidth() / 2, yOriginalAlvoDireita);
 
         stage.addActor(alvoEsquerda);
@@ -116,6 +125,18 @@ public class GameScreen implements Screen {
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
+
+                    // pega a peça que foi colocada pelo cliente no tabuleiro
+                    if (cliente != null) {
+                        PacketJogada pacote = new PacketJogada();
+                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
+                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
+                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
+                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.noFinal = true;
+
+                        cliente.enviarJogada(pacote);
+                    }
                 } else {
                     System.out.println("Peça incompatível");
 
@@ -182,6 +203,18 @@ public class GameScreen implements Screen {
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
+
+                    //pega a peça que foi colocada pelo cliente no tabuleiro
+                    if (cliente != null) {
+                        PacketJogada pacote = new PacketJogada();
+                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
+                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
+                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
+                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.noFinal = false;
+
+                        cliente.enviarJogada(pacote);
+                    }
                 } else {
                     System.out.println("Peça incompatível");
 

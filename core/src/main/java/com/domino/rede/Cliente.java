@@ -1,7 +1,10 @@
 package com.domino.rede;
 
+import com.badlogic.gdx.Gdx;
+import com.domino.rede.packets.PacketJogada;
 import com.domino.telas.GameScreen;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
@@ -41,6 +44,10 @@ public class Cliente {
         cliente.addListener(new Listener(){
 
         });
+    }
+
+    public void enviarJogada(PacketJogada jogada){
+        cliente.sendTCP(jogada);
     }
 
     public void fechar(){
