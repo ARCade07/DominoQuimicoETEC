@@ -42,7 +42,13 @@ public class Cliente {
         Registro.registrarClasses(cliente.getKryo());
 
         cliente.addListener(new Listener(){
+            public void received(Connection conexao, Object objeto){
+                if(objeto instanceof PacketJogada){
+                    final PacketJogada jogada = (PacketJogada) objeto;
 
+                    
+                }
+            }
         });
     }
 
