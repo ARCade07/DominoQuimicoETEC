@@ -4,15 +4,33 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.domino.Main;
 
+import java.util.Scanner;
+
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
-        createApplication();
+
+        // --- LÓGICA DO TERMINAL ---
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("***Início de Jogo");
+        System.out.println("1 - Criar Partida");
+        System.out.println("2 - Entrar na Partida ");
+        System.out.print("Sua escolha: ");
+
+        int escolha = 1;
+        try {
+            escolha = scanner.nextInt();
+        } catch (Exception e) {
+            System.out.println("Entrada inválida. Iniciando como Host por padrão.");
+        }
+        // ---------------------------
+
+        createApplication(escolha);
     }
 
-    private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new Main(), getDefaultConfiguration());
+    private static Lwjgl3Application createApplication(int escolha) {
+        return new Lwjgl3Application(new Main(escolha), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
