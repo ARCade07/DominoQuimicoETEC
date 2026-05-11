@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class Servidor {
     private Server servidor;
@@ -32,6 +33,16 @@ public class Servidor {
                 }
             }
         });
+    }
+
+    public String obterIPLocal (){
+        try {
+            // endereço IP da máquina local
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            System.out.println("Erro ao obter seu IP : " + e.getMessage());
+            return "FALHA";
+        }
     }
 
     public void fechar() {
