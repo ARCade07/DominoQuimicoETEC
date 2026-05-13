@@ -15,12 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import com.domino.atores.PecaVisual;
 import com.domino.atores.ZonaDeSoltarPeca;
+import com.domino.bd.ConnectionFactory;
+import com.domino.dao.PecaDao;
 import com.domino.logica.*;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.rede.packets.PacketJogada;
 import com.domino.texturas.Background;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen {
@@ -129,10 +132,7 @@ public class GameScreen implements Screen {
                     // pega a peça que foi colocada pelo cliente no tabuleiro
                     if (cliente != null) {
                         PacketJogada pacote = new PacketJogada();
-                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
-                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
-                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
-                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
                         cliente.enviarJogada(pacote);
@@ -200,17 +200,13 @@ public class GameScreen implements Screen {
                     //}
                     alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
 
-
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
                     //pega a peça que foi colocada pelo cliente no tabuleiro
                     if (cliente != null) {
                         PacketJogada pacote = new PacketJogada();
-                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
-                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
-                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
-                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
                         cliente.enviarJogada(pacote);
@@ -344,7 +340,6 @@ public class GameScreen implements Screen {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-
     public void setServidor(Servidor servidor) {
         this.servidor = servidor;
     }

@@ -9,7 +9,6 @@ import com.mongodb.client.model.Aggregates;
 import org.bson.Document;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PecaDao {
