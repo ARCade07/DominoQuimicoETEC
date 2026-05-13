@@ -177,6 +177,19 @@ public class LoginScreen implements Screen {
         });
         cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(20).center().row();
 
+        //Label Cadastre-se
+        Label linkCadastreSe = new Label("Cadastrar-se", estiloTextoNegrito);
+        linkCadastreSe.setFontScale(0.8f / MULTIPLICADOR_HD);
+        linkCadastreSe.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //Teste para ver se funcionou o clicker (tirar depois)
+                System.out.println("Clicou em Cadastrar-se!");
+                //Função para trocar de tela
+            }
+        });
+        cartaoLogin.add(linkCadastreSe).center().padBottom(20).row();
+
         fundo.add(cartaoLogin).expand().center();
     }
 
