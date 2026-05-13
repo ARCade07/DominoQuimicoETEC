@@ -114,7 +114,7 @@ public class LoginScreen implements Screen {
         texture = new Texture(Gdx.files.internal("User.png"));
         Image imagemUsuario = new Image(texture);
         //Fundo da imagem user
-        NinePatchDrawable fundoArredondadoUsuario = criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"),45, 2);
+        NinePatchDrawable fundoArredondadoUsuario = criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 45, 2);
         Image fundoUsuario = new Image(fundoArredondadoUsuario);
         //Junta o fundo com a imagem em um stack
         Stack stackUsuario = new Stack();
@@ -125,7 +125,7 @@ public class LoginScreen implements Screen {
         cartaoLogin.add(stackUsuario).width(90).height(90).center().padBottom(20).row();
 
         //Título
-        Label titulo =  criarRotulo("Login", estiloTextoNormal, 1.8f);
+        Label titulo = criarRotulo("Login", estiloTextoNormal, 1.8f);
         cartaoLogin.add(titulo).left().padBottom(40).row();
 
         //Campo Username
@@ -152,6 +152,19 @@ public class LoginScreen implements Screen {
         campoSenha.setPasswordCharacter('*');
         grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
         cartaoLogin.add(grupoSenha).width(340).height(50).padBottom(40).row();
+
+        //Label Esqueceu senha
+        Label linkEsqueceuSenha = new Label("Esqueceu a senha?", estiloTextoNegrito);
+        linkEsqueceuSenha.setFontScale(0.6f / MULTIPLICADOR_HD);
+        linkEsqueceuSenha.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //Teste para ver se funcionou o clicker (tirar depois)
+                System.out.println("Clicou em Esqueci a Senha!");
+                //Função para trocar de tela e função de mandar e-mail para troca de senha
+            }
+        });
+        cartaoLogin.add(linkEsqueceuSenha).right().padBottom(20).row();
 
         //Botão Entrar
         TextButton botaoEntrar = new TextButton("Entrar", estiloBotaoEntrar);
