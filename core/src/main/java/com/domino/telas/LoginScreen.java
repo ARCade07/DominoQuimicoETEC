@@ -151,7 +151,7 @@ public class LoginScreen implements Screen {
         campoSenha.setPasswordMode(true);
         campoSenha.setPasswordCharacter('*');
         grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
-        cartaoLogin.add(grupoSenha).width(340).height(50).padBottom(40).row();
+        cartaoLogin.add(grupoSenha).width(340).height(50).padBottom(10).row();
 
         //Label Esqueceu senha
         Label linkEsqueceuSenha = new Label("Esqueceu a senha?", estiloTextoNegrito);
@@ -175,7 +175,7 @@ public class LoginScreen implements Screen {
 
             }
         });
-        cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(20).center().row();
+        cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(15).center().row();
 
         //Label Cadastre-se
         Label linkCadastreSe = new Label("Cadastrar-se", estiloTextoNegrito);
