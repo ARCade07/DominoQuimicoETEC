@@ -16,6 +16,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.domino.atores.PecaVisual;
 import com.domino.atores.ZonaDeSoltarPeca;
 import com.domino.logica.*;
+import com.domino.rede.Cliente;
+import com.domino.rede.Servidor;
+import com.domino.rede.packets.PacketJogada;
 import com.domino.texturas.Background;
 
 import java.util.List;
@@ -28,11 +31,17 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
+    private float yOriginalAlvoEsquerda;
+    private float yOriginalAlvoDireita;
+
     // Texturas
     private Texture texturaZonas;
     private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
     private Texture texturaPeca_b_b;
+
+    private Cliente cliente;
+    private Servidor servidor;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -50,10 +59,12 @@ public class GameScreen implements Screen {
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
-        alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3));
+        yOriginalAlvoEsquerda = (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
+        alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, yOriginalAlvoEsquerda);
 
         alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
-        alvoDireita.setPosition(stage.getWidth() / 2, (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3));
+        yOriginalAlvoDireita = (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3);
+        alvoDireita.setPosition(stage.getWidth() / 2, yOriginalAlvoDireita);
 
         stage.addActor(alvoEsquerda);
         stage.addActor(alvoDireita);
@@ -97,9 +108,10 @@ public class GameScreen implements Screen {
                     // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
                     final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
                     final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : 0;
+                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
 
-                    //TODO: corrigir eixo Y: deixar peça no meio da zona
+                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
+                    alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
 
                     // Move a peça
                     pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
@@ -109,10 +121,22 @@ public class GameScreen implements Screen {
                         // Se for a primeira jogada, atualiza a outra zona também
                         //alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoDireita.getY());
                     //}
-                    alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, alvoDireita.getY());
+                    alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
+
+                    // pega a peça que foi colocada pelo cliente no tabuleiro
+                    if (cliente != null) {
+                        PacketJogada pacote = new PacketJogada();
+                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
+                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
+                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
+                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.noFinal = true;
+
+                        cliente.enviarJogada(pacote);
+                    }
                 } else {
                     System.out.println("Peça incompatível");
 
@@ -160,8 +184,11 @@ public class GameScreen implements Screen {
 
                     // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
                     final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : 0;
+                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : pecaSolta.getWidth();
+                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+
+                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
+                    alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
 
                     // Move a peça
                     pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
@@ -171,11 +198,23 @@ public class GameScreen implements Screen {
                     // Se for a primeira jogada, atualiza a outra zona também
                     //alvoDireita.setPosition(alvoDireita.getX() - larguraVisual, alvoEsquerda.getY());
                     //}
-                    alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoEsquerda.getY());
+                    alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
 
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
+
+                    //pega a peça que foi colocada pelo cliente no tabuleiro
+                    if (cliente != null) {
+                        PacketJogada pacote = new PacketJogada();
+                        pacote.info1 = (String) pecaSolta.getPecaLogica().getInfo1();
+                        pacote.info2 = (String) pecaSolta.getPecaLogica().getInfo2();
+                        pacote.tipo1 = pecaSolta.getPecaLogica().getTipo1();
+                        pacote.tipo2 = pecaSolta.getPecaLogica().getTipo2();
+                        pacote.noFinal = false;
+
+                        cliente.enviarJogada(pacote);
+                    }
                 } else {
                     System.out.println("Peça incompatível");
 
@@ -205,7 +244,7 @@ public class GameScreen implements Screen {
     private void inicializarPecas(){
         HorizontalGroup pecasNaMao = new  HorizontalGroup();
         pecasNaMao.space(15);
-        pecasNaMao.setPosition(stage.getWidth() / 4, 200);
+        pecasNaMao.setPosition(stage.getWidth() / 4, 125);
         stage.addActor(pecasNaMao);
 
         // Processo pode ser otimizado. Isso é uma solução prática para poder testar as conexões rapidamente.
@@ -237,6 +276,12 @@ public class GameScreen implements Screen {
             dragAndDrop.addSource(new DragAndDrop.Source(pecaVisual) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+
+                    if(!cliente.minhaVez){
+                        System.out.println("Vez de adversário");
+                        return null;
+                    }
+
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(pecaVisual);
 
@@ -252,6 +297,63 @@ public class GameScreen implements Screen {
                 }
             });
         }
+    }
+
+    // pega a textura da peça que foi jogada pelo oponente
+    private Texture getTextura(String info1, String info2) {
+        // caso a peça seja uma bucha
+        if (info1.equals("A") && info2.equals("A")) return texturaPeca_a_a;
+        if (info1.equals("B") && info2.equals("B")) return texturaPeca_b_b;
+
+        // caso mão seja uma bucha
+        if ((info1.equals("A") && info2.equals("B")) || (info1.equals("B") && info2.equals("A"))) {
+            return texturaPeca_a_b;
+        }
+
+        return null;
+    }
+
+    public void receberJogadaRede(PacketJogada jogada) {
+        Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
+
+        if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
+
+            Texture textura = getTextura(jogada.info1, jogada.info2);
+            PecaVisual visualAdversario = new PecaVisual(pecaAdversario, textura);
+
+            stage.addActor(visualAdversario);
+            visualAdversario.setRotation(pecaAdversario.getRotacao());
+
+            // dimensionamento
+            final boolean estaDeitada = visualAdversario.getRotation() == 90 || visualAdversario.getRotation() == -90;
+            final float larguraVisual = estaDeitada ? visualAdversario.getHeight() : visualAdversario.getWidth();
+
+            // posicionamento da peça e da zona
+            if (jogada.noFinal) {
+                final float deslocamentoX = estaDeitada ? (visualAdversario.getWidth() / 2f) : 0;
+                final float deslocamentoY = estaDeitada ? -(visualAdversario.getWidth() / 2f) : -(visualAdversario.getHeight() / 4f);
+
+                alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
+                visualAdversario.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+                alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+
+            } else {
+                final float deslocamentoX = estaDeitada ? (visualAdversario.getWidth() / 2f) : visualAdversario.getWidth();
+                final float deslocamentoY = estaDeitada ? -(visualAdversario.getWidth() / 2f) : -(visualAdversario.getHeight() / 4f);
+
+                alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
+                visualAdversario.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+                alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+            }
+        }
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public void setServidor(Servidor servidor) {
+        this.servidor = servidor;
     }
 
     @Override
@@ -272,6 +374,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
+        if (cliente != null) cliente.fechar();
+//        if (servidor != null) servidor.fechar();
         stage.dispose(); // Libera a memória ao fechar a tela
     }
 
