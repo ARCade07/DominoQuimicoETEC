@@ -91,7 +91,7 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado2Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo1Peca)) ultimaPeca.setLado1Ocupado(true);
+                if (tipoCompativelLado1.equals(tipo2Peca)) ultimaPeca.setLado1Ocupado(true);
                 else ultimaPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addLast(peca);
