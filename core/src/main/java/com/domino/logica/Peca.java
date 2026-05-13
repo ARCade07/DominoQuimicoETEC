@@ -1,14 +1,11 @@
 package com.domino.logica;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Peca {
     private Tipo tipo1;
     private Tipo tipo2;
     private boolean lado1Ocupado;
-    private Object info1;
-    private Object info2;
+    private String info1;
+    private String info2;
     private boolean lado2Ocupado;
 
     private boolean isBucha;
@@ -17,7 +14,7 @@ public class Peca {
 
     public Peca(){}
 
-    public Peca(Object info1, Tipo tipo1, Object info2, Tipo tipo2) {
+    public Peca(String info1, Tipo tipo1, String info2, Tipo tipo2) {
         this.info1 = info1;
         this.tipo1 = tipo1;
         this.info2 = info2;
@@ -26,10 +23,10 @@ public class Peca {
         if (info1.equals(info2)) this.isBucha = true;
     }
 
-    public Object getInfo1() {
+    public String getInfo1() {
         return this.info1;
     }
-    public Object getInfo2() {
+    public String getInfo2() {
         return this.info2;
     }
 
@@ -75,11 +72,11 @@ public class Peca {
         this.tipo2 = tipo2;
     }
 
-    public void setInfo1(Object info1) {
+    public void setInfo1(String info1) {
         this.info1 = info1;
     }
 
-    public void setInfo2(Object info2) {
+    public void setInfo2(String info2) {
         this.info2 = info2;
     }
 
