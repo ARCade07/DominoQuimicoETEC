@@ -1,18 +1,16 @@
 package com.domino.logica;
 
 public class Peca {
-    private Tipo tipo1;
-    private Tipo tipo2;
+    private final Tipo tipo1;
+    private final Tipo tipo2;
     private boolean lado1Ocupado;
-    private String info1;
-    private String info2;
+    private final String info1;
+    private final String info2;
     private boolean lado2Ocupado;
 
     private boolean isBucha;
 
     private int rotacao;
-
-    public Peca(){}
 
     public Peca(String info1, Tipo tipo1, String info2, Tipo tipo2) {
         this.info1 = info1;
@@ -33,7 +31,9 @@ public class Peca {
     public boolean isLado1Ocupado() {
         return lado1Ocupado;
     }
-    public void setLado1Ocupado(boolean lado1Ocupado) {this.lado1Ocupado = lado1Ocupado;}
+    public void setLado1Ocupado(boolean lado1Ocupado) {
+        this.lado1Ocupado = lado1Ocupado;
+    }
 
     public boolean isLado2Ocupado() {
         return lado2Ocupado;
@@ -46,6 +46,7 @@ public class Peca {
     public Tipo getTipo2(){
         return this.tipo2;
     }
+
     public Tipo getConexoes1(){
         return this.tipo1.getConexoes();
     }
@@ -62,22 +63,6 @@ public class Peca {
     }
     public void setRotacao(int rotacao){
         this.rotacao = rotacao;
-    }
-
-    public void setTipo1(Tipo tipo1) {
-        this.tipo1 = tipo1;
-    }
-
-    public void setTipo2(Tipo tipo2) {
-        this.tipo2 = tipo2;
-    }
-
-    public void setInfo1(String info1) {
-        this.info1 = info1;
-    }
-
-    public void setInfo2(String info2) {
-        this.info2 = info2;
     }
 
     @Override
