@@ -247,27 +247,20 @@ public class GameScreen implements Screen {
         pecasNaMao.setPosition(stage.getWidth() / 4, 125);
         stage.addActor(pecasNaMao);
 
-        // Processo pode ser otimizado. Isso é uma solução prática para poder testar as conexões rapidamente.
-        Peca logicaPeca_a_a = new Peca("A", Tipo.ACIDO, "A", Tipo.ACIDO);
-        Peca logicaPeca_a_b = new Peca("A", Tipo.ACIDO, "B", Tipo.BASE);
-        Peca logicaPeca_b_b = new Peca("B", Tipo.BASE, "B", Tipo.BASE);
+        List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
 
-        PecaVisual peca_a_a = new PecaVisual(logicaPeca_a_a, texturaPeca_a_a);
-        PecaVisual peca_a_b = new PecaVisual(logicaPeca_a_b, texturaPeca_a_b);
-        PecaVisual peca_b_b = new PecaVisual(logicaPeca_b_b, texturaPeca_b_b);
+        PecaDao p = new PecaDao(new ConnectionFactory());
+        List<Peca> pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
-        Peca logicaPeca_a_b2 = new Peca("A", Tipo.ACIDO, "B", Tipo.BASE);
-        PecaVisual peca_a_b2 = new PecaVisual(logicaPeca_a_b2, texturaPeca_a_b);
+        for (Peca pecaNaMao : pecasLogicasNaMao){
+            String info1 = pecaNaMao.getInfo1();
+            String info2 = pecaNaMao.getInfo2();
 
-        Peca logicaPeca_a_a2 = new Peca("A", Tipo.ACIDO, "A", Tipo.ACIDO);
-        PecaVisual peca_a_a2 = new PecaVisual(logicaPeca_a_a2, texturaPeca_a_a);
+            Texture texturaPeca = this.getTextura(info1, info2);
 
-        Peca logicaPeca_a_a3 = new Peca("A", Tipo.ACIDO, "A", Tipo.ACIDO);
-        PecaVisual peca_a_a3 = new PecaVisual(logicaPeca_a_a3, texturaPeca_a_a);
-
-
-        List<PecaVisual> pecaVisualNaMao = List.of(peca_a_a, peca_a_b, peca_b_b, peca_a_a2, peca_a_b2, peca_a_a3);
-
+            PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaPeca);
+            pecaVisualNaMao.add(pecaVisual);
+        }
 
         for (PecaVisual pecaVisual : pecaVisualNaMao) {
             pecasNaMao.addActor(pecaVisual);

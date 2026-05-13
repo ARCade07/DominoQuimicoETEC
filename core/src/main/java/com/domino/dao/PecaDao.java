@@ -40,13 +40,12 @@ public class PecaDao {
     }
 
     public Peca converterDocumentoParaPeca(Document doc) {
-        Peca p = new Peca();
+        String info1 = doc.getString("info1");
+        Tipo tipo1  = Tipo.valueOf(doc.getString("tipo1"));
 
-        p.setInfo1(doc.getString("info1"));
-        p.setTipo1(Tipo.valueOf(doc.getString("tipo1")));
-        p.setInfo2(doc.getString("info2"));
-        p.setTipo2(Tipo.valueOf(doc.getString("tipo2")));
+        String info2 = doc.getString("info2");
+        Tipo tipo2 = Tipo.valueOf(doc.getString("tipo2"));
 
-        return p;
+        return new Peca(info1, tipo1, info2, tipo2);
     }
 }
