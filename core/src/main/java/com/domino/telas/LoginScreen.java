@@ -32,6 +32,8 @@ public class LoginScreen implements Screen {
     private BitmapFont fonteNormal;
     private BitmapFont fonteNegrito;
 
+    private Texture texture;
+
     @Override
     public void show() {
 
@@ -109,22 +111,50 @@ public class LoginScreen implements Screen {
         //Cria cartão de login
         Table cartaoLogin = new Table();
         cartaoLogin.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("616161"), 8, 2));
-        cartaoLogin.pad(40);
+        cartaoLogin.pad(60, 80, 60, 80);
 
+        //Imagem User
+        texture = new Texture(Gdx.files.internal("User.png"));
+        Image imagemUsuario = new Image(texture);
+        //Fundo da imagem user
+        NinePatchDrawable fundoArredondadoUsuario = criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"),45, 2);
+        Image fundoUsuario = new Image(fundoArredondadoUsuario);
+        //Junta o fundo com a imagem em um stack
+        Stack stackUsuario = new Stack();
+        stackUsuario.add(fundoUsuario);
+        Table tabelaIcone = new Table();
+        tabelaIcone.add(imagemUsuario).size(60, 60);
+        stackUsuario.add(tabelaIcone);
+        cartaoLogin.add(stackUsuario).width(90).height(90).center().padBottom(20).row();
 
         //Título
         Label titulo =  criarRotulo("Login", estiloTextoNormal, 1.8f);
         cartaoLogin.add(titulo).left().padBottom(40).row();
 
         //Campo Username
-        TextField campoUsername = new TextField("", estiloCampoTexto);
-        cartaoLogin.add(campoUsername).width(340).height(50).padBottom(40).row();
+        Table grupoUsername = new Table();
+        grupoUsername.setBackground(criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 8, 2));
+        Image iconeUserCampo = new Image(texture);
+        grupoUsername.add(iconeUserCampo).size(24, 24).padLeft(5).padRight(10);
+        TextField.TextFieldStyle estiloCampoSemFundo = new TextField.TextFieldStyle(estiloCampoTexto);
+        estiloCampoSemFundo.background = criarTexturaCor(new Color(0, 0, 0, 0));
+        TextField campoUsername = new TextField("", estiloCampoSemFundo);
+        grupoUsername.add(campoUsername).expandX().fillX().padRight(15);
+        cartaoLogin.add(grupoUsername).width(340).height(50).padBottom(40).row();
+
+        //Imagem Senha
+        Texture texturePassword = new Texture(Gdx.files.internal("Cadeado.png"));
 
         //Campo Senha
-        TextField campoSenha = new TextField("", estiloCampoTexto);
+        Table grupoSenha = new Table();
+        grupoSenha.setBackground(criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 8, 2));
+        Image iconeSenhaCampo = new Image(texturePassword);
+        grupoSenha.add(iconeSenhaCampo).size(24, 24).padLeft(5).padRight(10);
+        TextField campoSenha = new TextField("", estiloCampoSemFundo);
         campoSenha.setPasswordMode(true);
         campoSenha.setPasswordCharacter('*');
-        cartaoLogin.add(campoSenha).width(340).height(50).padBottom(20).row();
+        grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
+        cartaoLogin.add(grupoSenha).width(340).height(50).padBottom(40).row();
 
         //Botão Entrar
         TextButton botaoEntrar = new TextButton("Entrar", estiloBotaoEntrar);
@@ -178,6 +208,7 @@ public class LoginScreen implements Screen {
         stage.dispose();
         if (fonteNormal != null) fonteNormal.dispose();
         if (fonteNegrito != null) fonteNegrito.dispose();
+        if (texture != null) texture.dispose();
     }
 
     private Label criarRotulo(String texto, Label.LabelStyle estilo, float escalaDesejada) {
