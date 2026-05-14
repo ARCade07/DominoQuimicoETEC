@@ -99,6 +99,17 @@ public class StartScreen implements Screen {
         Image imagemEtec = new Image(texture);
         cabecalho.add(imagemEtec).right().padTop(20);
 
+        //Botão Jogar
+        TextButton botaoJogar = new TextButton("Jogar", estiloBotao);
+        botaoJogar.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        botaoJogar.addListener(new ClickListener() {
+            //Adicionar função para entrar no jogo
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoJogar).width(600).height(100).padBottom(45).center().row();
+
     }
 
     @Override
