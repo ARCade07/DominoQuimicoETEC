@@ -38,7 +38,7 @@ public class TelaTutorial implements Screen {
 
     @Override
     public void show() {
-        palco = new Stage(new FitViewport(1280, 720));
+        palco = new Stage(new FitViewport(1920, 1080));
         Gdx.input.setInputProcessor(palco);
         tema = new Skin();
 
@@ -46,7 +46,7 @@ public class TelaTutorial implements Screen {
         //cria uma fonte gigante para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNormal = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Medium.ttf"));
         FreeTypeFontParameter parametroNormal = new FreeTypeFontParameter();
-        parametroNormal.size = (int) (24 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
+        parametroNormal.size = (int) (36 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
         parametroNormal.color = Color.WHITE;
         parametroNormal.genMipMaps = true;
         parametroNormal.minFilter = Texture.TextureFilter.MipMapLinearLinear;
@@ -69,7 +69,7 @@ public class TelaTutorial implements Screen {
         //cria uma fonte gigante em negrito para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
         FreeTypeFontParameter parametroNegrito = new FreeTypeFontParameter();
-        parametroNegrito.size = (int) (24 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
+        parametroNegrito.size = (int) (36 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
         parametroNegrito.color = Color.WHITE;
         parametroNegrito.genMipMaps = true;
         parametroNegrito.minFilter = Texture.TextureFilter.MipMapLinearLinear;
@@ -113,16 +113,16 @@ public class TelaTutorial implements Screen {
         estiloBotao.fontColor = Color.WHITE;
 
         //botao normal
-        estiloBotao.up = criarBotao3D(corVinho, corSombra, 12, 6);
+        estiloBotao.up = criarBotao3D(corVinho, corSombra, 18, 9);
 
         //botao com o mouse em Cima
-        estiloBotao.over = criarBotao3D(corVinho.cpy().add(0.1f, 0.1f, 0.1f, 0), corSombra, 12, 6);
+        estiloBotao.over = criarBotao3D(corVinho.cpy().add(0.1f, 0.1f, 0.1f, 0), corSombra, 18, 9);
 
         //botao ao ser clicado
-        estiloBotao.down = criarBotao3D(corVinho, corSombra, 12, 2);
+        estiloBotao.down = criarBotao3D(corVinho, corSombra, 18, 3);
 
         //botao ao ser focado pelo teclado
-        estiloBotao.focused = criarBotao3D(GerenciadorAcessibilidade.getCorDestaqueFoco(), Color.valueOf("B8860B"), 12, 6);
+        estiloBotao.focused = criarBotao3D(GerenciadorAcessibilidade.getCorDestaqueFoco(), Color.valueOf("B8860B"), 18, 9);
         estiloBotao.focusedFontColor = Color.BLACK;
 
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotao);
@@ -173,20 +173,20 @@ public class TelaTutorial implements Screen {
         Table layerSuperior = new Table();
         layerSuperior.setFillParent(true);
         layerSuperior.top().left();
-        layerSuperior.add(btnVoltar).width(180).height(65).pad(20);
+        layerSuperior.add(btnVoltar).width(270).height(98).pad(30);
         layerSuperior.add().expandX();
 
         //caixa direita para os testes
         Table caixaTestes = new Table();
-        caixaTestes.add(btnTesteAcessibilidade).width(230).height(50).padRight(15);
-        caixaTestes.add(btnTesteTamanho).width(230).height(50);
-        layerSuperior.add(caixaTestes).pad(20).right();
+        caixaTestes.add(btnTesteAcessibilidade).width(345).height(75).padRight(22);
+        caixaTestes.add(btnTesteTamanho).width(345).height(75);
+        layerSuperior.add(caixaTestes).pad(30).right();
 
         palco.addActor(layerSuperior);
 
         Table cabecalho = new Table();
         Label lblTitulo = criarRotulo("COMO JOGAR", estiloTitulo, 2.0f);
-        cabecalho.add(lblTitulo).expandX().center().padTop(40).padBottom(30);
+        cabecalho.add(lblTitulo).expandX().center().padTop(60).padBottom(45);
 
         raiz.add(cabecalho).growX().top().row();
 
@@ -195,8 +195,8 @@ public class TelaTutorial implements Screen {
         Table colunaEsquerda = criarColunaEsquerda(estiloSubtitulo, estiloTexto);
         Table colunaDireita = criarColunaDireita(estiloSubtitulo, estiloTexto, estiloVerde, estiloVermelho, fonteNormal);
 
-        conteudo.add(colunaEsquerda).width(Value.percentWidth(0.40f, raiz)).top().pad(20).padLeft(30);
-        conteudo.add(colunaDireita).width(Value.percentWidth(0.55f, raiz)).top().pad(20).padRight(30);
+        conteudo.add(colunaEsquerda).width(Value.percentWidth(0.40f, raiz)).top().pad(30).padLeft(45);
+        conteudo.add(colunaDireita).width(Value.percentWidth(0.55f, raiz)).top().pad(30).padRight(45);
 
         raiz.add(conteudo).grow().top();
 
@@ -220,11 +220,11 @@ public class TelaTutorial implements Screen {
     //componentes da tela, tudo pra baixo sao os cartoes pra colocar os textos
     private Table criarCartaoTexto(String titulo, String texto, Label.LabelStyle estiloTitulo, Label.LabelStyle estiloTexto) {
         Table cartao = new Table();
-        cartao.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaCartao(), 12, 2));
-        cartao.pad(15);
+        cartao.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaCartao(), 18, 3));
+        cartao.pad(22);
 
         Label lblTitulo = criarRotulo(titulo, estiloTitulo, 1.0f);
-        cartao.add(lblTitulo).left().padBottom(5).row();
+        cartao.add(lblTitulo).left().padBottom(7).row();
 
         Label lblTexto = criarRotuloComQuebra(texto, estiloTexto, 1.0f);
         cartao.add(lblTexto).growX().left();
@@ -237,11 +237,11 @@ public class TelaTutorial implements Screen {
         coluna.top().left();
 
         Label t1 = criarRotulo("1. REGRAS BÁSICAS", estiloSubtitulo, 1.3f);
-        coluna.add(t1).left().padBottom(20).row();
+        coluna.add(t1).left().padBottom(30).row();
 
         //cartoes alinhados com o conteudo da direita
-        coluna.add(criarCartaoTexto("1. OBJETIVO DO JOGO", "Ser o primeiro jogador a ficar sem peças ou ter a maior pontuação final.", estiloSubtitulo, estiloTexto)).growX().padBottom(35).row();
-        coluna.add(criarCartaoTexto("2. DISTRIBUIÇÃO E MONTE", "Cada jogador começa com 7 peças. As restantes formam o Monte no canto esquerdo da mesa.", estiloSubtitulo, estiloTexto)).growX().padBottom(30).row();
+        coluna.add(criarCartaoTexto("1. OBJETIVO DO JOGO", "Ser o primeiro jogador a ficar sem peças ou ter a maior pontuação final.", estiloSubtitulo, estiloTexto)).growX().padBottom(52).row();
+        coluna.add(criarCartaoTexto("2. DISTRIBUIÇÃO E MONTE", "Cada jogador começa com 7 peças. As restantes formam o Monte no canto esquerdo da mesa.", estiloSubtitulo, estiloTexto)).growX().padBottom(45).row();
         coluna.add(criarCartaoTexto("3. O TURNO", "Encaixe uma peça compatível em uma das pontas. Se não tiver, compre do Monte.", estiloSubtitulo, estiloTexto)).growX().row();
 
         return coluna;
@@ -253,11 +253,11 @@ public class TelaTutorial implements Screen {
         coluna.top().left();
 
         Label t2 = criarRotulo("2. MECÂNICA DE ENCAIXE QUÍMICO", estiloSubtitulo, 1.3f);
-        coluna.add(t2).left().padBottom(20).row();
+        coluna.add(t2).left().padBottom(30).row();
 
         Table caixaDestaque = new Table();
-        caixaDestaque.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCaixaDestaqueErro(), GerenciadorAcessibilidade.getCorDestaqueErro(), 12, 2));
-        caixaDestaque.pad(15);
+        caixaDestaque.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCaixaDestaqueErro(), GerenciadorAcessibilidade.getCorDestaqueErro(), 18, 3));
+        caixaDestaque.pad(22);
 
         Label.LabelStyle estiloTituloVermelho = new Label.LabelStyle(fonteOriginal, GerenciadorAcessibilidade.getCorDestaqueErro());
         Label lblCaixaTitulo = criarRotulo("A REGRA MAIS IMPORTANTE:", estiloTituloVermelho, 1.0f);
@@ -266,28 +266,28 @@ public class TelaTutorial implements Screen {
 
         Label lblCaixaTexto = criarRotuloComQuebra("Conecte peças da MESMA FUNÇÃO INORGÂNICA ou\npor correspondência direta (NOME ↔ FÓRMULA).", estiloTexto, 1.0f);
         lblCaixaTexto.setAlignment(Align.center);
-        caixaDestaque.add(lblCaixaTexto).growX().padTop(5).row();
+        caixaDestaque.add(lblCaixaTexto).growX().padTop(7).row();
 
-        coluna.add(caixaDestaque).growX().padBottom(30).row();
+        coluna.add(caixaDestaque).growX().padBottom(45).row();
 
         coluna.add(criarRotulo("A. ENCAIXE CORRETO (Acerto)", estiloVerde, 1.0f)).left().row();
-        coluna.add(criarRotulo("As duas pontas são da função Ácido.", estiloTexto, 1.0f)).left().padBottom(10).row();
+        coluna.add(criarRotulo("As duas pontas são da função Ácido.", estiloTexto, 1.0f)).left().padBottom(15).row();
 
         Table tabelaAcerto = new Table();
 
-        tabelaAcerto.add(criarDomino("Ácido", "HCl", estiloSubtitulo)).size(210, 70);
-        tabelaAcerto.add(criarRotulo(" ↔ ", estiloVerde, 1.0f)).pad(10);
-        tabelaAcerto.add(criarDomino("Ácido\nClorídrico", "Base", estiloSubtitulo)).size(210, 70);
-        coluna.add(tabelaAcerto).left().padBottom(30).row();
+        tabelaAcerto.add(criarDomino("Ácido", "HCl", estiloSubtitulo)).size(315, 105);
+        tabelaAcerto.add(criarRotulo(" ↔ ", estiloVerde, 1.0f)).pad(15);
+        tabelaAcerto.add(criarDomino("Ácido\nClorídrico", "Base", estiloSubtitulo)).size(315, 105);
+        coluna.add(tabelaAcerto).left().padBottom(45).row();
 
         coluna.add(criarRotulo("B. ENCAIXE INCORRETO (Erro)", estiloVermelho, 1.0f)).left().row();
-        coluna.add(criarRotulo("NaOH é uma Base e não se conecta com Óxido.", estiloTexto, 1.0f)).left().padBottom(10).row();
+        coluna.add(criarRotulo("NaOH é uma Base e não se conecta com Óxido.", estiloTexto, 1.0f)).left().padBottom(15).row();
 
         Table tabelaErro = new Table();
 
-        tabelaErro.add(criarDomino("Sal", "NaOH", estiloSubtitulo)).size(210, 70);
-        tabelaErro.add(criarRotulo(" ↔ ", estiloVermelho, 1.0f)).pad(10);
-        tabelaErro.add(criarDomino("Óxido", "NaCl", estiloSubtitulo)).size(210, 70);
+        tabelaErro.add(criarDomino("Sal", "NaOH", estiloSubtitulo)).size(315, 105);
+        tabelaErro.add(criarRotulo(" ↔ ", estiloVermelho, 1.0f)).pad(15);
+        tabelaErro.add(criarDomino("Óxido", "NaCl", estiloSubtitulo)).size(315, 105);
         coluna.add(tabelaErro).left().row();
 
         return coluna;
@@ -374,18 +374,18 @@ public class TelaTutorial implements Screen {
 
     private Table criarDomino(String textoEsquerda, String textoDireita, Label.LabelStyle estilo) {
         Table domino = new Table();
-        domino.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaForte(), 12, 2));
+        domino.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaForte(), 18, 3));
 
         Label lblEsquerda = criarRotuloComQuebra(textoEsquerda, estilo, 0.70f);
         lblEsquerda.setAlignment(Align.center);
-        domino.add(lblEsquerda).expand().fill().pad(5);
+        domino.add(lblEsquerda).expand().fill().pad(7);
 
         Image separador = new Image(criarTexturaCor(GerenciadorAcessibilidade.getCorBordaForte()));
-        domino.add(separador).width(2).growY();
+        domino.add(separador).width(3).growY();
 
         Label lblDireita = criarRotuloComQuebra(textoDireita, estilo, 0.70f);
         lblDireita.setAlignment(Align.center);
-        domino.add(lblDireita).expand().fill().pad(5);
+        domino.add(lblDireita).expand().fill().pad(7);
 
         return domino;
     }
