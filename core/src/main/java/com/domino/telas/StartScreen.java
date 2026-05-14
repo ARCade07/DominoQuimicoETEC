@@ -78,6 +78,12 @@ public class StartScreen implements Screen {
         fundo.top();
         stage.addActor(fundo);
 
+        //Cabeçalho
+        Table cabecalho = new Table();
+        cabecalho.setFillParent(true);
+        cabecalho.top();
+        stage.addActor(cabecalho);
+
     }
 
     @Override
