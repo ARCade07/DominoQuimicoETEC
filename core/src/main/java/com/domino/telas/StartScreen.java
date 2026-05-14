@@ -72,6 +72,12 @@ public class StartScreen implements Screen {
         estiloBotao.over = criarBordaArredondadaTextura(Color.valueOf("CAAFAF"), Color.valueOf("957474"), 8, 2);
         estiloBotao.down = criarBordaArredondadaTextura(Color.valueOf("F2BDBD"), Color.valueOf("500000"), 8, 2);
 
+        //Fundo
+        Table fundo = new Table();
+        fundo.setFillParent(true);
+        fundo.top();
+        stage.addActor(fundo);
+
     }
 
     @Override
