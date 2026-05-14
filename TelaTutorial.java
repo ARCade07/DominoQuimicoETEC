@@ -52,19 +52,19 @@ public class TelaTutorial implements Screen {
         parametroNormal.minFilter = Texture.TextureFilter.MipMapLinearLinear;
         parametroNormal.magFilter = Texture.TextureFilter.Linear;
         parametroNormal.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←";
+        parametroNormal.borderWidth = 2f;
+        parametroNormal.borderColor = new Color(0, 0, 0, 0);
         BitmapFont fonteNormal = geradorNormal.generateFont(parametroNormal);
+        parametroNormal.padTop = 8;
+        parametroNormal.padBottom = 8;
+        parametroNormal.padLeft = 8;
+        parametroNormal.padRight = 8;
+        parametroNormal.spaceX = 8;
+        parametroNormal.spaceY = 8;
         geradorNormal.dispose();
 
         //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNormal.setUseIntegerPositions(false);
-
-        //resolve o texture bleeding
-        parametroNormal.padTop = 4;
-        parametroNormal.padBottom = 4;
-        parametroNormal.padLeft = 4;
-        parametroNormal.padRight = 4;
-        parametroNormal.spaceX = 4;
-        parametroNormal.spaceY = 4;
 
         //cria uma fonte gigante em negrito para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
@@ -75,19 +75,20 @@ public class TelaTutorial implements Screen {
         parametroNegrito.minFilter = Texture.TextureFilter.MipMapLinearLinear;
         parametroNegrito.magFilter = Texture.TextureFilter.Linear;
         parametroNegrito.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←";
+        parametroNegrito.borderWidth = 2f;
+        parametroNegrito.borderColor = new Color(0, 0, 0, 0);
         BitmapFont fonteNegrito = geradorNegrito.generateFont(parametroNegrito);
-        geradorNegrito.dispose();
+        parametroNegrito.padTop = 8;
+        parametroNegrito.padBottom = 8;
+        parametroNegrito.padLeft = 8;
+        parametroNegrito.padRight = 8;
+        parametroNegrito.spaceX = 8;
+        parametroNegrito.spaceY = 8;
 
         //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNegrito.setUseIntegerPositions(false);
 
-        //resolve o texture bleeding
-        parametroNegrito.padTop = 4;
-        parametroNegrito.padBottom = 4;
-        parametroNegrito.padLeft = 4;
-        parametroNegrito.padRight = 4;
-        parametroNegrito.spaceX = 4;
-        parametroNegrito.spaceY = 4;
+        geradorNegrito.dispose();
 
         //estilos de texto
         Label.LabelStyle estiloTitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
