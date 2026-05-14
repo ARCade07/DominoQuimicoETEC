@@ -121,6 +121,16 @@ public class StartScreen implements Screen {
         });
         fundo.add(botaoConfiguracoes).width(600).height(100).padBottom(45).center().row();
 
+        //Botão Sair
+        TextButton botaoSair = new TextButton("Sair", estiloBotao);
+        botaoSair.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        botaoSair.addListener(new ClickListener() {
+            //Adicionar função para fechar o jogo
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoSair).width(600).height(100).padBottom(45).center().row();
     }
 
     @Override
