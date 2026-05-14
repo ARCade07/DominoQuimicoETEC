@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -57,6 +58,14 @@ public class TelaTutorial implements Screen {
         //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNormal.setUseIntegerPositions(false);
 
+        //resolve o texture bleeding
+        parametroNormal.padTop = 4;
+        parametroNormal.padBottom = 4;
+        parametroNormal.padLeft = 4;
+        parametroNormal.padRight = 4;
+        parametroNormal.spaceX = 4;
+        parametroNormal.spaceY = 4;
+
         //cria uma fonte gigante em negrito para redimensionar sem perder qualidade quando diminuir ou aumentar a tela
         FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
         FreeTypeFontParameter parametroNegrito = new FreeTypeFontParameter();
@@ -72,6 +81,14 @@ public class TelaTutorial implements Screen {
         //desliga o arredondamento de pixels para nao atrapalhar o redimensionamento
         fonteNegrito.setUseIntegerPositions(false);
 
+        //resolve o texture bleeding
+        parametroNegrito.padTop = 4;
+        parametroNegrito.padBottom = 4;
+        parametroNegrito.padLeft = 4;
+        parametroNegrito.padRight = 4;
+        parametroNegrito.spaceX = 4;
+        parametroNegrito.spaceY = 4;
+
         //estilos de texto
         Label.LabelStyle estiloTitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
         Label.LabelStyle estiloSubtitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
@@ -85,22 +102,27 @@ public class TelaTutorial implements Screen {
         raiz.setBackground(criarTexturaCor(GerenciadorAcessibilidade.getCorFundoTela()));
         palco.addActor(raiz);
 
+        //cor do botao 3d
+        Color corVinho = GerenciadorAcessibilidade.getCorDestaqueErro();
+        boolean isAltoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        Color corSombra = isAltoContraste ? Color.DARK_GRAY : Color.valueOf("4D0000");
+
         //tudo do botao
         TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
         estiloBotao.font = fonteNegrito;
-        estiloBotao.fontColor = GerenciadorAcessibilidade.getCorDestaqueErro();
+        estiloBotao.fontColor = Color.WHITE;
 
         //botao normal
-        estiloBotao.up = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+        estiloBotao.up = criarBotao3D(corVinho, corSombra, 12, 6);
 
         //botao com o mouse em Cima
-        estiloBotao.over = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoHover(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+        estiloBotao.over = criarBotao3D(corVinho.cpy().add(0.1f, 0.1f, 0.1f, 0), corSombra, 12, 6);
 
         //botao ao ser clicado
-        estiloBotao.down = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoDown(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+        estiloBotao.down = criarBotao3D(corVinho, corSombra, 12, 2);
 
         //botao ao ser focado pelo teclado
-        estiloBotao.focused = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorDestaqueFoco(), GerenciadorAcessibilidade.getCorDestaqueErro(), 8, 2);
+        estiloBotao.focused = criarBotao3D(GerenciadorAcessibilidade.getCorDestaqueFoco(), Color.valueOf("B8860B"), 12, 6);
         estiloBotao.focusedFontColor = Color.BLACK;
 
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotao);
@@ -110,7 +132,8 @@ public class TelaTutorial implements Screen {
         btnVoltar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Voltar funcionando");
+                btnVoltar.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaRanking());
             }
         });
 
@@ -122,6 +145,7 @@ public class TelaTutorial implements Screen {
         btnTesteAcessibilidade.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                btnTesteAcessibilidade.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
                 int totalModos = GerenciadorAcessibilidade.ModoVisao.values().length;
                 int proximoIndice = (GerenciadorAcessibilidade.modoVisaoAtual.ordinal() + 1) % totalModos;
                 GerenciadorAcessibilidade.modoVisaoAtual = GerenciadorAcessibilidade.ModoVisao.values()[proximoIndice];
@@ -137,6 +161,7 @@ public class TelaTutorial implements Screen {
         btnTesteTamanho.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                btnTesteTamanho.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
                 int totalTamanhos = GerenciadorAcessibilidade.TamanhoFonte.values().length;
                 int proximoIndice = (GerenciadorAcessibilidade.tamanhoFonteAtual.ordinal() + 1) % totalTamanhos;
                 GerenciadorAcessibilidade.tamanhoFonteAtual = GerenciadorAcessibilidade.TamanhoFonte.values()[proximoIndice];
@@ -144,19 +169,24 @@ public class TelaTutorial implements Screen {
             }
         });
 
+        //camada superior com posicao absoluta
+        Table layerSuperior = new Table();
+        layerSuperior.setFillParent(true);
+        layerSuperior.top().left();
+        layerSuperior.add(btnVoltar).width(180).height(65).pad(20);
+        layerSuperior.add().expandX();
+
+        //caixa direita para os testes
+        Table caixaTestes = new Table();
+        caixaTestes.add(btnTesteAcessibilidade).width(230).height(50).padRight(15);
+        caixaTestes.add(btnTesteTamanho).width(230).height(50);
+        layerSuperior.add(caixaTestes).pad(20).right();
+
+        palco.addActor(layerSuperior);
+
         Table cabecalho = new Table();
         Label lblTitulo = criarRotulo("COMO JOGAR", estiloTitulo, 2.0f);
-
-        Table caixaEsquerda = new Table();
-        caixaEsquerda.add(btnVoltar).size(150, 50).expandX().left().padLeft(20);
-
-        Table caixaDireita = new Table();
-        caixaDireita.add(btnTesteAcessibilidade).size(230, 50).expandX().right().padRight(20).row();
-        caixaDireita.add(btnTesteTamanho).size(230, 50).expandX().right().padRight(20).padTop(10);
-
-        cabecalho.add(caixaEsquerda).width(300).padTop(20).padBottom(20);
-        cabecalho.add(lblTitulo).expandX().center();
-        cabecalho.add(caixaDireita).width(300).padTop(20).padBottom(20);
+        cabecalho.add(lblTitulo).expandX().center().padTop(40).padBottom(30);
 
         raiz.add(cabecalho).growX().top().row();
 
@@ -173,21 +203,21 @@ public class TelaTutorial implements Screen {
         GerenciadorAcessibilidade.configurarNavegacao(palco, btnVoltar, btnTesteAcessibilidade, btnTesteTamanho);
     }
 
-    // ajusta a qualidade das letras
+    //ajusta a qualidade das letras
     private Label criarRotulo(String texto, Label.LabelStyle estilo, float escalaDesejada) {
         Label rotulo = new Label(texto, estilo);
         rotulo.setFontScale(escalaDesejada / MULTIPLICADOR_HD);
         return rotulo;
     }
 
-    // quebra de linha automatica
+    //quebra de linha automatica
     private Label criarRotuloComQuebra(String texto, Label.LabelStyle estilo, float escalaDesejada) {
         Label rotulo = criarRotulo(texto, estilo, escalaDesejada);
         rotulo.setWrap(true);
         return rotulo;
     }
 
-    // componentes da tela, tudo pra baixo sao os cartoes pra colocar os textos
+    //componentes da tela, tudo pra baixo sao os cartoes pra colocar os textos
     private Table criarCartaoTexto(String titulo, String texto, Label.LabelStyle estiloTitulo, Label.LabelStyle estiloTexto) {
         Table cartao = new Table();
         cartao.setBackground(criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), GerenciadorAcessibilidade.getCorBordaCartao(), 12, 2));
@@ -271,6 +301,38 @@ public class TelaTutorial implements Screen {
         textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         mapaPixels.dispose();
         return new TextureRegionDrawable(textura);
+    }
+
+    //cria botao com profundidade 3d
+    private NinePatchDrawable criarBotao3D(Color corCorpo, Color corSombra, int raio, int profundidade) {
+        int escala = 4;
+        int t = 100 * escala;
+        int r = raio * escala;
+        int p = profundidade * escala;
+
+        Pixmap pix = new Pixmap(t, t, Pixmap.Format.RGBA8888);
+        pix.setBlending(Pixmap.Blending.None);
+
+        //desenha a sombra
+        pix.setColor(corSombra);
+        pix.fillCircle(r, t-r-1, r); pix.fillCircle(t-r-1, t-r-1, r);
+        pix.fillRectangle(r, t-2*r, t-2*r, 2*r);
+        pix.fillRectangle(0, t-r-1-p, t, p);
+
+        //desenha o corpo
+        pix.setColor(corCorpo);
+        pix.fillCircle(r, r, r); pix.fillCircle(t-r-1, r, r);
+        pix.fillCircle(r, t-r-1-p, r); pix.fillCircle(t-r-1, t-r-1-p, r);
+        pix.fillRectangle(r, 0, t-2*r, t-p);
+        pix.fillRectangle(0, r, t, t-2*r-p);
+
+        Texture tex = new Texture(pix, true);
+        tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        pix.dispose();
+
+        NinePatch np = new NinePatch(tex, r, r, r, r + p);
+        np.scale(1f/escala, 1f/escala);
+        return new NinePatchDrawable(np);
     }
 
     private NinePatchDrawable criarBordaArredondadaTextura(Color corFundo, Color corBorda, int raio, int tamanhoBorda) {
