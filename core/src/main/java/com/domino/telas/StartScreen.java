@@ -60,6 +60,10 @@ public class StartScreen implements Screen {
         geradorNegrito.dispose();
         fonteNegrito.setUseIntegerPositions(false);
 
+        //Estilos textos
+        Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("7D0000"));
+        Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("7D0000"));
+
     }
 
     @Override
