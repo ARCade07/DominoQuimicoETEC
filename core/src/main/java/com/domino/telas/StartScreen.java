@@ -94,6 +94,11 @@ public class StartScreen implements Screen {
         Image imagemChemDom = new Image(texture);
         fundo.add(imagemChemDom).center().row();
 
+        //Imagem Etec
+        texture = new Texture(Gdx.files.internal("etec_ra_metropolitana_sp_santo_andre_etec_julio_de_mesquita_cor 1.png"));
+        Image imagemEtec = new Image(texture);
+        cabecalho.add(imagemEtec).right().padTop(20);
+
     }
 
     @Override
