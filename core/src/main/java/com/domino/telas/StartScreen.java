@@ -64,6 +64,14 @@ public class StartScreen implements Screen {
         Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("7D0000"));
         Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("7D0000"));
 
+        //Estilo Botão
+        TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
+        estiloBotao.font = fonteNormal;
+        estiloBotao.fontColor = Color.valueOf("7D0000");
+        estiloBotao.up = criarBordaArredondadaTextura(Color.valueOf("F4E7E7"), Color.valueOf("7D0000"), 8, 2);
+        estiloBotao.over = criarBordaArredondadaTextura(Color.valueOf("CAAFAF"), Color.valueOf("957474"), 8, 2);
+        estiloBotao.down = criarBordaArredondadaTextura(Color.valueOf("F2BDBD"), Color.valueOf("500000"), 8, 2);
+
     }
 
     @Override
