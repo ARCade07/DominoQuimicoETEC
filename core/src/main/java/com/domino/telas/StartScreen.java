@@ -110,6 +110,17 @@ public class StartScreen implements Screen {
         });
         fundo.add(botaoJogar).width(600).height(100).padBottom(45).center().row();
 
+        //Botão Configurações
+        TextButton botaoConfiguracoes = new TextButton("Configurações", estiloBotao);
+        botaoConfiguracoes.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        botaoConfiguracoes.addListener(new ClickListener() {
+            //Adicionar função para entrar na tela de acessibilidade
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoConfiguracoes).width(600).height(100).padBottom(45).center().row();
+
     }
 
     @Override
