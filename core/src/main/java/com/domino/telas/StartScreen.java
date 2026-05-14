@@ -159,4 +159,42 @@ public class StartScreen implements Screen {
         if (fonteNegrito != null) fonteNegrito.dispose();
         if (texture != null) texture.dispose();
     }
+
+    private NinePatchDrawable criarBordaArredondadaTextura(Color corFundo, Color corBorda, int raio, int tamanhoBorda) {
+        int escala = 4;
+        int tamanho = 100 * escala;
+        int r = raio * escala;
+        int b = tamanhoBorda * escala;
+
+        Pixmap mapaPixels = new Pixmap(tamanho, tamanho, Pixmap.Format.RGBA8888);
+        mapaPixels.setBlending(Pixmap.Blending.None);
+
+        mapaPixels.setColor(corBorda);
+        mapaPixels.fillCircle(r, r, r);
+        mapaPixels.fillCircle(tamanho - r - 1, r, r);
+        mapaPixels.fillCircle(r, tamanho - r - 1, r);
+        mapaPixels.fillCircle(tamanho - r - 1, tamanho - r - 1, r);
+        mapaPixels.fillRectangle(r, 0, tamanho - 2 * r, tamanho);
+        mapaPixels.fillRectangle(0, r, tamanho, tamanho - 2 * r);
+
+        mapaPixels.setColor(corFundo);
+        int raioInterno = r - b;
+        if (raioInterno < 0) raioInterno = 0;
+        mapaPixels.fillCircle(r, r, raioInterno);
+        mapaPixels.fillCircle(tamanho - r - 1, r, raioInterno);
+        mapaPixels.fillCircle(r, tamanho - r - 1, raioInterno);
+        mapaPixels.fillCircle(tamanho - r - 1, tamanho - r - 1, raioInterno);
+        mapaPixels.fillRectangle(r, b, tamanho - 2 * r, tamanho - 2 * b);
+        mapaPixels.fillRectangle(b, r, tamanho - 2 * b, tamanho - 2 * r);
+
+        Texture textura = new Texture(mapaPixels, true);
+        textura.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        mapaPixels.dispose();
+
+        NinePatch remendo = new NinePatch(textura, r, r, r, r);
+        remendo.scale(1f / escala, 1f / escala);
+
+        return new NinePatchDrawable(remendo);
+    }
+
 }
