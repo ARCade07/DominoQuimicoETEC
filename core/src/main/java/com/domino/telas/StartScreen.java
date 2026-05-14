@@ -89,6 +89,11 @@ public class StartScreen implements Screen {
         Image imagemLogo = new Image(texture);
         cabecalho.add(imagemLogo).expandX().left().padTop(20);
 
+        //Imagem ChemDom
+        texture = new Texture(Gdx.files.internal("chemdom.png"));
+        Image imagemChemDom = new Image(texture);
+        fundo.add(imagemChemDom).center().row();
+
     }
 
     @Override
