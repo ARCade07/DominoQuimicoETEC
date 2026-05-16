@@ -2,6 +2,7 @@ package com.domino.rede;
 
 import com.domino.logica.Tipo;
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketPrimeiroJogador;
 import com.domino.rede.packets.PacketQuantidadePecas;
 import com.esotericsoftware.kryo.Kryo;
 
@@ -12,6 +13,7 @@ public class Registro {
         kryo.register(Tipo.class);
         kryo.register(PacketJogada.class);
         kryo.register(PacketQuantidadePecas.class);
+        kryo.register(PacketPrimeiroJogador.class);
     }
 
 }
