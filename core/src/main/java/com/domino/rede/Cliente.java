@@ -2,6 +2,7 @@ package com.domino.rede;
 
 import com.badlogic.gdx.Gdx;
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketPrimeiroJogador;
 import com.domino.rede.packets.PacketQuantidadePecas;
 import com.domino.telas.GameScreen;
 import com.esotericsoftware.kryonet.Client;
@@ -53,7 +54,10 @@ public class Cliente {
                         }
                     });
                 }
-
+                if(objeto instanceof PacketPrimeiroJogador){
+                    minhaVez = true;
+                    System.out.println("Você começa");
+                }
             }
         });
     }

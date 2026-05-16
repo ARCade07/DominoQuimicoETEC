@@ -1,6 +1,7 @@
 package com.domino.rede;
 
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketPrimeiroJogador;
 import com.domino.rede.packets.PacketQuantidadePecas;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Servidor {
     private Server servidor;
@@ -68,6 +70,18 @@ public class Servidor {
             System.out.println("Erro ao obter seu IP : " + e.getMessage());
             return "FALHA";
         }
+    }
+
+    public void decidirQuemComeca(){
+        Random random = new Random();
+
+        int indiceAleatorio = random.nextInt(jogadoresConectados.size());
+        int quemComeca = jogadoresConectados.get(indiceAleatorio);
+
+        PacketPrimeiroJogador primeiroJogador = new PacketPrimeiroJogador();
+
+
+        servidor.sendToTCP(quemComeca, primeiroJogador);
     }
 
     public void fechar() {
