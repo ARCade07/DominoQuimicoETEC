@@ -2,6 +2,7 @@ package com.domino.rede;
 
 import com.badlogic.gdx.Gdx;
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketQuantidadePecas;
 import com.domino.telas.GameScreen;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -52,6 +53,7 @@ public class Cliente {
                         }
                     });
                 }
+
             }
         });
     }
@@ -59,6 +61,10 @@ public class Cliente {
     public void enviarJogada(PacketJogada jogada){
         cliente.sendTCP(jogada);
         minhaVez = false;
+    }
+
+    public void enviarQuantidadePecas(PacketQuantidadePecas quantidade){
+        cliente.sendTCP(quantidade);
     }
 
     public void fechar(){
