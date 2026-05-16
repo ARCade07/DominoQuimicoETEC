@@ -1,6 +1,7 @@
 package com.domino.rede;
 
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketQuantidadePecas;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -45,6 +46,15 @@ public class Servidor {
 
                     // envia a jogada para todos os jogadores, menos o que enviou
                     servidor.sendToAllExceptTCP(connection.getID(), jogada);
+                }
+
+                if(object instanceof PacketQuantidadePecas){
+                    PacketQuantidadePecas quantidadePecas = (PacketQuantidadePecas) object;
+
+                    int quemEnviou = connection.getID();
+
+                    quantidadePecas.jogador = quemEnviou;
+                    servidor.sendToAllExceptTCP(quemEnviou, quantidadePecas);
                 }
             }
         });
