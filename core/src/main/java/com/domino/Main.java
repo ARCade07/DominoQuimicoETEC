@@ -29,7 +29,13 @@ public class Main extends Game {
                 System.out.println("IP do servidor: " + ip);
                 Cliente cliente = new Cliente(telaJogo, "localhost");
 
-                cliente.minhaVez = true;
+                try{
+                    Thread.sleep(30000);
+                    servidor.decidirQuemComeca();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
 
                 telaJogo.setServidor(servidor);
                 telaJogo.setCliente(cliente);
