@@ -21,6 +21,7 @@ import com.domino.logica.*;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketQuantidadePecas;
 import com.domino.texturas.Background;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class GameScreen implements Screen {
 
     private Cliente cliente;
     private Servidor servidor;
+    private int quantidadePecas = 7;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -129,13 +131,21 @@ public class GameScreen implements Screen {
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
-                    // pega a peça que foi colocada pelo cliente no tabuleiro
+
                     if (cliente != null) {
+                        // pega a peça que foi colocada pelo cliente no tabuleiro
                         PacketJogada pacote = new PacketJogada();
                         pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
                         cliente.enviarJogada(pacote);
+
+                        // atualiza a quantidade de peças para os outros jogadores
+                        PacketQuantidadePecas atualizaQuantidade = new PacketQuantidadePecas();
+                        quantidadePecas--;
+                        atualizaQuantidade.quantidadePecas = quantidadePecas;
+
+                        cliente.enviarQuantidadePecas(atualizaQuantidade);
                     }
                 } else {
                     System.out.println("Peça incompatível");
@@ -203,13 +213,21 @@ public class GameScreen implements Screen {
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
-                    //pega a peça que foi colocada pelo cliente no tabuleiro
+
                     if (cliente != null) {
+                        //pega a peça que foi colocada pelo cliente no tabuleiro
                         PacketJogada pacote = new PacketJogada();
                         pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
                         cliente.enviarJogada(pacote);
+
+                        // atualiza a quantidade de peças para os outros jogadores
+                        PacketQuantidadePecas atualizaQuantidade = new PacketQuantidadePecas();
+                        quantidadePecas--;
+                        atualizaQuantidade.quantidadePecas = quantidadePecas;
+
+                        cliente.enviarQuantidadePecas(atualizaQuantidade);
                     }
                 } else {
                     System.out.println("Peça incompatível");
