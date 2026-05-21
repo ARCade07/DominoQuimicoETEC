@@ -10,7 +10,6 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 public class Cliente {
     // instancia o cliente
@@ -45,14 +44,18 @@ public class Cliente {
 
                     minhaVez = (jogada.proximoAJogar == conexao.getID());
 
-                    // acessa a thread principal do lib e envia para ela a alteração no tabuleiro
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            // metodo da tela principal que vai receber a jogada do adversário
-                            gameScreen.receberJogadaRede(jogada);
-                        }
-                    });
+                    // caso a jogada seja válida
+                    if(jogada.info1 != null){
+                        // acessa a thread principal do lib e envia para ela a alteração no tabuleiro
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                // metodo da tela principal que vai receber a jogada do adversário
+                                gameScreen.receberJogadaRede(jogada);
+                            }
+                        });
+                    }
+
                 }
                 if(objeto instanceof PacketPrimeiroJogador){
                     minhaVez = true;
