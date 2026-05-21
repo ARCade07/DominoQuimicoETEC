@@ -108,7 +108,7 @@ public class LoginScreen implements Screen {
 
         //Cria cartão de login
         Table cartaoLogin = new Table();
-        cartaoLogin.setBackground(criarBordaArredondadaTextura(Color.WHITE, Color.valueOf("616161"), 8, 2));
+        cartaoLogin.setBackground(criarBordaArredondadaTextura(Color.valueOf("1A0404"), Color.valueOf("500000"), 8, 2));
         cartaoLogin.pad(60, 80, 60, 80);
 
         //Imagem User
