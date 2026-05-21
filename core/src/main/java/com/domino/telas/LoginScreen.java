@@ -103,7 +103,7 @@ public class LoginScreen implements Screen {
         //Cria fundo gradiente
         Table fundo = new Table();
         fundo.setFillParent(true);
-        fundo.setBackground(criarTexturaGradiente(Color.WHITE, Color.valueOf("FF9797")));
+        fundo.setBackground(criarTexturaGradiente(Color.valueOf("4A0000"), Color.valueOf("0D0202")));
         stage.addActor(fundo);
 
         //Cria cartão de login
