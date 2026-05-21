@@ -87,7 +87,7 @@ public class StartScreen implements Screen {
         //Imagem Logo CPS
         texture = new Texture(Gdx.files.internal("logo_cps_versao_br.png"));
         Image imagemLogo = new Image(texture);
-        cabecalho.add(imagemLogo).expandX().left().padTop(20);
+        cabecalho.add(imagemLogo).expandX().left().padTop(20).padLeft(20);
 
         //Imagem ChemDom
         texture = new Texture(Gdx.files.internal("chemdom.png"));
@@ -97,7 +97,7 @@ public class StartScreen implements Screen {
         //Imagem Etec
         texture = new Texture(Gdx.files.internal("etec_ra_metropolitana_sp_santo_andre_etec_julio_de_mesquita_cor 1.png"));
         Image imagemEtec = new Image(texture);
-        cabecalho.add(imagemEtec).right().padTop(20);
+        cabecalho.add(imagemEtec).right().padTop(20).padRight(20);
 
         //Botão Jogar
         TextButton botaoJogar = new TextButton("Jogar", estiloBotao);
