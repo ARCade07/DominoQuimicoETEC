@@ -134,8 +134,8 @@ public class GameScreen implements Screen {
 
                     if (cliente != null) {
                         // pega a peça que foi colocada pelo cliente no tabuleiro
-                        PacketJogada pacote = new PacketJogada();
-                        pacote.copiarPeca(pecaSolta.getPecaLogica());
+                        PacketJogada pacote = new PacketJogada(pecaSolta.getPecaLogica());
+//                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
                         cliente.enviarJogada(pacote);
@@ -158,6 +158,10 @@ public class GameScreen implements Screen {
 
                     pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
+
+                    if(cliente != null){
+                        passarVez();
+                    }
 
                 }
             }
@@ -216,8 +220,8 @@ public class GameScreen implements Screen {
 
                     if (cliente != null) {
                         //pega a peça que foi colocada pelo cliente no tabuleiro
-                        PacketJogada pacote = new PacketJogada();
-                        pacote.copiarPeca(pecaSolta.getPecaLogica());
+                        PacketJogada pacote = new PacketJogada(pecaSolta.getPecaLogica());
+//                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
                         cliente.enviarJogada(pacote);
@@ -241,11 +245,20 @@ public class GameScreen implements Screen {
                     pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
 
+                    if(cliente != null){
+                        passarVez();
+                    }
+
                 }
 
             }
         });
         this.inicializarPecas();
+    }
+
+    private void passarVez(){
+        PacketJogada pacote = new PacketJogada();
+        cliente.enviarJogada(pacote);
     }
 
     private void inicilizarTexturas(){
