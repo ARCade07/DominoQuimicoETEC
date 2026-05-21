@@ -4,6 +4,7 @@ import com.domino.logica.Tipo;
 import com.domino.logica.Peca;
 
 public class PacketJogada {
+//    public boolean jogadaValida;
     public String info1;
     public String info2;
     public Tipo tipo1;
@@ -14,7 +15,11 @@ public class PacketJogada {
     public int rotacao;
     public boolean isBucha;
 
-    public void copiarPeca(Peca p){
+    public PacketJogada(){
+
+    }
+
+    public PacketJogada(Peca p){
         this.info1 = p.getInfo1();
         this.info2 = p.getInfo2();
         this.tipo1 = p.getTipo1();
@@ -22,4 +27,13 @@ public class PacketJogada {
         this.rotacao = p.getRotacao();
         this.isBucha = p.isBucha();
     }
+
+//    public void copiarPeca(Peca p){
+//        this.info1 = p.getInfo1();
+//        this.info2 = p.getInfo2();
+//        this.tipo1 = p.getTipo1();
+//        this.tipo2 = p.getTipo2();
+//        this.rotacao = p.getRotacao();
+//        this.isBucha = p.isBucha();
+//    }
 }
