@@ -100,8 +100,13 @@ public class StartScreen implements Screen {
         cabecalho.add(imagemEtec).right().padTop(20).padRight(20);
 
         //Botão Jogar
-        TextButton botaoJogar = new TextButton("Jogar", estiloBotao);
-        botaoJogar.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        Button botaoJogar = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("play.png"));
+        Image iconeJogar = new Image(texture);
+        botaoJogar.add(iconeJogar).size(55, 55).padLeft(15).padRight(10);
+        Label textoJogar = new Label("Jogar", estiloTextoNormal);
+        textoJogar.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoJogar.add(textoJogar).expandX().padLeft(-25);
         botaoJogar.addListener(new ClickListener() {
             //Adicionar função para entrar no jogo
             public void clicked(InputEvent event, float x, float y) {
@@ -111,8 +116,13 @@ public class StartScreen implements Screen {
         fundo.add(botaoJogar).width(600).height(100).padBottom(45).center().row();
 
         //Botão Configurações
-        TextButton botaoConfiguracoes = new TextButton("Configurações", estiloBotao);
-        botaoConfiguracoes.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        Button botaoConfiguracoes = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("configuracoes.png"));
+        Image iconeConfiguracoes = new Image(texture);
+        botaoConfiguracoes.add(iconeConfiguracoes).size(55, 55).padLeft(15).padRight(10);
+        Label textoConfiguracoes = new Label("Configuracoes", estiloTextoNormal);
+        textoConfiguracoes.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoConfiguracoes.add(textoConfiguracoes).expandX().padLeft(-25);
         botaoConfiguracoes.addListener(new ClickListener() {
             //Adicionar função para entrar na tela de acessibilidade
             public void clicked(InputEvent event, float x, float y) {
@@ -122,8 +132,13 @@ public class StartScreen implements Screen {
         fundo.add(botaoConfiguracoes).width(600).height(100).padBottom(45).center().row();
 
         //Botão Sair
-        TextButton botaoSair = new TextButton("Sair", estiloBotao);
-        botaoSair.getLabel().setFontScale(2f / MULTIPLICADOR_HD);
+        Button botaoSair = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("sair.png"));
+        Image iconeSair = new Image(texture);
+        botaoSair.add(iconeSair).size(55, 55).padLeft(15).padRight(10);
+        Label textoSair = new Label("Sair", estiloTextoNormal);
+        textoSair.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoSair.add(textoSair).expandX().padLeft(-25);
         botaoSair.addListener(new ClickListener() {
             //Adicionar função para fechar o jogo
             public void clicked(InputEvent event, float x, float y) {
