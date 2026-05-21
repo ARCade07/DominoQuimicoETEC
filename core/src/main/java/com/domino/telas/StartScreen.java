@@ -62,8 +62,8 @@ public class StartScreen implements Screen {
         fonteNegrito.setUseIntegerPositions(false);
 
         //Estilos textos
-        Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("7D0000"));
-        Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("7D0000"));
+        Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("FFFFFF"));
+        Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("FFFFFF"));
 
         //Estilo Botão
         TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
