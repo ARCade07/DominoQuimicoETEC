@@ -74,6 +74,7 @@ public class StartScreen implements Screen {
         //Fundo
         Table fundo = new Table();
         fundo.setFillParent(true);
+        fundo.setBackground(criarTexturaGradiente(Color.valueOf("4A0000"), Color.valueOf("0D0202")));
         fundo.top();
         stage.addActor(fundo);
 
