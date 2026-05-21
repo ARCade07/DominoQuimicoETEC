@@ -85,7 +85,7 @@ public class StartScreen implements Screen {
         stage.addActor(cabecalho);
 
         //Imagem Logo CPS
-        texture = new Texture(Gdx.files.internal("logo_cps_versao_cor.png"));
+        texture = new Texture(Gdx.files.internal("logo_cps_versao_br.png"));
         Image imagemLogo = new Image(texture);
         cabecalho.add(imagemLogo).expandX().left().padTop(20);
 
