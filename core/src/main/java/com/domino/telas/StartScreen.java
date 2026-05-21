@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -31,7 +32,7 @@ public class StartScreen implements Screen {
     @Override
     public void show() {
 
-        stage = new Stage(new FitViewport(1920, 1080));
+        stage = new Stage(new ExtendViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
         // Gerador de fonte normal
@@ -135,7 +136,7 @@ public class StartScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.valueOf("0D0202"));
 
         // Atualiza as animações e desenha todos os atores que estiverem no palco
         stage.act(delta);
