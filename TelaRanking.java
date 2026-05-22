@@ -33,12 +33,12 @@ public class TelaRanking implements Screen {
     private Skin tema;
     private static final float MULTIPLICADOR_HD = 3.0f;
 
-    //medalhas mantidas fixas por representarem materiais fisicos
+    //cores medalhas
     private static final Color COR_OURO              = Color.valueOf("FFD700");
     private static final Color COR_PRATA             = Color.valueOf("B0B0B0");
     private static final Color COR_BRONZE            = Color.valueOf("CD7F32");
 
-    //estrutura de dados
+    //estrutura de dados para armazenar informacoes de cada linha do ranking
     public static class EntradaRanking {
         public final int    posicao;
         public final String nome;
@@ -85,13 +85,13 @@ public class TelaRanking implements Screen {
         this.entradas     = lista;
     }
 
-    //show
     @Override
     public void show() {
         palco = new Stage(new ExtendViewport(1920, 1080));
         Gdx.input.setInputProcessor(palco);
         tema = new Skin();
 
+        //geracao da fonte normal
         FreeTypeFontGenerator geradorNormal = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Medium.ttf"));
         FreeTypeFontParameter parametroNormal = new FreeTypeFontParameter();
         parametroNormal.size = (int) (36 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
@@ -109,9 +109,11 @@ public class TelaRanking implements Screen {
         parametroNormal.padRight = 4;
         parametroNormal.spaceX = 4;
         parametroNormal.spaceY = 4;
+
         fonteNormal.setUseIntegerPositions(false);
         geradorNormal.dispose();
 
+        //geracao da fonte em negrito
         FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
         FreeTypeFontParameter parametroNegrito = new FreeTypeFontParameter();
         parametroNegrito.size = (int) (36 * MULTIPLICADOR_HD * GerenciadorAcessibilidade.getEscalaFonteUsuario());
@@ -132,38 +134,49 @@ public class TelaRanking implements Screen {
         fonteNegrito.setUseIntegerPositions(false);
         geradorNegrito.dispose();
 
+        //verifica os modos de acessibilidade ativos no gerenciador central
         boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
 
         Color corFundo      = GerenciadorAcessibilidade.getCorFundoTela();
-        Color corBordaForte = GerenciadorAcessibilidade.getCorBordaForte();
+        Color corCartao     = GerenciadorAcessibilidade.getCorFundoCartao();
+        Color corBorda      = GerenciadorAcessibilidade.getCorBordaCartao();
 
-        Color corTextoPadrao = Color.WHITE;
-        Color corTextoTitulo = Color.WHITE;
+        Color corTextoPadrao = GerenciadorAcessibilidade.getCorTextoPadrao();
+        Color corTextoTitulo = GerenciadorAcessibilidade.getCorTextoTitulo();
 
         Label.LabelStyle sBranco    = new Label.LabelStyle(fonteNormal,  corTextoPadrao);
         Label.LabelStyle sBrancoNeg = new Label.LabelStyle(fonteNegrito, corTextoPadrao);
         Label.LabelStyle sTitulo    = new Label.LabelStyle(fonteNegrito, corTextoTitulo);
-        Label.LabelStyle sFraco     = new Label.LabelStyle(fonteNormal,  Color.LIGHT_GRAY);
+        Label.LabelStyle sFraco     = new Label.LabelStyle(fonteNormal,  GerenciadorAcessibilidade.getCorTextoFraco());
 
+        //cores das medalhas em alto contraste
         Label.LabelStyle sOuro      = new Label.LabelStyle(fonteNegrito, altoContraste ? Color.YELLOW : COR_OURO);
-        Label.LabelStyle sPrata     = new Label.LabelStyle(fonteNegrito, altoContraste ? Color.LIGHT_GRAY : COR_PRATA);
-        Label.LabelStyle sBronze    = new Label.LabelStyle(fonteNegrito, altoContraste ? Color.valueOf("CC8800") : COR_BRONZE);
+        Label.LabelStyle sPrata     = new Label.LabelStyle(fonteNegrito, altoContraste ? Color.WHITE : COR_PRATA);
+        Label.LabelStyle sBronze    = new Label.LabelStyle(fonteNegrito, altoContraste ? Color.valueOf("FF9900") : COR_BRONZE);
 
         Table raiz = new Table();
         raiz.setFillParent(true);
         raiz.top().left();
 
+        //define o degrade do fundo
         if (altoContraste) {
             raiz.setBackground(criarTexturaCor(corFundo));
         } else {
-            Color corTopo = Color.valueOf("4A0000");
-            Color corBase = Color.valueOf("0D0202");
+            Color corTopo, corBase;
+            if (protanopia) {
+                corTopo = Color.valueOf("0A1428");
+                corBase = Color.valueOf("02050A");
+            } else {
+                corTopo = Color.valueOf("4A0000");
+                corBase = Color.valueOf("0D0202");
+            }
             raiz.setBackground(GerenciadorAcessibilidade.criarTexturaGradiente(corTopo, corBase));
         }
         palco.addActor(raiz);
 
-        // --- ADIÇÃO DO BOTÃO VOLTAR ---
-        Color corSombraBtn   = altoContraste ? Color.DARK_GRAY : Color.valueOf("4D0000");
+        //configuracoes de acessibilidade e design do botao voltar
+        Color corSombraBtn   = altoContraste ? Color.DARK_GRAY : (protanopia ? Color.valueOf("001F4D") : Color.valueOf("4D0000"));
         Color corBotaoNormal = GerenciadorAcessibilidade.getCorFundoBotaoNormal();
         Color corBotaoHover  = GerenciadorAcessibilidade.getCorFundoBotaoHover();
         Color corBotaoDown   = GerenciadorAcessibilidade.getCorFundoBotaoDown();
@@ -191,16 +204,16 @@ public class TelaRanking implements Screen {
             }
         });
 
+
         Table layerSuperior = new Table();
         layerSuperior.setFillParent(true);
         layerSuperior.top().left();
         layerSuperior.add(btnVoltar).width(270).height(98).pad(30);
         palco.addActor(layerSuperior);
-        // --------------------------------
 
         Table painelJogador = criarPainelJogador(
             jogadorAtual, sBrancoNeg, sBranco, sFraco, sBrancoNeg,
-            Color.valueOf("140505"), corBordaForte);
+            corCartao, corBorda);
 
         Table areaConteudo = new Table();
         areaConteudo.top().left();
@@ -208,6 +221,7 @@ public class TelaRanking implements Screen {
         Label lblTitulo = criarRotulo("RANKING", sTitulo, 2.8f);
         areaConteudo.add(lblTitulo).center().padTop(0).padBottom(40).row();
 
+        //renderiza o podio apenas se houverem jogadores suficientes
         if (entradas.length >= 3) {
             Table podio = criarPodio(
                 entradas[0], entradas[1], entradas[2],
@@ -230,6 +244,7 @@ public class TelaRanking implements Screen {
             }
             lista.add().height(15).row();
 
+            //scrollpane encapsula a lista para permitir a rolagem vertical
             ScrollPane.ScrollPaneStyle estiloScroll = new ScrollPane.ScrollPaneStyle();
             ScrollPane scroll = new ScrollPane(lista, estiloScroll);
             scroll.setFadeScrollBars(false);
@@ -255,9 +270,6 @@ public class TelaRanking implements Screen {
                                      Color corCartao, Color corBorda) {
         Table painel = new Table();
         painel.setBackground(criarBordaArredondadaTextura(corCartao, corBorda, 24, 3));
-
-        // AQUI ESTÁ A MUDANÇA: pad(topo, esquerda, baixo, direita)
-        // Aumentamos as laterais de 25 para 45 para afastar os cartões menores da borda
         painel.pad(25, 30, 25, 30);
 
         Table conteudoCentral = new Table();
@@ -267,44 +279,51 @@ public class TelaRanking implements Screen {
         lblNome.setAlignment(Align.center);
         conteudoCentral.add(lblNome).growX().center().padBottom(40).row();
 
-        // Variáveis de ajuste fino
         float escalaValor = 1.05f;
         float escalaTexto = 0.75f;
         int espacoEntreCaixas = 28;
 
-        // 1. Caixa de Posição
+        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+
+        //busca a cor correta no gerenciador
+        Color corFundoCaixa = GerenciadorAcessibilidade.getCorFundoCaixaRanking();
+        Color corBordaCaixa = altoContraste ? Color.WHITE : Color.CLEAR;
+        int espessuraBorda  = altoContraste ? 2 : 0;
+
+        //caixa de posicao
         Table caixaPos = new Table();
-        caixaPos.setBackground(criarBordaArredondadaTextura(Color.valueOf("2B0505"), Color.CLEAR, 12, 0));
+        caixaPos.setBackground(criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaPos.pad(15, 25, 15, 25);
         caixaPos.add(criarRotulo("SUA POSIÇÃO", sFraco, escalaTexto)).expandX().left();
         caixaPos.add(criarRotulo(jogador.posicao + "º", sNeg, escalaValor)).right();
         conteudoCentral.add(caixaPos).growX().padBottom(espacoEntreCaixas).row();
 
-        // 2. Caixa de Pontuação
+        //caixa de pontuacao
         Table caixaPts = new Table();
-        caixaPts.setBackground(criarBordaArredondadaTextura(Color.valueOf("2B0505"), Color.CLEAR, 12, 0));
+        caixaPts.setBackground(criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaPts.pad(15, 20, 15, 20);
+
+        //o padright impede que pontuacoes enormes sobreponham o texto ao lado
         caixaPts.add(criarRotulo("PONTUAÇÃO", sFraco, escalaTexto)).expandX().left().padRight(10);
         caixaPts.add(criarRotulo(formatarPontuacao(jogador.pontuacao), sNeg, escalaValor)).right();
         conteudoCentral.add(caixaPts).growX().padBottom(espacoEntreCaixas).row();
 
-        // 3. Caixa de Partidas Jogadas
+        //caixa de partidas
         Table caixaPartidas = new Table();
-        caixaPartidas.setBackground(criarBordaArredondadaTextura(Color.valueOf("2B0505"), Color.CLEAR, 12, 0));
+        caixaPartidas.setBackground(criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaPartidas.pad(15, 20, 15, 20);
         caixaPartidas.add(criarRotulo("PARTIDAS", sFraco, escalaTexto)).expandX().left();
         caixaPartidas.add(criarRotulo("42", sNeg, escalaValor)).right();
         conteudoCentral.add(caixaPartidas).growX().padBottom(espacoEntreCaixas).row();
 
-        // 4. Caixa de Taxa de Vitória
+        //caixa de taxa de vitoria
         Table caixaVitorias = new Table();
-        caixaVitorias.setBackground(criarBordaArredondadaTextura(Color.valueOf("2B0505"), Color.CLEAR, 12, 0));
+        caixaVitorias.setBackground(criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaVitorias.pad(15, 20, 15, 20);
         caixaVitorias.add(criarRotulo("VITÓRIAS", sFraco, escalaTexto)).expandX().left();
         caixaVitorias.add(criarRotulo("65%", sNeg, escalaValor)).right();
         conteudoCentral.add(caixaVitorias).growX().row();
 
-        // Expandindo para o centro
         painel.add(conteudoCentral).expand().fillX().center();
 
         return painel;
@@ -313,15 +332,19 @@ public class TelaRanking implements Screen {
     private Table criarPodio(EntradaRanking primeiro, EntradaRanking segundo, EntradaRanking terceiro,
                              Label.LabelStyle sOuro, Label.LabelStyle sPrata, Label.LabelStyle sBronze,
                              Label.LabelStyle sBrancoNeg) {
+
+        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        Color cOuro   = altoContraste ? Color.YELLOW : COR_OURO;
+        Color cPrata  = altoContraste ? Color.WHITE : COR_PRATA;
+        Color cBronze = altoContraste ? Color.valueOf("FF9900") : COR_BRONZE;
+
         Table podio = new Table();
         podio.bottom();
 
-        Table card2 = criarCartaoPodio(segundo,  2, COR_PRATA,  sPrata,  sBrancoNeg);
-        Table card1 = criarCartaoPodio(primeiro, 1, COR_OURO,   sOuro,   sBrancoNeg);
-        Table card3 = criarCartaoPodio(terceiro, 3, COR_BRONZE, sBronze, sBrancoNeg);
+        Table card2 = criarCartaoPodio(segundo,  2, cPrata,  sPrata,  sBrancoNeg);
+        Table card1 = criarCartaoPodio(primeiro, 1, cOuro,   sOuro,   sBrancoNeg);
+        Table card3 = criarCartaoPodio(terceiro, 3, cBronze, sBronze, sBrancoNeg);
 
-        // Removi os '.height()' que estavam fixos para deixar o Stack calcular sozinho
-        // e respeitar os paddings que definem a linha horizontal certinha.
         podio.add(card2).width(310).bottom().padRight(25);
         podio.add(card1).width(360).bottom().padRight(25);
         podio.add(card3).width(310).bottom();
@@ -338,14 +361,21 @@ public class TelaRanking implements Screen {
         float cardHeight = posicao == 1 ? 220f : 180f;
         float circleRadius = 30f;
 
-        // 1. O fundo com bordas arredondadas e os textos (caixa)
         Table cardTable = new Table();
         cardTable.bottom();
 
         Table conteudoBox = new Table();
-        conteudoBox.setBackground(criarBordaArredondadaTextura(Color.valueOf("1A0000"), corMedalha, 20, 4));
+        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
+
+        Color corFundoBox;
+        if (altoContraste) corFundoBox = Color.BLACK;
+        else if (protanopia) corFundoBox = Color.valueOf("070E1A");
+        else corFundoBox = Color.valueOf("1A0000");
+
+        conteudoBox.setBackground(criarBordaArredondadaTextura(corFundoBox, corMedalha, 20, 4));
         conteudoBox.pad(15);
-        conteudoBox.padTop(circleRadius + 15); // Espaço extra pra respirar abaixo do circulo
+        conteudoBox.padTop(circleRadius + 15);
 
         Label lblNome = criarRotulo(entrada.nome, sBrancoNeg, 1f);
         lblNome.setEllipsis(true);
@@ -358,31 +388,29 @@ public class TelaRanking implements Screen {
 
         cardTable.add(conteudoBox).growX().height(cardHeight);
 
-        // 2. A estrutura do topo: Bolinha e Coroa
         Table badgeLayer = new Table();
-        badgeLayer.bottom(); // Alinhamos esse container base para calcularmos do chao para cima
+        badgeLayer.bottom();
 
         Table badgeGroup = new Table();
         badgeGroup.bottom();
         if (posicao == 1) {
             Image imgCoroa = new Image(criarCoroaTextura(corMedalha));
-            badgeGroup.add(imgCoroa).size(50, 32).center().padBottom(-3).row(); // Coroa
+            badgeGroup.add(imgCoroa).size(50, 32).center().padBottom(12).row();
         }
 
         Table circulo = new Table();
         circulo.setBackground(criarCirculoComBorda((int)circleRadius, corMedalha, corMedalha, 2));
         Label lblNum = criarRotulo(String.valueOf(posicao), sBrancoNeg, 1f);
+
+        //forca o numero para a cor preta em medalhas claras para garantir visibilidade
         if (posicao == 1) lblNum.setColor(Color.BLACK);
+        if (posicao == 2 && altoContraste) lblNum.setColor(Color.BLACK);
         lblNum.setAlignment(Align.center);
         circulo.add(lblNum).expand().center().padBottom(6);
 
         badgeGroup.add(circulo).size(circleRadius * 2, circleRadius * 2).center();
 
-        // CÁLCULO EXATO DA INTERSECÇÃO:
-        // Se a camada está alinhada por baixo, e a caixa tem a altura 'cardHeight'
-        // damos um padding inferior de (cardHeight - circleRadius)
-        // Isso faz com que a base da bolinha fique na marca de cardHeight menos o seu próprio raio,
-        // posicionando O CENTRO da bolinha matematicamente exato no topo da linha da caixa!
+        //faz a matematica compensando o raio para posicionar a bolinha cortando o topo exato do cartao
         badgeLayer.add(badgeGroup).expandX().center().padBottom(cardHeight - circleRadius);
 
         stack.add(cardTable);
@@ -410,8 +438,15 @@ public class TelaRanking implements Screen {
                                     Label.LabelStyle sNeg, Label.LabelStyle sNormal,
                                     Label.LabelStyle sDestaque, Label.LabelStyle sFraco) {
 
-        Color corFundo = Color.valueOf("110202");
-        Color corBorda = Color.valueOf("350A0A");
+        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
+
+        Color corFundo;
+        if (altoContraste) corFundo = Color.BLACK;
+        else if (protanopia) corFundo = Color.valueOf("03060C");
+        else corFundo = Color.valueOf("110202");
+
+        Color corBorda = GerenciadorAcessibilidade.getCorBordaLinhaRanking();
 
         Table linha = new Table();
         linha.setBackground(criarBordaArredondadaTextura(corFundo, corBorda, 15, 2));
@@ -432,8 +467,7 @@ public class TelaRanking implements Screen {
         return linha;
     }
 
-    //utilitarios
-
+    //adiciona os separadores de milhar via rotina aritmetica
     private String formatarPontuacao(int pontos) {
         String s   = String.valueOf(pontos);
         StringBuilder sb = new StringBuilder();
@@ -480,6 +514,7 @@ public class TelaRanking implements Screen {
         return new TextureRegionDrawable(tex);
     }
 
+    //desenha a coroa dinamicamente com geometria no pixmap
     private TextureRegionDrawable criarCoroaTextura(Color cor) {
         int w = 60;
         int h = 45;
@@ -516,7 +551,7 @@ public class TelaRanking implements Screen {
         np.scale(1f / escala, 1f / escala);
         return new NinePatchDrawable(np);
     }
-
+    
     private NinePatchDrawable criarBordaArredondadaTextura(Color corFundo, Color corBorda,
                                                            int raio, int tamanhoBorda) {
         int escala = 4, tamanho = 100 * escala, r = raio * escala, b = tamanhoBorda * escala;
