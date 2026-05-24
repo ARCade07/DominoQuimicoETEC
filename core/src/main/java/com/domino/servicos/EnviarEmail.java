@@ -17,5 +17,23 @@ public class EnviarEmail {
         Dotenv dotenv = Dotenv.load();
         this.usuarioEmail = dotenv.get("SMTP_EMAIL");
         this.senhaEmail = dotenv.get("SMTP_SENHA");
+        configurarSessao();
+    }
+
+
+    private void configurarSessao() {
+        Properties propriedades = new Properties();
+        propriedades.put("mail.smtp.auth", "true");
+        propriedades.put("mail.smtp.starttls.enable", "true");
+        propriedades.put("mail.smtp.host", "smtp.gmail.com");
+        propriedades.put("mail.smtp.port", "587");
+
+        this.sessao = Session.getInstance(propriedades, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(usuarioEmail, senhaEmail);
+            }
+        });
+    }
     }
 }
