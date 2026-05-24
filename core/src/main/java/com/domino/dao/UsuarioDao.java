@@ -15,6 +15,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class UsuarioDao {
     // Onde os documentos BSON serão guardados:
@@ -116,6 +117,19 @@ public class UsuarioDao {
         return converterDocumentoParaUsuario(doc);
     }
 
+    public boolean salvarTokenRecuperacao(String email, String tokenRecuperacao){
+        long tempo = TimeUnit.MINUTES.toMillis(15);
+        long expiracao = System.currentTimeMillis() + tempo;
+
+        var atualizacoes = Updates.combine(
+            Updates.set("tokenRecuperacao", tokenRecuperacao),
+            Updates.set("tokenExpiracao", expiracao)
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+
+        return resultado.getMatchedCount() > 0;
+    }
     public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
         var atualizacoes = Updates.combine(
             Updates.inc("estatisticas.partidasJogadas", 1),
