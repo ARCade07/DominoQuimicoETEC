@@ -22,6 +22,11 @@ public class ControladorLogin {
 
         return false;
     }
+
+    public void fazerLogout() {
+        this.usuarioLogado = null;
+    }
+
     public Usuario getUsuarioLogado() {
         return this.usuarioLogado;
     }
