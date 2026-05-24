@@ -10,6 +10,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -89,6 +90,20 @@ public class UsuarioDao {
         }
         // email não existe ou a senha não bate com a do banco
         return null;
+    }
+
+    public boolean redefinirSenha(String email, String novaSenhaDigitada) {
+        String hashSenha = BCrypt.withDefaults().hashToString(12, novaSenhaDigitada.toCharArray());
+
+        var atualizacoes = Updates.combine(
+            Updates.set("senha", hashSenha),
+            Updates.unset("tokenRecuperacao"),
+            Updates.unset("tokenExpiracao")
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+        
+        return resultado.getModifiedCount() > 0;
     }
 
     public Usuario buscarPorEmail(String email) {
