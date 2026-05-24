@@ -54,5 +54,17 @@ public class EnviarEmail {
             return false;
         }
     }
+
+    public void emailRecuperacao(String destinatario, String tokenRecuperacao) {
+        String assunto = "Recuperação de Senha - CHEMDOM";
+        String corpoEmail = "<h3>Recuperação de Senha</h3>"
+            + "<p>Você solicitou a redefinição de senha.</p>"
+            + "<p>Seu código de verificação é: <strong>" + tokenRecuperacao + "</strong></p>"
+            + "<p>Este código expira em 15 minutos.</p>"
+            + "<p>Caso não tenha solicitado, ignore essa mensagem</p>";
+
+            boolean enviado = emailBase(destinatario, assunto, corpoEmail);
+
+            if (enviado) System.out.println("E-mail enviado com sucesso para: " + destinatario);
     }
 }
