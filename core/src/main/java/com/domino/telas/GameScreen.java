@@ -64,7 +64,7 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
 
         // 3. Montagem do Cenário (Mundo)
-        Texture backgroundTextura = new Texture("Sprite-0001.png");
+        Texture backgroundTextura = new Texture("BgTile.png");
         Background background = new Background(backgroundTextura);
         worldStage.addActor(background);
 
