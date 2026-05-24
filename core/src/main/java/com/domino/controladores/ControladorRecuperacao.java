@@ -27,4 +27,11 @@ public class ControladorRecuperacao {
 
         return false;
     }
+
+    public boolean confirmarNovaSenha(String email, String codigoDigitado, String novaSenha) {
+        if (u.validarToken(email, codigoDigitado)) {
+            return u.redefinirSenha(email, novaSenha);
+        }
+        return false;
+    }
 }
