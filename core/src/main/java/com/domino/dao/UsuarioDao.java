@@ -167,6 +167,10 @@ public class UsuarioDao {
         u.setEmail(doc.getString("email"));
         u.setSenha(doc.getString("senha"));
         u.setTokenSessao(doc.getString("tokenSessao"));
+        u.setTokenRecuperacao(doc.getString("tokenRecuperacao"));
+
+        Long expiracao = doc.getLong("tokenExpiracao");
+        if (expiracao != null) u.setTokenExpiracao(expiracao);
 
         // Pega o sub-documento de estatísticas do bd
         Document docEstat = (Document) doc.get("estatisticas");
