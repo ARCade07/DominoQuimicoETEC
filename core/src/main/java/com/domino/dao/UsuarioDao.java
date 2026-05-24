@@ -130,6 +130,16 @@ public class UsuarioDao {
 
         return resultado.getMatchedCount() > 0;
     }
+
+    public boolean validarToken(String email, String tokenDigitado) {
+        Usuario u = buscarPorEmail(email);
+
+        if (u != null && tokenDigitado.equals(u.getTokenRecuperacao())) {
+            return System.currentTimeMillis() <= u.getTokenExpiracao();
+        }
+        return false;
+    }
+
     public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
         var atualizacoes = Updates.combine(
             Updates.inc("estatisticas.partidasJogadas", 1),
