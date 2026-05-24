@@ -14,4 +14,17 @@ public class ControladorRecuperacao {
         this.u = u;
         this.e = new EnviarEmail();
     }
+
+    public boolean enviarCodigo(String email) {
+
+        String codigoGerado = String.format("%06d", new Random().nextInt(1000000));
+        boolean sucesso = u.salvarTokenRecuperacao(email, codigoGerado);
+
+        if (sucesso) {
+            e.emailRecuperacao(email, codigoGerado);
+            return true;
+        }
+
+        return false;
+    }
 }
