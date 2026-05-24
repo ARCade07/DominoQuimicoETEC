@@ -11,6 +11,7 @@ public class EnviarEmail {
 
     private final String usuarioEmail;
     private final String senhaEmail;
+    // mantém a conexao configurada com o servidor do gmail
     private Session sessao;
 
     public EnviarEmail(){
@@ -34,6 +35,24 @@ public class EnviarEmail {
                 return new PasswordAuthentication(usuarioEmail, senhaEmail);
             }
         });
+    }
+    public boolean emailBase(String destinario, String assunto, String corpoEmail) {
+        try {
+            Message mensagem = new MimeMessage(this.sessao);
+            mensagem.setFrom(new InternetAddress(usuarioEmail));
+            mensagem.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinario));
+
+            mensagem.setSubject(assunto);
+            mensagem.setContent(corpoEmail, "text/html; charset=utf-8");
+
+            Transport.send(mensagem);
+            return true;
+
+        } catch (MessagingException e) {
+            System.err.println("Falhar ao enviar e-mail para " + destinario + ". Erro: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
     }
 }
