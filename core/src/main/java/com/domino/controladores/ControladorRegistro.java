@@ -12,10 +12,14 @@ public class ControladorRegistro {
     }
 
     public boolean registrarUsuario(Usuario u) {
-        String email = u.getEmail();
+        String email = u.getEmail().toLowerCase();
 
-        if (!email.endsWith("@etec.sp.gov.br")) {
-            System.out.println("Ero: O cadastro exige um e-mail institucional da ETEC/CPS");
+        if (email.endsWith("@aluno.cps.sp.gov.br")) {
+            u.setRole("ALUNO");
+        } else if (email.endsWith("@cps.sp.gov.br")) {
+            u.setRole("PROFESSOR");
+        } else {
+            System.out.println("Erro: O cadastro exige um e-mail institucional da ETEC/CPS");
             return false;
         }
 
