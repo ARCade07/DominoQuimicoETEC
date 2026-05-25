@@ -212,3 +212,23 @@ public class TeacherScreen implements Screen {
         return new NinePatchDrawable(remendo);
     }
 
+    private TextureRegionDrawable criarTexturaGradiente(Color corTopo, Color corBase) {
+        int altura = 512;
+        Pixmap mapaPixels = new Pixmap(1, altura, Pixmap.Format.RGBA8888);
+
+        for (int y = 0; y < altura; y++) {
+            float ratio = (float) y / (altura - 1);
+
+            Color corAtual = new Color(corTopo).lerp(corBase, ratio);
+
+            mapaPixels.setColor(corAtual);
+            mapaPixels.drawPixel(0, y);
+        }
+
+        Texture textura = new Texture(mapaPixels);
+        textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        mapaPixels.dispose();
+
+        return new TextureRegionDrawable(textura);
+    }
+}
