@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -29,47 +31,62 @@ import java.util.List;
 
 public class GameScreen implements Screen {
 
-    // Separação Arquitetural
+    // Separação Arquitetural (Camadas Gráficas)
     private final Stage worldStage;
     private final Stage hudStage;
 
-    private final DragAndDrop dragAndDrop;
+    // Gerenciador de Input e Interações Visuais
+    private DragAndDrop dragAndDrop;
 
+    // Elementos de Regra de Negócio e Infraestrutura
     private final Tabuleiro tabuleiro = new Tabuleiro();
-    private final ZonaDeSoltarPeca alvoEsquerda;
-    private final ZonaDeSoltarPeca alvoDireita;
+    private ZonaDeSoltarPeca alvoEsquerda;
+    private ZonaDeSoltarPeca alvoDireita;
 
     private float yOriginalAlvoEsquerda;
     private float yOriginalAlvoDireita;
 
-    // Texturas
+    // Recursos Gráficos e Gerenciamento de Assets
     private Texture texturaZonas;
-    private Texture texturaPeca_a_a;
-    private Texture texturaPeca_a_b;
-    private Texture texturaPeca_b_b;
+    private Texture texturaBase;
+    private BitmapFont fontePadrao;
+    private Background background;
 
+    // Camada de Comunicação em Rede
     private Cliente cliente;
     private Servidor servidor;
 
     public GameScreen() {
-        // 1. Inicializa camadas isoladas
+        // 1. Inicializa camadas isoladas com Viewports fixos
         worldStage = new Stage(new FitViewport(1920, 1080));
         hudStage = new Stage(new FitViewport(1920, 1080));
 
-        // 2. Orquestração de Input
+        // 2. Orquestração e Hierarquia de Entrada de Dispositivos (Inputs)
         InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(hudStage); // HUD recebe cliques primeiro (para pegar peças da mão)
-        multiplexer.addProcessor(new PanInputHandler(worldStage.getCamera())); // Pan monitora a câmera do Mundo
-        multiplexer.addProcessor(worldStage); // Mundo recebe cliques por último (zonas de soltar)
+        OrthographicCamera cameraMundo = (OrthographicCamera) worldStage.getCamera();
+
+        multiplexer.addProcessor(hudStage);                  // Interface (Mão do jogador) consome clicks primeiro
+        multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
+        multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
+        multiplexer.addProcessor(worldStage);                // Elementos do tabuleiro recebem inputs por último
         Gdx.input.setInputProcessor(multiplexer);
 
-        // 3. Montagem do Cenário (Mundo)
-        Texture backgroundTextura = new Texture("BgTile.png");
-        Background background = new Background(backgroundTextura);
-        worldStage.addActor(background);
+        // 3. Montagem e Alinhamento Centralizado do Cenário Cinematográfico
+        this.background = new Background();
 
+        float centroMundoX = worldStage.getWidth() / 2f;
+        float centroMundoY = worldStage.getHeight() / 2f;
+
+        this.background.setPosition(
+            centroMundoX - (this.background.getWidth() / 2f),
+            centroMundoY - (this.background.getHeight() / 2f)
+        );
+        worldStage.addActor(this.background);
+
+        // Inicialização de texturas dependentes
         this.inicilizarTexturas();
 
+        // Construção das Zonas de Interação de Soltura
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
         yOriginalAlvoEsquerda = (worldStage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
         alvoEsquerda.setPosition((worldStage.getWidth() / 2) - 200, yOriginalAlvoEsquerda);
@@ -81,7 +98,7 @@ public class GameScreen implements Screen {
         worldStage.addActor(alvoEsquerda);
         worldStage.addActor(alvoDireita);
 
-        // 4. Lógica de Drag and Drop
+        // 4. Lógica e Engenharia de Drag and Drop
         dragAndDrop = new DragAndDrop();
 
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoDireita) {
@@ -93,7 +110,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                getActor().setColor(Color.BLACK);
+                getActor().setColor(Color.WHITE); // Mantém o canal Alpha intacto para evitar escurecimento definitivo
             }
 
             @Override
@@ -101,7 +118,6 @@ public class GameScreen implements Screen {
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), true)){
-                    // Transferência de Stage: sai do HUD estático e entra no Mundo onde a câmera move
                     worldStage.addActor(pecaSolta);
 
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
@@ -125,7 +141,6 @@ public class GameScreen implements Screen {
                         cliente.enviarJogada(pacote);
                     }
                 } else {
-                    // Retorna para a posição base no HUD (falha ao conectar)
                     float xOriginal = source.getActor().getX();
                     float yOriginal = source.getActor().getY();
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
@@ -142,7 +157,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                getActor().setColor(Color.BLACK);
+                getActor().setColor(Color.WHITE);
             }
 
             @Override
@@ -150,7 +165,6 @@ public class GameScreen implements Screen {
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), false)){
-                    // Transferência de Stage
                     worldStage.addActor(pecaSolta);
 
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
@@ -185,18 +199,15 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-        this.texturaZonas = new Texture("libgdx.png");
-        this.texturaPeca_a_a = new Texture("peca_a_a.png");
-        this.texturaPeca_a_b = new Texture("peca_a_b.png");
-        this.texturaPeca_b_b = new Texture("peca_b_b.png");
+        this.texturaZonas = ZonaDeSoltarPeca.criarTextura();
+        this.texturaBase = new Texture("pecafinal.png");
+        this.fontePadrao = new BitmapFont();
     }
 
     private void inicializarPecas(){
         HorizontalGroup pecasNaMao = new HorizontalGroup();
         pecasNaMao.space(15);
         pecasNaMao.setPosition(hudStage.getWidth() / 4, 125);
-
-        // As peças na mão são ancoradas ao HUD Stage para nunca saírem da tela durante o Pan
         hudStage.addActor(pecasNaMao);
 
         List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
@@ -204,12 +215,7 @@ public class GameScreen implements Screen {
         List<Peca> pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
-            String info1 = pecaNaMao.getInfo1();
-            String info2 = pecaNaMao.getInfo2();
-
-            Texture texturaPeca = this.getTextura(info1, info2);
-
-            PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaPeca);
+            PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaBase, fontePadrao);
             pecaVisualNaMao.add(pecaVisual);
         }
 
@@ -227,7 +233,7 @@ public class GameScreen implements Screen {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(pecaVisual);
 
-                    Image fantasma = new Image(pecaVisual.getSprite());
+                    Image fantasma = new Image(texturaBase);
                     fantasma.setSize(100, 200);
                     fantasma.setColor(1, 1, 1, 0.5f);
 
@@ -240,23 +246,12 @@ public class GameScreen implements Screen {
         }
     }
 
-    private Texture getTextura(String info1, String info2) {
-        if (info1.equals("A") && info2.equals("A")) return texturaPeca_a_a;
-        if (info1.equals("B") && info2.equals("B")) return texturaPeca_b_b;
-        if ((info1.equals("A") && info2.equals("B")) || (info1.equals("B") && info2.equals("A"))) {
-            return texturaPeca_a_b;
-        }
-        return null;
-    }
-
     public void receberJogadaRede(PacketJogada jogada) {
         Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
 
         if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
-            Texture textura = getTextura(jogada.info1, jogada.info2);
-            PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, textura);
+            PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, texturaBase, fontePadrao);
 
-            // Adversário joga direto na camada do Mundo
             worldStage.addActor(pecaVisualAdversario);
             pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
 
@@ -287,15 +282,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(new Color(0.15f, 0.15f, 0.15f, 1f));
+        // Limpeza em preto absoluto camufla os cortes secos de proporção de tela do Viewport (FitViewport)
+        ScreenUtils.clear(Color.BLACK);
 
-        // 1. Processa a lógica de ambos os contextos
         worldStage.act(delta);
         hudStage.act(delta);
 
-        // 2. Renderização em profundidade (Z-Index)
-        worldStage.draw(); // O tabuleiro fica atrás
-        hudStage.draw();   // A interface e mão de peças sobrepõem o tabuleiro
+        worldStage.draw();
+        hudStage.draw();
     }
 
     @Override
@@ -307,12 +301,15 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         if (cliente != null) cliente.fechar();
+
         worldStage.dispose();
         hudStage.dispose();
+
+        // Evita vazamentos e estouro de memória de vídeo externa (VRAM / Pointer Leaks)
         if (texturaZonas != null) texturaZonas.dispose();
-        if (texturaPeca_a_a != null) texturaPeca_a_a.dispose();
-        if (texturaPeca_a_b != null) texturaPeca_a_b.dispose();
-        if (texturaPeca_b_b != null) texturaPeca_b_b.dispose();
+        if (texturaBase != null) texturaBase.dispose();
+        if (fontePadrao != null) fontePadrao.dispose();
+        if (background != null) background.dispose();
     }
 
     @Override public void show() {}
