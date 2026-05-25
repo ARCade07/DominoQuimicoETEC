@@ -47,6 +47,7 @@ public class GameScreen implements Screen {
     private Cliente cliente;
     private Servidor servidor;
     private int quantidadePecas = 7;
+    private int pontuacao;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -131,6 +132,8 @@ public class GameScreen implements Screen {
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
+                    pontuacao += 100;
+
 
                     if (cliente != null) {
                         // pega a peça que foi colocada pelo cliente no tabuleiro
@@ -158,6 +161,10 @@ public class GameScreen implements Screen {
 
                     pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
+
+                    if(pontuacao > 0){
+                        pontuacao -= 50;
+                    }
 
                     if(cliente != null){
                         passarVez();
@@ -217,6 +224,8 @@ public class GameScreen implements Screen {
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
+                    pontuacao += 100;
+
 
                     if (cliente != null) {
                         //pega a peça que foi colocada pelo cliente no tabuleiro
@@ -244,6 +253,10 @@ public class GameScreen implements Screen {
 
                     pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
+
+                    if(pontuacao > 100){
+                        pontuacao -= 50;
+                    }
 
                     if(cliente != null){
                         passarVez();
