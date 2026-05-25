@@ -1,16 +1,19 @@
 package com.pidomino;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 
 public class GerenciadorAcessibilidade {
 
@@ -28,10 +31,11 @@ public class GerenciadorAcessibilidade {
             case ALTO_CONTRASTE:
                 return Color.BLACK;
             case PROTANOPIA_DEUTERANOPIA:
+                return Color.valueOf("050A14"); // Fundo Azul muito escuro
             case TRITANOPIA:
-                return Color.valueOf("EAEAEA"); //cinza claro
+            case PADRAO:
             default:
-                return Color.valueOf("F5F5F5"); //branco
+                return Color.valueOf("0D0202"); // Fundo Vermelho muito escuro
         }
     }
 
@@ -51,47 +55,91 @@ public class GerenciadorAcessibilidade {
     }
 
     public static Color getCorFundoCartao() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.BLACK : Color.WHITE;
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE:
+                return Color.BLACK;
+            case PROTANOPIA_DEUTERANOPIA:
+                return Color.valueOf("0A1428"); // Cartão Azul Escuro
+            case TRITANOPIA:
+            case PADRAO:
+            default:
+                return Color.valueOf("140505"); // Cartão Vermelho Escuro
+        }
     }
 
     public static Color getCorFundoCaixaDestaqueErro() {
         switch (modoVisaoAtual) {
             case ALTO_CONTRASTE: return Color.BLACK;
-            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("FFE8D6");
-            case TRITANOPIA: return Color.valueOf("FFD9D9");
-            default: return Color.valueOf("FEE1E1");
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("2B1300"); // Marrom/Laranja escuro
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("330808");
         }
     }
 
     //cor das bordas e separadores
     public static Color getCorBordaCartao() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.WHITE : Color.valueOf("D1D5DB");
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.WHITE;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("1E3A5F"); // Azul acinzentado
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("350A0A");
+        }
     }
 
     public static Color getCorBordaForte() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.valueOf("333333");
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.YELLOW;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("2A5285"); // Azul mais claro
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("4A0808");
+        }
     }
 
     //cor do botao
     public static Color getCorFundoBotaoNormal() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.BLACK : Color.WHITE;
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.BLACK;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("0055A4"); // Azul forte e legível
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("7D0000");
+        }
     }
 
     public static Color getCorFundoBotaoHover() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.valueOf("333333") : Color.valueOf("E8ECEF");
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.valueOf("333333");
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("3377BD"); // Hover azul
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("957474");
+        }
     }
 
     public static Color getCorFundoBotaoDown() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.valueOf("555555") : Color.valueOf("D1D5DB");
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.valueOf("555555");
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("003366"); // Clique azul escuro
+            case TRITANOPIA:
+            case PADRAO:
+            default: return Color.valueOf("500000");
+        }
     }
 
     //cores de texto
     public static Color getCorTextoTitulo() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.BLACK;
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.WHITE;
     }
 
     public static Color getCorTextoPadrao() {
-        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.valueOf("FFFF00") : Color.valueOf("333333");
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.YELLOW : Color.WHITE;
+    }
+
+    public static Color getCorTextoFraco() {
+        return modoVisaoAtual == ModoVisao.ALTO_CONTRASTE ? Color.WHITE : Color.LIGHT_GRAY;
     }
 
     public static Color getCorDestaqueErro() {
@@ -99,11 +147,11 @@ public class GerenciadorAcessibilidade {
             case ALTO_CONTRASTE:
                 return Color.RED;
             case PROTANOPIA_DEUTERANOPIA:
-                return Color.valueOf("D55E00"); //laranja
+                return Color.valueOf("FF6B6B");
             case TRITANOPIA:
-                return Color.valueOf("CC0000"); //vermelho
+            case PADRAO:
             default:
-                return Color.valueOf("7D0000"); //vinho
+                return Color.valueOf("FF5252");
         }
     }
 
@@ -112,44 +160,38 @@ public class GerenciadorAcessibilidade {
             case ALTO_CONTRASTE:
                 return Color.GREEN;
             case PROTANOPIA_DEUTERANOPIA:
-                return Color.valueOf("0072B2"); //azul claro
+                return Color.valueOf("FFD700");
             case TRITANOPIA:
-                return Color.valueOf("009E73"); //ciano
+            case PADRAO:
             default:
-                return Color.valueOf("2E7D32"); //verde
+                return Color.valueOf("00BFA5");
         }
     }
 
     //navegacao e foco pelo teclado
     public static Color getCorDestaqueFoco() {
         switch (modoVisaoAtual) {
-            case ALTO_CONTRASTE: return Color.YELLOW; //contraste máximo
-            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("0072B2"); // Azul forte
-            case TRITANOPIA: return Color.valueOf("009E73"); // Ciano forte
-            default: return Color.valueOf("FFD700"); //dourado padrão
+            case ALTO_CONTRASTE: return Color.YELLOW;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("F0E442"); // Amarelo acessível
+            case TRITANOPIA: return Color.valueOf("00FFFF"); // Ciano (já que amarelo é invisível para eles)
+            case PADRAO:
+            default: return Color.valueOf("FFD700");
         }
     }
 
     //aplica acessibilidade motora
     public static void aplicarFoco(Actor ator) {
-        //garante que se o botao crescer ele vai crescer a partir do centro e nao do canto
         ator.setOrigin(Align.center);
         ator.addListener(new FocusListener() {
             @Override
             public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
                 if (focused) {
-                    //o botao da um leve zoom
                     actor.addAction(Actions.scaleTo(1.05f, 1.05f, 0.1f));
-
-                    //fallback de cor apenas se nao for um botao
                     if (!(actor instanceof Button)) {
                         actor.setColor(getCorDestaqueFoco());
                     }
-
                 } else {
-                    //volta o tamanho ao normal
                     actor.addAction(Actions.scaleTo(1f, 1f, 0.1f));
-
                     if (!(actor instanceof Button)) {
                         actor.setColor(Color.WHITE);
                     }
@@ -161,16 +203,12 @@ public class GerenciadorAcessibilidade {
     //config do sistema pra aceitar teclas para navegacao e clique
     public static void configurarNavegacao(Stage palco, Actor... atoresFocaveis) {
         if (atoresFocaveis.length == 0) return;
-
         palco.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 Actor focoAtual = palco.getKeyboardFocus();
-
-                //acao de clicar com enter ou espaco
                 if (keycode == Input.Keys.ENTER || keycode == Input.Keys.SPACE || keycode == Input.Keys.NUMPAD_ENTER) {
                     if (focoAtual != null) {
-                        //procura os cliques do botao focado e executa
                         for (com.badlogic.gdx.scenes.scene2d.EventListener listener : focoAtual.getListeners()) {
                             if (listener instanceof com.badlogic.gdx.scenes.scene2d.utils.ClickListener) {
                                 ((com.badlogic.gdx.scenes.scene2d.utils.ClickListener) listener).clicked(new InputEvent(), 0, 0);
@@ -179,42 +217,62 @@ public class GerenciadorAcessibilidade {
                         return true;
                     }
                 }
-
-                //navegacao para frente com shift+tab, tab ou setas
                 boolean irParaFrente = (keycode == Input.Keys.TAB && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
                     || keycode == Input.Keys.RIGHT
                     || keycode == Input.Keys.DOWN;
-
-                //navegacao para tras com shift+tab, tab ou setas
                 boolean irParaTras = (keycode == Input.Keys.TAB && Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
                     || keycode == Input.Keys.LEFT
                     || keycode == Input.Keys.UP;
-
                 if (irParaFrente || irParaTras) {
                     int indiceAtual = -1;
-
-                    //descobre qual botao ta focado no momento
                     for (int i = 0; i < atoresFocaveis.length; i++) {
                         if (atoresFocaveis[i] == focoAtual) {
                             indiceAtual = i;
                             break;
                         }
                     }
-
                     int proximoIndice;
                     if (irParaFrente) {
-                        proximoIndice = (indiceAtual + 1) % atoresFocaveis.length; //vai pro proximo
+                        proximoIndice = (indiceAtual + 1) % atoresFocaveis.length;
                     } else {
-                        proximoIndice = (indiceAtual - 1); //vai pro anterior
-                        if (proximoIndice < 0) proximoIndice = atoresFocaveis.length - 1; //se passar de zero vai pro ultimo
+                        proximoIndice = (indiceAtual - 1);
+                        if (proximoIndice < 0) proximoIndice = atoresFocaveis.length - 1;
                     }
-
-                    //muda o foco e avisa o stage
                     palco.setKeyboardFocus(atoresFocaveis[proximoIndice]);
                     return true;
                 }
                 return false;
             }
         });
+    }
+
+    public static TextureRegionDrawable criarTexturaGradiente(Color corTopo, Color corBase) {
+        int altura = 512;
+        Pixmap mapaPixels = new Pixmap(1, altura, Pixmap.Format.RGBA8888);
+        for (int y = 0; y < altura; y++) {
+            float ratio = (float) y / (altura - 1);
+            Color corAtual = new Color(corTopo).lerp(corBase, ratio);
+            mapaPixels.setColor(corAtual);
+            mapaPixels.drawPixel(0, y);
+        }
+        Texture textura = new Texture(mapaPixels);
+        textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        mapaPixels.dispose();
+        return new TextureRegionDrawable(textura);
+    }
+    public static Color getCorFundoCaixaRanking() {
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.BLACK;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("050A14"); // O azul que definimos
+            default: return Color.valueOf("2B0505"); // O vermelho original
+        }
+    }
+
+    public static Color getCorBordaLinhaRanking() {
+        switch (modoVisaoAtual) {
+            case ALTO_CONTRASTE: return Color.WHITE;
+            case PROTANOPIA_DEUTERANOPIA: return Color.valueOf("0F1C33");
+            default: return Color.valueOf("350A0A");
+        }
     }
 }
