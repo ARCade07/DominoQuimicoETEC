@@ -115,6 +115,22 @@ public class TeacherScreen implements Screen {
         });
         fundo.add(botaoRanking).width(600).height(100).padBottom(45).center().row();
 
+        //Botão Configurações
+        Button botaoConfiguracoes = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("configuracoes.png"));
+        Image iconeConfiguracoes = new Image(texture);
+        botaoConfiguracoes.add(iconeConfiguracoes).size(55, 55).padLeft(15).padRight(10);
+        Label textoConfiguracoes = new Label("Configuracoes", estiloTextoNormal);
+        textoConfiguracoes.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoConfiguracoes.add(textoConfiguracoes).expandX().padLeft(-25);
+        botaoConfiguracoes.addListener(new ClickListener() {
+            //Adicionar função para entrar na tela de acessibilidade
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoConfiguracoes).width(600).height(100).padBottom(45).center().row();
+
     }
 
     @Override
