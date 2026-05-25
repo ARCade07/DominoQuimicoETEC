@@ -98,6 +98,23 @@ public class TeacherScreen implements Screen {
         texture = new Texture(Gdx.files.internal("etec_ra_metropolitana_sp_santo_andre_etec_julio_de_mesquita_cor 1.png"));
         Image imagemEtec = new Image(texture);
         cabecalho.add(imagemEtec).right().padTop(20).padRight(20);
+
+        //Botão Ranking
+        Button botaoRanking = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("ranking.png"));
+        Image iconeRanking = new Image(texture);
+        botaoRanking.add(iconeRanking).size(55, 55).padLeft(15).padRight(10);
+        Label textoRanking = new Label("Ranking", estiloTextoNormal);
+        textoRanking.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoRanking.add(textoRanking).expandX().padLeft(-25);
+        botaoRanking.addListener(new ClickListener() {
+            //Adicionar função para entrar no jogo
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoRanking).width(600).height(100).padBottom(45).center().row();
+
     }
 
     @Override
