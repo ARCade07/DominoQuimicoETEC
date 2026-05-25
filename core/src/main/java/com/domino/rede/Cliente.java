@@ -74,6 +74,10 @@ public class Cliente {
         cliente.sendTCP(quantidade);
     }
 
+    public void enviarPontuacao(PacketPontuacao pontuacao){
+        cliente.sendTCP(pontuacao);
+    }
+
     public void fechar(){
         if(cliente != null) cliente.stop();
     }

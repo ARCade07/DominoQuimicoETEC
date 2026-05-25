@@ -21,6 +21,7 @@ import com.domino.logica.*;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.PacketPontuacao;
 import com.domino.rede.packets.PacketQuantidadePecas;
 import com.domino.texturas.Background;
 
@@ -141,6 +142,12 @@ public class GameScreen implements Screen {
 //                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
+                            pacote.ultimaJogada = true;
+
+                            PacketPontuacao pontuacaoFinal = new PacketPontuacao();
+                            pontuacaoFinal.pontuacao = pontuacao;
+
+                            cliente.enviarPontuacao(pontuacaoFinal);
                         cliente.enviarJogada(pacote);
 
                         // atualiza a quantidade de peças para os outros jogadores
@@ -233,6 +240,12 @@ public class GameScreen implements Screen {
 //                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
+                            pacote.ultimaJogada = true;
+
+                            PacketPontuacao pontuacaoFinal = new PacketPontuacao();
+                            pontuacaoFinal.pontuacao = pontuacao;
+
+                            cliente.enviarPontuacao(pontuacaoFinal);
                         cliente.enviarJogada(pacote);
 
                         // atualiza a quantidade de peças para os outros jogadores
