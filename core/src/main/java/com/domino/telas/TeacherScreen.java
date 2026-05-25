@@ -131,6 +131,21 @@ public class TeacherScreen implements Screen {
         });
         fundo.add(botaoConfiguracoes).width(600).height(100).padBottom(45).center().row();
 
+        //Botão Sair
+        Button botaoSair = new Button(estiloBotaoGrupo);
+        texture = new Texture(Gdx.files.internal("sair.png"));
+        Image iconeSair = new Image(texture);
+        botaoSair.add(iconeSair).size(55, 55).padLeft(15).padRight(10);
+        Label textoSair = new Label("Sair", estiloTextoNormal);
+        textoSair.setFontScale(2f / MULTIPLICADOR_HD);
+        botaoSair.add(textoSair).expandX().padLeft(-25);
+        botaoSair.addListener(new ClickListener() {
+            //Adicionar função para fechar o jogo
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+        fundo.add(botaoSair).width(600).height(100).padBottom(45).center().row();
     }
 
     @Override
