@@ -31,6 +31,10 @@ public class TeacherScreen implements Screen {
 
     @Override
     public void show() {
+
+        stage = new Stage(new ExtendViewport(1920, 1080));
+        Gdx.input.setInputProcessor(stage);
+
     }
 
     @Override
