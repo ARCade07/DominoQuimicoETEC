@@ -35,6 +35,32 @@ public class TeacherScreen implements Screen {
         stage = new Stage(new ExtendViewport(1920, 1080));
         Gdx.input.setInputProcessor(stage);
 
+        // Gerador de fonte normal
+        FreeTypeFontGenerator geradorNormal = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Medium.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parametroNormal = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parametroNormal.size = (int) (24 * MULTIPLICADOR_HD); // Tamanho real 72
+        parametroNormal.color = Color.WHITE;
+        parametroNormal.genMipMaps = true;
+        parametroNormal.minFilter = Texture.TextureFilter.MipMapLinearLinear;
+        parametroNormal.magFilter = Texture.TextureFilter.Linear;
+        parametroNormal.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←";
+        BitmapFont fonteNormal = geradorNormal.generateFont(parametroNormal);
+        geradorNormal.dispose();
+        fonteNormal.setUseIntegerPositions(false);
+
+        //Gerador de fonte negrito
+        FreeTypeFontGenerator geradorNegrito = new FreeTypeFontGenerator(Gdx.files.internal("Inter_24pt-Bold.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parametroNegrito = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parametroNegrito.size = (int) (24 * MULTIPLICADOR_HD); // Tamanho real 72
+        parametroNegrito.color = Color.WHITE;
+        parametroNegrito.genMipMaps = true;
+        parametroNegrito.minFilter = Texture.TextureFilter.MipMapLinearLinear;
+        parametroNegrito.magFilter = Texture.TextureFilter.Linear;
+        parametroNegrito.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←";
+        BitmapFont fonteNegrito = geradorNegrito.generateFont(parametroNegrito);
+        geradorNegrito.dispose();
+        fonteNegrito.setUseIntegerPositions(false);
+
     }
 
     @Override
