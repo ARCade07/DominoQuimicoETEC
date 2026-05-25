@@ -38,13 +38,16 @@ public class Servidor {
                 if (object instanceof PacketJogada) {
                     PacketJogada jogada = (PacketJogada) object;
 
-                    // pega quem enviou a jogada
-                    int jogadorAtual = jogadoresConectados.indexOf(connection.getID());
-                    // calcula, através do array de jogadoresConectados, quem será o próximo a jogar
-                    int proximoAJogar = (jogadorAtual + 1) % jogadoresConectados.size();
-                    int idProximoAJogar = jogadoresConectados.get(proximoAJogar);
-                    // envia pela rede o  id do próximo jogador
-                    jogada.proximoAJogar = idProximoAJogar;
+                    if(!jogada.ultimaJogada){
+                        // pega quem enviou a jogada
+                        int jogadorAtual = jogadoresConectados.indexOf(connection.getID());
+                        // calcula, através do array de jogadoresConectados, quem será o próximo a jogar
+                        int proximoAJogar = (jogadorAtual + 1) % jogadoresConectados.size();
+                        int idProximoAJogar = jogadoresConectados.get(proximoAJogar);
+                        // envia pela rede o  id do próximo jogador
+                        jogada.proximoAJogar = idProximoAJogar;
+                    }
+                    else jogada.proximoAJogar = -1;
 
                     // envia a jogada para todos os jogadores, menos o que enviou
                     servidor.sendToAllExceptTCP(connection.getID(), jogada);

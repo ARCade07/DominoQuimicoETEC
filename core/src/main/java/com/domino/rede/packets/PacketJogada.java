@@ -11,6 +11,7 @@ public class PacketJogada {
     public Tipo tipo2;
     public boolean noFinal;
     public int proximoAJogar;
+    public boolean ultimaJogada;
 
     public int rotacao;
     public boolean isBucha;
