@@ -1,9 +1,7 @@
 package com.domino.rede;
 
 import com.badlogic.gdx.Gdx;
-import com.domino.rede.packets.PacketJogada;
-import com.domino.rede.packets.PacketPrimeiroJogador;
-import com.domino.rede.packets.PacketQuantidadePecas;
+import com.domino.rede.packets.*;
 import com.domino.telas.GameScreen;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -60,6 +58,14 @@ public class Cliente {
                 if(objeto instanceof PacketPrimeiroJogador){
                     minhaVez = true;
                     System.out.println("Você começa");
+                }
+                if(objeto instanceof PacketResultadoJogo){
+                    PacketResultadoJogo resultado = (PacketResultadoJogo) objeto;
+
+                    for(PacketResultadoJogador resultadoJogador : resultado.resultadoFinal){
+
+                        System.out.println("Jogador: " + resultadoJogador.idJogador + " | Pontuação: " + resultadoJogador.pontuacao);
+                    }
                 }
             }
         });
