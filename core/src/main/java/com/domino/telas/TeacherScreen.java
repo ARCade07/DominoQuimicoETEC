@@ -65,6 +65,12 @@ public class TeacherScreen implements Screen {
         Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("FFFFFF"));
         Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("FFFFFF"));
 
+        //Estilo Botão
+        Button.ButtonStyle estiloBotaoGrupo = new Button.ButtonStyle();
+        estiloBotaoGrupo.up = criarBordaArredondadaTextura(Color.valueOf("1A0404"), Color.valueOf("500000"), 8, 2);
+        estiloBotaoGrupo.over = criarBordaArredondadaTextura(Color.valueOf("271818"), Color.valueOf("500000"), 8, 2);
+        estiloBotaoGrupo.down = criarBordaArredondadaTextura(Color.valueOf("080505"), Color.valueOf("500000"), 8, 2);
+
     }
 
     @Override
