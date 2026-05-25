@@ -1,21 +1,18 @@
 package com.domino.rede;
 
-import com.domino.rede.packets.PacketJogada;
-import com.domino.rede.packets.PacketPrimeiroJogador;
-import com.domino.rede.packets.PacketQuantidadePecas;
+import com.domino.rede.packets.*;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Servidor {
     private Server servidor;
     private List<Integer> jogadoresConectados = new ArrayList<>();
+    private Map<Integer, Integer> pontuacaoFinalJogadores = new HashMap<>();
 
     public  Servidor () throws IOException {
         // instancia o servidor
@@ -60,6 +57,31 @@ public class Servidor {
 
                     quantidadePecas.jogador = quemEnviou;
                     servidor.sendToAllExceptTCP(quemEnviou, quantidadePecas);
+                }
+
+                if(object instanceof PacketPontuacao){
+                    PacketPontuacao packetPontuacao = (PacketPontuacao) object;
+                    int pontuacaoFinal = packetPontuacao.pontuacao;
+                    int idJogador = connection.getID();
+
+                    pontuacaoFinalJogadores.put(idJogador, pontuacaoFinal);
+
+                    if(pontuacaoFinalJogadores.size() == jogadoresConectados.size()){
+                        // utiliza entry para acessar o mapa como um conjunto de pares para poder ordenar depois
+                        List<Map.Entry<Integer, Integer>> pontuacaoFinalJogadoresOrdenada = new ArrayList<>(pontuacaoFinalJogadores.entrySet());
+
+                        pontuacaoFinalJogadoresOrdenada.sort(Map.Entry.<Integer,Integer>comparingByValue().reversed());
+
+                        PacketResultadoJogo packetResultadoJogo = new PacketResultadoJogo();
+                        for(Map.Entry<Integer, Integer> entry : pontuacaoFinalJogadoresOrdenada){
+
+                            PacketResultadoJogador resultado = new PacketResultadoJogador(entry.getKey(),entry.getValue());
+
+                            packetResultadoJogo.resultadoFinal.add(resultado);
+                        }
+
+                        servidor.sendToAllTCP(packetResultadoJogo);
+                    }
                 }
             }
         });
