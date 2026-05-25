@@ -84,6 +84,11 @@ public class TeacherScreen implements Screen {
         cabecalho.top();
         stage.addActor(cabecalho);
 
+        //Imagem Logo CPS
+        texture = new Texture(Gdx.files.internal("logo_cps_versao_br.png"));
+        Image imagemLogo = new Image(texture);
+        cabecalho.add(imagemLogo).expandX().left().padTop(20).padLeft(20);
+
     }
 
     @Override
