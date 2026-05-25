@@ -61,6 +61,10 @@ public class TeacherScreen implements Screen {
         geradorNegrito.dispose();
         fonteNegrito.setUseIntegerPositions(false);
 
+        //Estilos textos
+        Label.LabelStyle estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.valueOf("FFFFFF"));
+        Label.LabelStyle estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.valueOf("FFFFFF"));
+
     }
 
     @Override
