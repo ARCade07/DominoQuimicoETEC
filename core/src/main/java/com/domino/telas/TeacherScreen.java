@@ -71,6 +71,13 @@ public class TeacherScreen implements Screen {
         estiloBotaoGrupo.over = criarBordaArredondadaTextura(Color.valueOf("271818"), Color.valueOf("500000"), 8, 2);
         estiloBotaoGrupo.down = criarBordaArredondadaTextura(Color.valueOf("080505"), Color.valueOf("500000"), 8, 2);
 
+        //Fundo
+        Table fundo = new Table();
+        fundo.setFillParent(true);
+        fundo.setBackground(criarTexturaGradiente(Color.valueOf("4A0000"), Color.valueOf("0D0202")));
+        fundo.top();
+        stage.addActor(fundo);
+
     }
 
     @Override
