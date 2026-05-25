@@ -49,6 +49,7 @@ public class GameScreen implements Screen {
     private Servidor servidor;
     private int quantidadePecas = 7;
     private int pontuacao;
+    private List<Peca> pecasLogicasNaMao;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -130,6 +131,9 @@ public class GameScreen implements Screen {
                     //}
                     alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
 
+                    Peca pecaLogica = pecaSolta.getPecaLogica();
+                    pecasLogicasNaMao.remove(pecaLogica);
+
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
@@ -142,12 +146,15 @@ public class GameScreen implements Screen {
 //                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
+                        if(pecasLogicasNaMao.isEmpty()){
                             pacote.ultimaJogada = true;
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
 
                             cliente.enviarPontuacao(pontuacaoFinal);
+                        }
+
                         cliente.enviarJogada(pacote);
 
                         // atualiza a quantidade de peças para os outros jogadores
@@ -178,6 +185,7 @@ public class GameScreen implements Screen {
                     }
 
                 }
+                System.out.println("Pontuação: " + pontuacao);
             }
         });
         // Para a esquerda (final = false)
@@ -228,6 +236,9 @@ public class GameScreen implements Screen {
                     //}
                     alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
 
+                    Peca pecaLogica = pecaSolta.getPecaLogica();
+                    pecasLogicasNaMao.remove(pecaLogica);
+
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
@@ -240,12 +251,15 @@ public class GameScreen implements Screen {
 //                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
+                        if(pecasLogicasNaMao.isEmpty()){
                             pacote.ultimaJogada = true;
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
 
                             cliente.enviarPontuacao(pontuacaoFinal);
+                        }
+
                         cliente.enviarJogada(pacote);
 
                         // atualiza a quantidade de peças para os outros jogadores
@@ -276,6 +290,7 @@ public class GameScreen implements Screen {
                     }
 
                 }
+                System.out.println("Pontuação: " + pontuacao);
 
             }
         });
@@ -303,7 +318,7 @@ public class GameScreen implements Screen {
         List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
 
         PecaDao p = new PecaDao(new ConnectionFactory());
-        List<Peca> pecasLogicasNaMao = p.buscarPecasAleatorias(7);
+        pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
             String info1 = pecaNaMao.getInfo1();
@@ -360,6 +375,13 @@ public class GameScreen implements Screen {
     }
 
     public void receberJogadaRede(PacketJogada jogada) {
+        if(jogada.proximoAJogar == -1){
+            PacketPontuacao packetPontuacao = new PacketPontuacao();
+            packetPontuacao.pontuacao = pontuacao;
+
+            cliente.enviarPontuacao(packetPontuacao);
+        }
+
         Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
 
         if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
