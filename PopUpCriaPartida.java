@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -19,10 +21,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 public class PopUpCriaPartida {
     private final Stage stage;
@@ -31,6 +34,9 @@ public class PopUpCriaPartida {
     private Texture texturaFundoEscuro;
     private Image cortina;
     private Dialog popupAtual;
+
+    // VARIÁVEL NOVA: Guarda os ouvintes de teclado da tela de trás (ex: TelaRanking)
+    private Array<EventListener> ouvintesOriginais = new Array<>();
 
     private static final float MULTIPLICADOR_HD = 3.0f;
 
@@ -50,6 +56,10 @@ public class PopUpCriaPartida {
     }
 
     public void show() {
+        // 1. ISOLAMENTO: Salva os eventos da tela de trás e limpa o palco principal
+        ouvintesOriginais.addAll(stage.getRoot().getListeners());
+        stage.getRoot().clearListeners();
+
         stage.addActor(cortina);
         mostrarPopUpMultiplayer();
     }
@@ -58,9 +68,21 @@ public class PopUpCriaPartida {
         if (popupAtual != null) popupAtual.hide();
         cortina.remove();
 
+        // 2. RESTAURAÇÃO: Limpa a navegação do Pop-up e devolve a navegação da TelaRanking
+        stage.getRoot().clearListeners();
+        for (EventListener ouvinte : ouvintesOriginais) {
+            stage.getRoot().addListener(ouvinte);
+        }
+
         if (skin != null) skin.dispose();
         if (fontePadrao != null) fontePadrao.dispose();
         if (texturaFundoEscuro != null) texturaFundoEscuro.dispose();
+    }
+
+    // --- FUNÇÃO CORRIGIDA: Aplica navegação limpa sem conflitos ---
+    private void aplicarNavegacaoPopUp(Actor... atores) {
+        stage.getRoot().clearListeners(); // Garante que apenas a navegação atual exista
+        GerenciadorAcessibilidade.configurarNavegacao(stage, atores);
     }
 
     private void criarSkinAcessivel() {
@@ -73,7 +95,9 @@ public class PopUpCriaPartida {
         parameter.minFilter = Texture.TextureFilter.MipMapLinearLinear;
         parameter.magFilter = Texture.TextureFilter.Linear;
         parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←.";
-
+        parameter.borderWidth = 2f;
+        parameter.borderColor = new Color(0, 0, 0, 0);
+        
         parameter.padTop = 4;
         parameter.padBottom = 4;
         parameter.padLeft = 4;
@@ -97,13 +121,15 @@ public class PopUpCriaPartida {
         boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
         Color corSombraBtn = altoContraste ? Color.DARK_GRAY : (protanopia ? Color.valueOf("001F4D") : Color.valueOf("4D0000"));
 
-        TextButton.TextButtonStyle btnStyle = new TextButton.TextButtonStyle();
-        btnStyle.font = fontePadrao;
-        btnStyle.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
-        btnStyle.up = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), corSombraBtn, 12, 6);
-        btnStyle.over = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoHover(), corSombraBtn, 12, 6);
-        btnStyle.down = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoDown(), corSombraBtn, 12, 2);
-        skin.add("default", btnStyle);
+        TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
+        estiloBotao.font = fontePadrao;
+        estiloBotao.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
+        estiloBotao.up = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), corSombraBtn, 12, 6);
+        estiloBotao.over = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoHover(), corSombraBtn, 12, 6);
+        estiloBotao.down = criarBotao3D(GerenciadorAcessibilidade.getCorFundoBotaoDown(), corSombraBtn, 12, 2);
+        estiloBotao.focused = criarBotao3D(GerenciadorAcessibilidade.getCorDestaqueFoco(), corSombraBtn, 12, 6);
+        estiloBotao.focusedFontColor = Color.BLACK;
+        skin.add("default", estiloBotao);
 
         Window.WindowStyle winStyle = new Window.WindowStyle();
         winStyle.titleFont = fontePadrao;
@@ -116,6 +142,8 @@ public class PopUpCriaPartida {
         tfStyle.font = fontePadrao;
         tfStyle.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
         tfStyle.background = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoTela(), GerenciadorAcessibilidade.getCorBordaCartao(), 8, 2);
+        tfStyle.focusedBackground = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoTela(), GerenciadorAcessibilidade.getCorDestaqueFoco(), 8, 2);
+        tfStyle.focusedFontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
 
         TextureRegionDrawable cursorTex = GerenciadorAcessibilidade.criarTexturaGradiente(GerenciadorAcessibilidade.getCorTextoPadrao(), GerenciadorAcessibilidade.getCorTextoPadrao());
         cursorTex.setMinWidth(2);
@@ -193,10 +221,12 @@ public class PopUpCriaPartida {
         Table botoesTable = new Table();
         botoesTable.defaults().width(260).height(54).pad(8);
 
-        TextButton btnHospedar = new TextButton("Hospedar Partida", skin);
-        btnHospedar.addListener(new ChangeListener() {
+        final TextButton btnHospedar = new TextButton("Hospedar Partida", skin);
+        GerenciadorAcessibilidade.aplicarFoco(btnHospedar);
+
+        btnHospedar.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Lógica de Host aqui...");
                 fecharEFecharRecursos();
             }
@@ -204,29 +234,38 @@ public class PopUpCriaPartida {
         botoesTable.add(btnHospedar).row();
 
         final TextButton btnEntrarIP = new TextButton("Entrar via IP", skin);
+        GerenciadorAcessibilidade.aplicarFoco(btnEntrarIP);
         final Cell<Actor> celulaEntrar = botoesTable.add(btnEntrarIP);
         botoesTable.row();
 
-        TextButton btnCancelar = new TextButton("Voltar", skin);
-        btnCancelar.addListener(new ChangeListener() {
+        final TextButton btnCancelar = new TextButton("Voltar", skin);
+        GerenciadorAcessibilidade.aplicarFoco(btnCancelar);
+
+        btnCancelar.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void clicked(InputEvent event, float x, float y) {
                 fecharEFecharRecursos();
             }
         });
         botoesTable.add(btnCancelar).row();
 
-        btnEntrarIP.addListener(new ChangeListener() {
+        aplicarNavegacaoPopUp(btnHospedar, btnEntrarIP, btnCancelar);
+
+        btnEntrarIP.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void clicked(InputEvent event, float x, float y) {
                 Table inputTable = new Table();
+
                 final TextField campoIp = new TextField("", skin);
                 campoIp.setAlignment(Align.center);
+                GerenciadorAcessibilidade.aplicarFoco(campoIp);
 
-                TextButton btnIr = new TextButton("Ir", skin);
-                btnIr.addListener(new ChangeListener() {
+                final TextButton btnIr = new TextButton("Ir", skin);
+                GerenciadorAcessibilidade.aplicarFoco(btnIr);
+
+                btnIr.addListener(new ClickListener() {
                     @Override
-                    public void changed(ChangeEvent event, Actor actor) {
+                    public void clicked(InputEvent event, float x, float y) {
                         System.out.println("Conectando ao IP: " + campoIp.getText());
                         fecharEFecharRecursos();
                     }
@@ -240,12 +279,15 @@ public class PopUpCriaPartida {
                 popupAtual.setPosition(Math.round((stage.getWidth() - popupAtual.getWidth()) / 2f),
                     Math.round((stage.getHeight() - popupAtual.getHeight()) / 2f));
 
+                aplicarNavegacaoPopUp(btnHospedar, campoIp, btnIr, btnCancelar);
+
                 stage.setKeyboardFocus(campoIp);
             }
         });
 
         popupAtual.getContentTable().add(botoesTable);
         popupAtual.show(stage);
+
         popupAtual.pack();
         popupAtual.setPosition(Math.round((stage.getWidth() - popupAtual.getWidth()) / 2f),
             Math.round((stage.getHeight() - popupAtual.getHeight()) / 2f));
