@@ -35,7 +35,6 @@ public class PopUpCriaPartida {
     private Image cortina;
     private Dialog popupAtual;
 
-    // VARIÁVEL NOVA: Guarda os ouvintes de teclado da tela de trás (ex: TelaRanking)
     private Array<EventListener> ouvintesOriginais = new Array<>();
 
     private static final float MULTIPLICADOR_HD = 3.0f;
@@ -56,7 +55,6 @@ public class PopUpCriaPartida {
     }
 
     public void show() {
-        // 1. ISOLAMENTO: Salva os eventos da tela de trás e limpa o palco principal
         ouvintesOriginais.addAll(stage.getRoot().getListeners());
         stage.getRoot().clearListeners();
 
@@ -68,7 +66,6 @@ public class PopUpCriaPartida {
         if (popupAtual != null) popupAtual.hide();
         cortina.remove();
 
-        // 2. RESTAURAÇÃO: Limpa a navegação do Pop-up e devolve a navegação da TelaRanking
         stage.getRoot().clearListeners();
         for (EventListener ouvinte : ouvintesOriginais) {
             stage.getRoot().addListener(ouvinte);
@@ -79,9 +76,8 @@ public class PopUpCriaPartida {
         if (texturaFundoEscuro != null) texturaFundoEscuro.dispose();
     }
 
-    // --- FUNÇÃO CORRIGIDA: Aplica navegação limpa sem conflitos ---
     private void aplicarNavegacaoPopUp(Actor... atores) {
-        stage.getRoot().clearListeners(); // Garante que apenas a navegação atual exista
+        stage.getRoot().clearListeners();
         GerenciadorAcessibilidade.configurarNavegacao(stage, atores);
     }
 
@@ -97,7 +93,7 @@ public class PopUpCriaPartida {
         parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←.";
         parameter.borderWidth = 2f;
         parameter.borderColor = new Color(0, 0, 0, 0);
-        
+
         parameter.padTop = 4;
         parameter.padBottom = 4;
         parameter.padLeft = 4;
@@ -227,8 +223,9 @@ public class PopUpCriaPartida {
         btnHospedar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Lógica de Host aqui...");
+                System.out.println("Hospedando partida e indo para o Lobby...");
                 fecharEFecharRecursos();
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaLobby());
             }
         });
         botoesTable.add(btnHospedar).row();
@@ -266,8 +263,9 @@ public class PopUpCriaPartida {
                 btnIr.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        System.out.println("Conectando ao IP: " + campoIp.getText());
+                        System.out.println("Conectando ao IP: " + campoIp.getText() + " e indo para o Lobby...");
                         fecharEFecharRecursos();
+                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaLobby());
                     }
                 });
 
