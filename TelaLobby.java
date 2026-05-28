@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,9 +25,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class TelaLobby implements Screen {
@@ -41,9 +44,8 @@ public class TelaLobby implements Screen {
 
     private TextureRegion tracoCinza;
 
-    private final Color COR_VERDE_BOTAO = Color.valueOf("00E5A3");
-    private final Color COR_FUNDO_PAINEL = new Color(0.05f, 0.02f, 0.02f, 0.8f);
-    private final Color COR_BORDA_PAINEL = new Color(0.2f, 0.05f, 0.05f, 1f);
+    private Array<Actor> ordemNavegacao;
+    private InputListener listenerTiraFoco;
 
     public TelaLobby() {}
 
@@ -52,6 +54,7 @@ public class TelaLobby implements Screen {
         palco = new Stage(new ExtendViewport(1920, 1080));
         Gdx.input.setInputProcessor(palco);
         tema = new Skin();
+        ordemNavegacao = new Array<>();
 
         Pixmap pixTraco = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixTraco.setColor(Color.WHITE);
@@ -64,7 +67,7 @@ public class TelaLobby implements Screen {
 
         construirInterface();
 
-        palco.getRoot().addCaptureListener(new InputListener() {
+        listenerTiraFoco = new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (!(event.getTarget() instanceof TextField)) {
@@ -72,7 +75,19 @@ public class TelaLobby implements Screen {
                 }
                 return false;
             }
-        });
+        };
+
+        atualizarNavegacao();
+    }
+
+    private void atualizarNavegacao() {
+        palco.getRoot().clearListeners();
+
+        if (listenerTiraFoco != null) {
+            palco.getRoot().addCaptureListener(listenerTiraFoco);
+        }
+
+        GerenciadorAcessibilidade.configurarNavegacao(palco, ordemNavegacao.toArray(Actor.class));
     }
 
     private void carregarFontes() {
@@ -141,30 +156,34 @@ public class TelaLobby implements Screen {
     }
 
     private void configurarEstilos() {
-        Label.LabelStyle sTitulo = new Label.LabelStyle(fonteNegrito, Color.WHITE);
+        Label.LabelStyle sTitulo = new Label.LabelStyle(fonteNegrito, GerenciadorAcessibilidade.getCorTextoTitulo());
         tema.add("titulo", sTitulo);
 
-        Label.LabelStyle sSubtitulo = new Label.LabelStyle(fonteNormal, Color.valueOf("A0A0A0"));
+        Label.LabelStyle sSubtitulo = new Label.LabelStyle(fonteNormal, GerenciadorAcessibilidade.getCorTextoFraco());
         tema.add("subtitulo", sSubtitulo);
 
-        Label.LabelStyle sTexto = new Label.LabelStyle(fonteNormal, Color.WHITE);
+        Label.LabelStyle sTexto = new Label.LabelStyle(fonteNormal, GerenciadorAcessibilidade.getCorTextoPadrao());
         tema.add("texto", sTexto);
 
         TextField.TextFieldStyle sInput = new TextField.TextFieldStyle();
         sInput.font = fonteInput;
-        sInput.fontColor = Color.WHITE;
+        sInput.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
 
-        NinePatchDrawable bgNormal = criarBordaArredondadaTextura(new Color(0.02f, 0.01f, 0.01f, 1f), COR_BORDA_PAINEL, 8, 2);
+        Color corBgPainel = GerenciadorAcessibilidade.getCorFundoCartao();
+        Color corBordaPainel = GerenciadorAcessibilidade.getCorBordaCartao();
+        Color corFoco = GerenciadorAcessibilidade.getCorDestaqueFoco();
+
+        NinePatchDrawable bgNormal = criarBordaArredondadaTextura(corBgPainel, corBordaPainel, 8, 2);
         bgNormal.getPatch().setLeftWidth(20);
         bgNormal.getPatch().setRightWidth(20);
         sInput.background = bgNormal;
 
-        NinePatchDrawable bgFoco = criarBordaArredondadaTextura(new Color(0.02f, 0.01f, 0.01f, 1f), Color.WHITE, 8, 2);
+        NinePatchDrawable bgFoco = criarBordaArredondadaTextura(corBgPainel, corFoco, 8, 2);
         bgFoco.getPatch().setLeftWidth(20);
         bgFoco.getPatch().setRightWidth(20);
         sInput.focusedBackground = bgFoco;
 
-        TextureRegionDrawable cursorTex = criarTexturaCor(Color.WHITE);
+        TextureRegionDrawable cursorTex = criarTexturaCor(GerenciadorAcessibilidade.getCorTextoPadrao());
         cursorTex.setMinWidth(2);
         sInput.cursor = cursorTex;
 
@@ -175,22 +194,24 @@ public class TelaLobby implements Screen {
         Table raiz = new Table();
         raiz.setFillParent(true);
 
-        Color corTopo, corBase;
-        if (GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE) {
-            raiz.setBackground(criarTexturaCor(Color.BLACK));
-        } else if (GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA) {
-            corTopo = Color.valueOf("0A1428");
-            corBase = Color.valueOf("02050A");
-            raiz.setBackground(GerenciadorAcessibilidade.criarTexturaGradiente(corTopo, corBase));
+        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
+        boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
+
+        if (altoContraste) {
+            raiz.setBackground(criarTexturaCor(GerenciadorAcessibilidade.getCorFundoTela()));
         } else {
-            corTopo = Color.valueOf("4A0000");
-            corBase = Color.valueOf("0D0202");
+            Color corTopo, corBase;
+            if (protanopia) {
+                corTopo = Color.valueOf("0A1428");
+                corBase = Color.valueOf("02050A");
+            } else {
+                corTopo = Color.valueOf("4A0000");
+                corBase = Color.valueOf("0D0202");
+            }
             raiz.setBackground(GerenciadorAcessibilidade.criarTexturaGradiente(corTopo, corBase));
         }
         palco.addActor(raiz);
 
-        boolean altoContraste = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
-        boolean protanopia = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
         Color corSombra = altoContraste ? Color.DARK_GRAY : (protanopia ? Color.valueOf("001F4D") : Color.valueOf("4D0000"));
 
         TextButton.TextButtonStyle estiloBotaoVoltar = new TextButton.TextButtonStyle();
@@ -204,7 +225,10 @@ public class TelaLobby implements Screen {
 
         TextButton btnVoltar = new TextButton("← VOLTAR", estiloBotaoVoltar);
         btnVoltar.getLabel().setFontScale(1f / MULTIPLICADOR_HD);
+
         GerenciadorAcessibilidade.aplicarFoco(btnVoltar);
+        ordemNavegacao.add(btnVoltar);
+
         btnVoltar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -230,8 +254,6 @@ public class TelaLobby implements Screen {
 
         raiz.add(colunaEsquerda).width(Value.percentWidth(0.40f, raiz)).top().padRight(30);
         raiz.add(colunaDireita).width(Value.percentWidth(0.45f, raiz)).top().padLeft(30);
-
-        GerenciadorAcessibilidade.configurarNavegacao(palco, btnVoltar);
     }
 
     private void construirColunaEsquerda(Table coluna) {
@@ -249,11 +271,35 @@ public class TelaLobby implements Screen {
         Label lblNumeroIp = criarRotulo(IP_OCULTO, "texto", 0.85f);
         lblNumeroIp.setAlignment(Align.center);
 
-        ImageButton.ImageButtonStyle estiloOlho = new ImageButton.ImageButtonStyle();
-        estiloOlho.imageUp = criarIconeOlho(Color.GRAY, true);
-        estiloOlho.imageChecked = criarIconeOlho(Color.WHITE, false);
+        final TextureRegionDrawable olhoFechadoNormal = criarIconeOlho(GerenciadorAcessibilidade.getCorTextoFraco(), true);
+        final TextureRegionDrawable olhoAbertoNormal = criarIconeOlho(GerenciadorAcessibilidade.getCorTextoPadrao(), false);
+        final TextureRegionDrawable olhoFechadoFoco = criarIconeOlho(GerenciadorAcessibilidade.getCorDestaqueFoco(), true);
+        final TextureRegionDrawable olhoAbertoFoco = criarIconeOlho(GerenciadorAcessibilidade.getCorDestaqueFoco(), false);
 
-        ImageButton btnVisibilidade = new ImageButton(estiloOlho);
+        ImageButton.ImageButtonStyle estiloOlho = new ImageButton.ImageButtonStyle();
+        estiloOlho.imageUp = olhoFechadoNormal;
+        estiloOlho.imageChecked = olhoAbertoNormal;
+        estiloOlho.imageOver = olhoFechadoFoco;
+        estiloOlho.imageCheckedOver = olhoAbertoFoco;
+
+        final ImageButton btnVisibilidade = new ImageButton(estiloOlho);
+
+        GerenciadorAcessibilidade.aplicarFoco(btnVisibilidade);
+        ordemNavegacao.add(btnVisibilidade);
+
+        btnVisibilidade.addListener(new FocusListener() {
+            @Override
+            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
+                if (focused) {
+                    btnVisibilidade.getStyle().imageUp = olhoFechadoFoco;
+                    btnVisibilidade.getStyle().imageChecked = olhoAbertoFoco;
+                } else {
+                    btnVisibilidade.getStyle().imageUp = olhoFechadoNormal;
+                    btnVisibilidade.getStyle().imageChecked = olhoAbertoNormal;
+                }
+            }
+        });
+
         btnVisibilidade.addListener(new ClickListener() {
             boolean visivel = false;
             @Override
@@ -276,6 +322,10 @@ public class TelaLobby implements Screen {
         painelHost.add(caixaFakeInput).growX().height(70).padBottom(25).row();
 
         TextButton btnCopiar = criarBotaoFino("COPIAR IP");
+
+        GerenciadorAcessibilidade.aplicarFoco(btnCopiar);
+        ordemNavegacao.add(btnCopiar);
+
         btnCopiar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -299,7 +349,7 @@ public class TelaLobby implements Screen {
                 if (getText().isEmpty()) {
                     BitmapFont font = getStyle().font;
                     Color corAntiga = font.getColor();
-                    font.setColor(Color.GRAY);
+                    font.setColor(GerenciadorAcessibilidade.getCorTextoFraco());
 
                     float y = getY() + (getHeight() / 2f) + (font.getCapHeight() / 2f);
                     font.draw(batch, "Digite o IP da sala aqui...", getX(), y, getWidth(), Align.center, false);
@@ -310,9 +360,16 @@ public class TelaLobby implements Screen {
         campoDigitarIp.setMessageText("");
         campoDigitarIp.setAlignment(Align.center);
 
+        GerenciadorAcessibilidade.aplicarFoco(campoDigitarIp);
+        ordemNavegacao.add(campoDigitarIp);
+
         painelConectar.add(campoDigitarIp).growX().height(70).padBottom(25).row();
 
         TextButton btnConectar = criarBotaoFino("CONECTAR");
+
+        GerenciadorAcessibilidade.aplicarFoco(btnConectar);
+        ordemNavegacao.add(btnConectar);
+
         painelConectar.add(btnConectar).width(350).height(65).row();
 
         coluna.add(painelConectar).growX().row();
@@ -348,35 +405,49 @@ public class TelaLobby implements Screen {
 
         coluna.add(listaJogadores).growX().row();
 
+        Color corFundoBtnIniciar = GerenciadorAcessibilidade.getCorDestaqueSucesso();
+        Color corSombraBtnIniciar = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE ?
+            Color.DARK_GRAY : new Color(corFundoBtnIniciar.r * 0.5f, corFundoBtnIniciar.g * 0.5f, corFundoBtnIniciar.b * 0.5f, 1f);
+
         TextButton.TextButtonStyle estiloIniciar = new TextButton.TextButtonStyle();
         estiloIniciar.font = fonteNegrito;
         estiloIniciar.fontColor = Color.BLACK;
-        estiloIniciar.up = criarBotao3D(COR_VERDE_BOTAO, Color.valueOf("009970"), 12, 6);
-        estiloIniciar.over = criarBotao3D(Color.valueOf("33FFC4"), Color.valueOf("009970"), 12, 6);
-        estiloIniciar.down = criarBotao3D(Color.valueOf("00CC92"), Color.valueOf("00664B"), 12, 2);
+        estiloIniciar.up = criarBotao3D(corFundoBtnIniciar, corSombraBtnIniciar, 12, 6);
+        estiloIniciar.over = criarBotao3D(new Color(corFundoBtnIniciar.r * 1.2f, corFundoBtnIniciar.g * 1.2f, corFundoBtnIniciar.b * 1.2f, 1f), corSombraBtnIniciar, 12, 6);
+        estiloIniciar.down = criarBotao3D(new Color(corFundoBtnIniciar.r * 0.8f, corFundoBtnIniciar.g * 0.8f, corFundoBtnIniciar.b * 0.8f, 1f), corSombraBtnIniciar, 12, 2);
+        estiloIniciar.focused = criarBotao3D(GerenciadorAcessibilidade.getCorDestaqueFoco(), corSombraBtnIniciar, 12, 6);
+        estiloIniciar.focusedFontColor = Color.BLACK;
 
         TextButton btnIniciar = new TextButton("INICIAR PARTIDA", estiloIniciar);
         btnIniciar.getLabel().setFontScale(1f / MULTIPLICADOR_HD);
+
+        GerenciadorAcessibilidade.aplicarFoco(btnIniciar);
+        ordemNavegacao.add(btnIniciar);
 
         coluna.add(btnIniciar).width(450).height(85).center().padTop(30);
     }
 
     private Table criarPainelBase() {
         Table painel = new Table();
-        painel.setBackground(criarBordaArredondadaTextura(COR_FUNDO_PAINEL, COR_BORDA_PAINEL, 16, 2));
+        painel.setBackground(criarBordaArredondadaTextura(
+            GerenciadorAcessibilidade.getCorFundoCartao(),
+            GerenciadorAcessibilidade.getCorBordaForte(),
+            16, 2));
         painel.pad(35);
         return painel;
     }
 
     private Table criarSlotJogador(String nome, boolean isHost, boolean temX, final Runnable acaoRemover) {
         Table slot = new Table();
-        slot.setBackground(criarBordaArredondadaTextura(new Color(0.06f, 0.02f, 0.02f, 1f), new Color(0.1f, 0.03f, 0.03f, 1f), 18, 2));
+        Color bgCartao = GerenciadorAcessibilidade.getCorFundoTela();
+        Color borderCartao = GerenciadorAcessibilidade.getCorBordaCartao();
+        slot.setBackground(criarBordaArredondadaTextura(bgCartao, borderCartao, 18, 2));
         slot.padLeft(20).padRight(20);
 
         Table conteudoEsquerda = new Table();
         if (isHost) {
             Label lblCoroa = criarRotulo("HOST", "titulo", 0.6f);
-            lblCoroa.setColor(Color.YELLOW);
+            lblCoroa.setColor(GerenciadorAcessibilidade.getCorTextoTitulo());
             conteudoEsquerda.add(lblCoroa).padRight(15);
         }
 
@@ -388,17 +459,24 @@ public class TelaLobby implements Screen {
         if (temX) {
             TextButton.TextButtonStyle estiloX = new TextButton.TextButtonStyle();
             estiloX.font = fonteNegrito;
-            estiloX.fontColor = Color.GRAY;
-            estiloX.overFontColor = Color.WHITE;
-            estiloX.downFontColor = Color.valueOf("FF4444");
+            estiloX.fontColor = GerenciadorAcessibilidade.getCorTextoFraco();
+            estiloX.overFontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
+            estiloX.downFontColor = GerenciadorAcessibilidade.getCorDestaqueErro();
+            estiloX.focusedFontColor = GerenciadorAcessibilidade.getCorDestaqueFoco();
 
-            TextButton btnX = new TextButton("X", estiloX);
+            final TextButton btnX = new TextButton("X", estiloX);
             btnX.getLabel().setFontScale(0.8f / MULTIPLICADOR_HD);
             btnX.pad(10);
+
+            GerenciadorAcessibilidade.aplicarFoco(btnX);
+            ordemNavegacao.add(btnX);
 
             btnX.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    ordemNavegacao.removeValue(btnX, true);
+                    atualizarNavegacao();
+
                     //colocar a logica de conexao com o servidor
                     if (acaoRemover != null) {
                         acaoRemover.run();
@@ -417,7 +495,9 @@ public class TelaLobby implements Screen {
             public void draw(com.badlogic.gdx.graphics.g2d.Batch batch, float parentAlpha) {
                 super.draw(batch, parentAlpha);
                 Color corAnterior = batch.getColor();
-                batch.setColor(new Color(0.4f, 0.4f, 0.4f, 0.5f));
+
+                Color corTraco = GerenciadorAcessibilidade.getCorTextoFraco();
+                batch.setColor(new Color(corTraco.r, corTraco.g, corTraco.b, 0.5f));
 
                 float dashWidth = 12f;
                 float spaceWidth = 8f;
@@ -469,7 +549,7 @@ public class TelaLobby implements Screen {
         pix.fillCircle(32, 32, 9);
 
         if (fechado) {
-            pix.setColor(Color.valueOf("FF5555"));
+            pix.setColor(GerenciadorAcessibilidade.getCorDestaqueErro());
             for (int i = -3; i <= 3; i++) {
                 pix.drawLine(12 + i, 52, 52 + i, 12);
             }
@@ -484,10 +564,15 @@ public class TelaLobby implements Screen {
     private TextButton criarBotaoFino(String texto) {
         TextButton.TextButtonStyle estiloBotao = new TextButton.TextButtonStyle();
         estiloBotao.font = fonteNegrito;
-        estiloBotao.fontColor = Color.WHITE;
-        estiloBotao.up = criarBordaArredondadaTextura(new Color(0.02f, 0.01f, 0.01f, 1f), Color.LIGHT_GRAY, 8, 2);
-        estiloBotao.over = criarBordaArredondadaTextura(new Color(0.1f, 0.1f, 0.1f, 1f), Color.WHITE, 8, 2);
-        estiloBotao.down = criarBordaArredondadaTextura(Color.DARK_GRAY, Color.GRAY, 8, 2);
+        estiloBotao.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
+
+        Color bgSecundario = GerenciadorAcessibilidade.getCorFundoTela();
+        Color bgFoco = GerenciadorAcessibilidade.getCorDestaqueFoco();
+
+        estiloBotao.up = criarBordaArredondadaTextura(bgSecundario, Color.LIGHT_GRAY, 8, 2);
+        estiloBotao.over = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoCartao(), Color.WHITE, 8, 2);
+        estiloBotao.down = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoDown(), Color.GRAY, 8, 2);
+        estiloBotao.focused = criarBordaArredondadaTextura(bgSecundario, bgFoco, 8, 3);
 
         TextButton btn = new TextButton(texto, estiloBotao);
         btn.getLabel().setFontScale(0.85f / MULTIPLICADOR_HD);
