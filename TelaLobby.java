@@ -16,14 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.ui.Value;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
@@ -381,7 +374,7 @@ public class TelaLobby implements Screen {
 
         Table listaJogadores = new Table();
 
-        Table slot1 = criarSlotJogador("1. Pom", true, false, null);
+        Table slot1 = criarSlotJogador("Pom", true, false, null);
         listaJogadores.add(slot1).growX().height(75).padBottom(15).row();
 
         final Cell<Table> celulaSlot2 = listaJogadores.add(new Table()).growX().height(75).padBottom(15);
@@ -394,7 +387,7 @@ public class TelaLobby implements Screen {
             }
         };
 
-        Table slot2 = criarSlotJogador("2. Paulu B.", false, true, acaoRemoverSlot2);
+        Table slot2 = criarSlotJogador("Paulu B.", false, true, acaoRemoverSlot2);
         celulaSlot2.setActor(slot2);
 
         Table slot3 = criarSlotVazio();
@@ -446,9 +439,8 @@ public class TelaLobby implements Screen {
 
         Table conteudoEsquerda = new Table();
         if (isHost) {
-            Label lblCoroa = criarRotulo("HOST", "titulo", 0.6f);
-            lblCoroa.setColor(GerenciadorAcessibilidade.getCorTextoTitulo());
-            conteudoEsquerda.add(lblCoroa).padRight(15);
+            Image imgCoroa = new Image(criarCoroaTextura(Color.valueOf("FFD700")));
+            conteudoEsquerda.add(imgCoroa).size(36, 27).padRight(15);
         }
 
         Label lblNome = criarRotulo(nome, "texto", 0.9f);
@@ -555,6 +547,22 @@ public class TelaLobby implements Screen {
             }
         }
 
+        Texture tex = new Texture(pix, true);
+        tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        pix.dispose();
+        return new TextureRegionDrawable(tex);
+    }
+
+    private TextureRegionDrawable criarCoroaTextura(Color cor) {
+        int w = 60;
+        int h = 45;
+        Pixmap pix = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        pix.setBlending(Pixmap.Blending.None);
+        pix.setColor(cor);
+        pix.fillRectangle(6, 30, 48, 9);
+        pix.fillTriangle(6, 30, 21, 30, 3, 6);
+        pix.fillTriangle(21, 30, 39, 30, 30, 0);
+        pix.fillTriangle(39, 30, 54, 30, 57, 6);
         Texture tex = new Texture(pix, true);
         tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
         pix.dispose();
