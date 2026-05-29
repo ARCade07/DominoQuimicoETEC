@@ -12,6 +12,7 @@ public class CadastroScreen extends BaseScreen {
 
     private Texture texUsuario;
     private Texture texSenha;
+    private Texture texEmail;
 
     public CadastroScreen() {
         super();
@@ -19,6 +20,7 @@ public class CadastroScreen extends BaseScreen {
         //Texturas específicas tela de login
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
+        texEmail = new Texture(Gdx.files.internal("Email.png"));
 
         montarTela();
     }
@@ -52,6 +54,19 @@ public class CadastroScreen extends BaseScreen {
         TextField campoUsername = new TextField("", Estilos.estiloCampoSemFundo);
         grupoUsername.add(campoUsername).expandX().fillX().padRight(15);
         cartaoCadastro.add(grupoUsername).width(340).height(50).padBottom(20).row();
+
+        //Label email
+        Label email = new Label("E-mail", Estilos.estiloTextoNormal);
+        email.setFontScale(1 / Estilos.MULTIPLICADOR_HD);
+        cartaoCadastro.add(email).left().padBottom(10).row();
+
+        //Campo Email
+        Table grupoEmail = new Table();
+        grupoEmail.setBackground(Estilos.fundoArredondadoClaro);
+        grupoEmail.add(new Image(texEmail)).size(24, 24).padLeft(5).padRight(10);
+        TextField campoEmail = new TextField("", Estilos.estiloCampoSemFundo);
+        grupoEmail.add(campoEmail).expandX().fillX().padRight(15);
+        cartaoCadastro.add(grupoEmail).width(340).height(50).padBottom(20).row();
 
         //Label Senha
         Label senha = new Label("Senha", Estilos.estiloTextoNormal);
