@@ -81,6 +81,7 @@ public class CadastroScreen extends BaseScreen {
         campoSenha.setPasswordMode(true);
         campoSenha.setPasswordCharacter('*');
         grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
+        cartaoCadastro.add(grupoSenha).width(340).height(50).padBottom(40).row();
 
         //Botão Cadastrar
         TextButton botaoCadastrar = new TextButton("Cadastrar", Estilos.estiloBotaoEntrar);
