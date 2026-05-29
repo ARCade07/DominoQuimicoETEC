@@ -81,22 +81,6 @@ public class CadastroScreen extends BaseScreen {
         campoSenha.setPasswordMode(true);
         campoSenha.setPasswordCharacter('*');
         grupoSenha.add(campoSenha).expandX().fillX().padRight(15);
-        cartaoCadastro.add(grupoSenha).width(340).height(50).padBottom(20).row();
-
-        //Label Username
-        Label confirmarSenha = new Label("Confirmar senha", Estilos.estiloTextoNormal);
-        confirmarSenha.setFontScale(1 / Estilos.MULTIPLICADOR_HD);
-        cartaoCadastro.add(confirmarSenha).left().padBottom(10).row();
-
-        //Campo Confirmar Senha
-        Table grupoConfirmarSenha = new Table();
-        grupoConfirmarSenha.setBackground(Estilos.fundoArredondadoClaro);
-        grupoConfirmarSenha.add(new Image(texSenha)).size(24, 24).padLeft(5).padRight(10);
-        TextField campoConfirmarSenha = new TextField("", Estilos.estiloCampoSemFundo);
-        campoConfirmarSenha.setPasswordMode(true);
-        campoConfirmarSenha.setPasswordCharacter('*');
-        grupoConfirmarSenha.add(campoConfirmarSenha).expandX().fillX().padRight(15);
-        cartaoCadastro.add(grupoConfirmarSenha).width(340).height(50).padBottom(40).row();
 
         //Botão Cadastrar
         TextButton botaoCadastrar = new TextButton("Cadastrar", Estilos.estiloBotaoEntrar);
