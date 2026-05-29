@@ -95,6 +95,19 @@ public class CadastroScreen extends BaseScreen {
         });
         cartaoCadastro.add(botaoCadastrar).width(180).height(60).padBottom(15).center().row();
 
+        //Label Cancelar
+        Label linkCancelar = new Label("Cancelar", Estilos.estiloTextoNegrito);
+        linkCancelar.setFontScale(0.8f / Estilos.MULTIPLICADOR_HD);
+        linkCancelar.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //Teste para ver se funcionou o clicker (tirar depois)
+                System.out.println("Clicou em Cancelar");
+                //Função para trocar de tela
+            }
+        });
+        cartaoCadastro.add(linkCancelar).center().padBottom(20).row();
+
         fundo.add(cartaoCadastro).expand().center();
     }
 
