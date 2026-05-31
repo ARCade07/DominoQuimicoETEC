@@ -26,6 +26,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.domino.rede.Cliente;
+import com.domino.rede.Servidor;
+
+import java.io.IOException;
 
 public class PopUpCriaPartida {
     private final Stage stage;
@@ -224,8 +228,18 @@ public class PopUpCriaPartida {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Hospedando partida e indo para o Lobby...");
-                fecharEFecharRecursos();
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaLobby());
+                try {
+                    Servidor servidor = new Servidor();
+
+                    Cliente cliente = new Cliente("localhost");
+                    fecharEFecharRecursos();
+                    TelaLobby telaLobby = new TelaLobby(servidor, cliente);
+                    ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
+                    cliente.setTelaLobby(telaLobby);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
         });
         botoesTable.add(btnHospedar).row();

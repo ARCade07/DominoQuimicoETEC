@@ -24,8 +24,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.domino.rede.Cliente;
+import com.domino.rede.Servidor;
 
 public class TelaLobby implements Screen {
+    private Cliente cliente;
+    private Servidor servidor;
 
     private Stage palco;
     private Skin tema;
@@ -41,6 +45,11 @@ public class TelaLobby implements Screen {
     private InputListener listenerTiraFoco;
 
     public TelaLobby() {}
+
+    public TelaLobby(Servidor servidor, Cliente cliente){
+        this.servidor = servidor;
+        this.cliente = cliente;
+    }
 
     @Override
     public void show() {
