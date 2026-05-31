@@ -19,16 +19,23 @@ public class Servidor {
         servidor = new Server();
         // inicia a thread do servidor e coloca ele para escutar nas respectivas portas
         servidor.start();
-        servidor.bind(54555, 54777);
 
         // registros das classe que serão serializadas utilizando o kryo
         Registro.registrarClasses(servidor.getKryo());
+
+        servidor.bind(54555, 54777);
+
+
 
         servidor.addListener(new Listener(){
             @Override
             public void connected(Connection connection){
                 jogadoresConectados.add(connection.getID());
                 System.out.println("Jogador " + connection.getID() + " conectou!");
+                PacketEntrouJogador packetEntrouJogador = new PacketEntrouJogador();
+                packetEntrouJogador.quantidadeJogadores = jogadoresConectados.size();
+                System.out.println("Enviando PacketEntrouJogador " + packetEntrouJogador.quantidadeJogadores);
+                servidor.sendToAllTCP(packetEntrouJogador);
             }
             @Override
             public void received(Connection connection, Object object) {
