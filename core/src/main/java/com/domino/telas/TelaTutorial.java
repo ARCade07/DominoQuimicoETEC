@@ -1,4 +1,4 @@
-package com.pidomino;
+package com.domino.telas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
