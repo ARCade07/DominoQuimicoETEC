@@ -48,7 +48,10 @@ public class StartScreen extends BaseScreen {
 
         //Botões
         fundo.add(criarBotao(texPlay, "Jogar", () -> {
-            System.out.println("Lógica para ir para a tela do jogo");})).width(600).height(100).padBottom(45).center().row();
+            System.out.println("Lógica para ir para a tela do jogo");
+            PopUpCriaPartida popUp = new PopUpCriaPartida(stage);
+                popUp.show();
+            })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texConfig, "Configuracoes", () -> {
             System.out.println("Lógica para abrir Configurações");
         })).width(600).height(100).padBottom(45).center().row();
