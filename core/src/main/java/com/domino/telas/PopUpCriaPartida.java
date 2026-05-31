@@ -278,8 +278,11 @@ public class PopUpCriaPartida {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         System.out.println("Conectando ao IP: " + campoIp.getText() + " e indo para o Lobby...");
+                        Cliente cliente = new Cliente(campoIp.getText());
                         fecharEFecharRecursos();
-                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new TelaLobby());
+                        TelaLobby telaLobby = new TelaLobby(null, cliente);
+                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
+                        cliente.setTelaLobby(telaLobby);
                     }
                 });
 
