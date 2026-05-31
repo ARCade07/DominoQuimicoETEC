@@ -43,6 +43,7 @@ public class TelaLobby implements Screen {
 
     private Array<Actor> ordemNavegacao;
     private InputListener listenerTiraFoco;
+    private Table listaJogadores;
 
     public TelaLobby() {}
 
@@ -267,7 +268,14 @@ public class TelaLobby implements Screen {
         Table caixaFakeInput = new Table();
         caixaFakeInput.setBackground(tema.get("default", TextField.TextFieldStyle.class).background);
 
-        final String IP_REAL = "192.168.0.150";
+        final String IP_REAL;
+        if(servidor != null){
+            IP_REAL = servidor.obterIPLocal();
+        }
+        else{
+            IP_REAL = "Vejo isso depois";
+        }
+
         final String IP_OCULTO = "............";
 
         Label lblNumeroIp = criarRotulo(IP_OCULTO, "texto", 0.85f);
@@ -378,34 +386,13 @@ public class TelaLobby implements Screen {
     }
 
     private void construirColunaDireita(Table coluna) {
-        Label lblJogadores = criarRotulo("JOGADORES CONECTADOS (2/4)", "titulo", 0.8f);
+        Label lblJogadores = criarRotulo("JOGADORES CONECTADOS", "titulo", 0.8f);
         coluna.add(lblJogadores).left().padBottom(20).row();
 
-        Table listaJogadores = new Table();
-
-        Table slot1 = criarSlotJogador("Pom", true, false, null);
-        listaJogadores.add(slot1).growX().height(75).padBottom(15).row();
-
-        final Cell<Table> celulaSlot2 = listaJogadores.add(new Table()).growX().height(75).padBottom(15);
-        listaJogadores.row();
-
-        Runnable acaoRemoverSlot2 = new Runnable() {
-            @Override
-            public void run() {
-                celulaSlot2.setActor(criarSlotVazio());
-            }
-        };
-
-        Table slot2 = criarSlotJogador("Paulu B.", false, true, acaoRemoverSlot2);
-        celulaSlot2.setActor(slot2);
-
-        Table slot3 = criarSlotVazio();
-        listaJogadores.add(slot3).growX().height(75).padBottom(15).row();
-
-        Table slot4 = criarSlotVazio();
-        listaJogadores.add(slot4).growX().height(75).padBottom(20).row();
+        listaJogadores = new Table();
 
         coluna.add(listaJogadores).growX().row();
+        atualizaJogadoresNaTela(1);
 
         Color corFundoBtnIniciar = GerenciadorAcessibilidade.getCorDestaqueSucesso();
         Color corSombraBtnIniciar = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE ?
@@ -427,6 +414,28 @@ public class TelaLobby implements Screen {
         ordemNavegacao.add(btnIniciar);
 
         coluna.add(btnIniciar).width(450).height(85).center().padTop(30);
+    }
+
+    public void atualizaJogadoresNaTela(int quantidadeDeJogadores) {
+                listaJogadores.clearChildren();
+
+                for (int i = 0; i < 4; i++) {
+                    if (i < quantidadeDeJogadores) {
+                        String nomeJogador = (i == 0) ? "Host" : "Jogador " + (i + 1);
+                        boolean isHost = (i == 0);
+
+
+                        boolean temX = (servidor != null && i != 0);
+
+                        Table slotOcupado = criarSlotJogador(nomeJogador, isHost, temX, null);
+                        listaJogadores.add(slotOcupado).growX().height(75).padBottom(15).row();
+                    } else {
+                        Table slotVazio = criarSlotVazio();
+                        listaJogadores.add(slotVazio).growX().height(75).padBottom(15).row();
+                    }
+                }
+
+
     }
 
     private Table criarPainelBase() {
