@@ -104,6 +104,15 @@ public class Servidor {
         }
     }
 
+    public void removerJogador(int idJogador){
+        for(Connection conexao : servidor.getConnections()){
+            if(conexao.getID() == idJogador){
+                conexao.close();
+                break;
+            }
+        }
+    }
+
     public void botaoInicioClicado(int idHost){
         PacketComecarJogo packetComecarJogo = new PacketComecarJogo();
         servidor.sendToAllExceptTCP(idHost, packetComecarJogo);

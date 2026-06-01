@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
+import java.util.List;
 
 public class TelaLobby implements Screen {
     private Cliente cliente;
@@ -392,7 +393,7 @@ public class TelaLobby implements Screen {
         listaJogadores = new Table();
 
         coluna.add(listaJogadores).growX().row();
-        atualizaJogadoresNaTela(1);
+
 
         Color corFundoBtnIniciar = GerenciadorAcessibilidade.getCorDestaqueSucesso();
         Color corSombraBtnIniciar = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE ?
@@ -436,18 +437,29 @@ public class TelaLobby implements Screen {
         coluna.add(btnIniciar).width(450).height(85).center().padTop(30);
     }
 
-    public void atualizaJogadoresNaTela(int quantidadeDeJogadores) {
+    public void atualizaJogadoresNaTela(List<Integer> idjogadoresConectados) {
                 listaJogadores.clearChildren();
+                int tamanho = idjogadoresConectados.size();
 
                 for (int i = 0; i < 4; i++) {
-                    if (i < quantidadeDeJogadores) {
-                        String nomeJogador = (i == 0) ? "Host" : "Jogador " + (i + 1);
+                    if (i < tamanho) {
+
+                        final int idJogador = idjogadoresConectados.get(i);
+
+                        String nomeJogador = (i == 0) ? "Host" : "Jogador " + (idjogadoresConectados.get(i));
                         boolean isHost = (i == 0);
 
 
-                        boolean temX = (servidor != null && i != 0);
+                        boolean temX = (servidor != null && i != 0);;
 
-                        Table slotOcupado = criarSlotJogador(nomeJogador, isHost, temX, null);
+                        Runnable acaoRemover = new Runnable() {
+                            @Override
+                            public void run() {
+                                servidor.removerJogador(idJogador);
+                            }
+                        };
+
+                        Table slotOcupado = criarSlotJogador(nomeJogador, isHost, temX, acaoRemover);
                         listaJogadores.add(slotOcupado).growX().height(75).padBottom(15).row();
                     } else {
                         Table slotVazio = criarSlotVazio();

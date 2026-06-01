@@ -3,12 +3,14 @@ package com.domino.rede;
 import com.badlogic.gdx.Gdx;
 import com.domino.rede.packets.*;
 import com.domino.telas.GameScreen;
+import com.domino.telas.StartScreen;
 import com.domino.telas.TelaLobby;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Cliente {
     // instancia o cliente
@@ -17,7 +19,7 @@ public class Cliente {
     private TelaLobby telaLobby;
     private String enderecoIP;
     public boolean minhaVez = false;
-    private int quantidadeJogadoresConectados = -1;
+    private List<Integer> jogadoresConectados;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -60,20 +62,18 @@ public class Cliente {
                         System.out.println("Jogador: " + resultadoJogador.idJogador + " | Pontuação: " + resultadoJogador.pontuacao);
                     }
                 }
-                if(objeto instanceof PacketEntrouJogador){
+                if(objeto instanceof PacketLobby){
                     System.out.println("PACKET RECEBIDO!");
 
-                    PacketEntrouJogador entrouJogador = (PacketEntrouJogador) objeto;
+                    PacketLobby packetLobby = (PacketLobby) objeto;
 
-                    quantidadeJogadoresConectados = entrouJogador.quantidadeJogadores;
-
-                    System.out.println("Quantidade: " + entrouJogador.quantidadeJogadores);
+                    jogadoresConectados = packetLobby.idJogadoresConectados;
 
                     if(telaLobby != null){
 
-                        final int quantidade = entrouJogador.quantidadeJogadores;
+                        final List<Integer> idJogadoresConectados = packetLobby.idJogadoresConectados;
 
-                        Gdx.app.postRunnable(() -> {telaLobby.atualizaJogadoresNaTela(quantidade);});
+                        Gdx.app.postRunnable(() -> {telaLobby.atualizaJogadoresNaTela(idJogadoresConectados);});
                     }
                 }
                 if(objeto instanceof PacketComecarJogo){
@@ -114,13 +114,12 @@ public class Cliente {
         );
 
         // resolve a race condition
-        System.out.println("ultimaQuantidadeJogadores = " + quantidadeJogadoresConectados);
-        if (quantidadeJogadoresConectados != -1) {
-            final int quantidade = quantidadeJogadoresConectados;
+        if (jogadoresConectados != null) {
+            final List<Integer> idJogadoresConectados = jogadoresConectados;
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    telaLobby.atualizaJogadoresNaTela(quantidade);
+                    telaLobby.atualizaJogadoresNaTela(idJogadoresConectados);
                 }
             });
         }
