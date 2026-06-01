@@ -34,8 +34,9 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
-    private float yOriginalAlvoEsquerda;
-    private float yOriginalAlvoDireita;
+    private final float yOriginalAlvoEsquerda;
+    private final float yOriginalAlvoDireita;
+    private final float MARGEM = 30f;
 
     // Texturas
     private Texture texturaZonas;
@@ -62,11 +63,11 @@ public class GameScreen implements Screen {
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
-        yOriginalAlvoEsquerda = (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
+        yOriginalAlvoEsquerda = (stage.getHeight() / 2);
         alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, yOriginalAlvoEsquerda);
 
         alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
-        yOriginalAlvoDireita = (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3);
+        yOriginalAlvoDireita = (stage.getHeight() / 2);
         alvoDireita.setPosition(stage.getWidth() / 2, yOriginalAlvoDireita);
 
         stage.addActor(alvoEsquerda);
@@ -108,23 +109,44 @@ public class GameScreen implements Screen {
 
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
-                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
-                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+                    // Gira a peça para arrumar visualmente no tabuleiro
+                    if (alvoDireita.direcao == Direcao.CIMA) pecaSolta.setRotation(pecaSolta.getRotation() + 90);
 
-                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
-                    alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
+                    // Calcula dimensões da peça solta (varia conforme a direção)
+                    float larguraVisual = alvoDireita.direcao.calcularLarguraVisual(pecaSolta, estaDeitada);
+                    float deslocamentoX = alvoDireita.direcao.calcularDeslocamentoX(pecaSolta, estaDeitada);
+                    float deslocamentoY = alvoDireita.direcao.calcularDeslocamentoY(pecaSolta, estaDeitada);
 
-                    // Move a peça
-                    pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+                    alvoDireita.direcao.calcularCoordenadas(alvoDireita, yOriginalAlvoDireita, pecaSolta);
 
-                    // Atualiza a zona
-                    //if (tabuleiro.primeiraJogada()){
-                        // Se for a primeira jogada, atualiza a outra zona também
-                        //alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoDireita.getY());
-                    //}
-                    alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+                    /* AVISO:
+                    lembrar de atualizar a zona.direção nos packets também e enviar para todos os clientes.
+                    Se isso não acontecer, vai quebrar o jogo para outros jogadores.
+                     */
+
+                    // Faz a cobrinha
+                    if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
+                        // Pra acontecer isso, a direção dessa zona tem que ser NORMAL.
+
+                        // se direção = invertido -> sentido = direita para esquerda. como esse é zona direita, direção = cima.
+                        // se direção = invertido -> inverter a rotação (-90° para 90° e vice versa)
+
+                        // como vou fazer verificação da subida / descida? stage.getHeight
+
+                        // se chegou no limite de altura e tem q dobrar dnv -> direção = invertido
+
+                        /* PROBLEMA:
+                        Ele atualiza a direção localmente para apenas 1 dos jogadores. O cliente não recebe a mudança na direção e isso da problema.
+                        Tem que arrumar isso antes pra conseguir testar se as coordenadas estão corretas
+                         */
+                        alvoDireita.direcao = Direcao.CIMA;
+                    }
+                    // Outra cobrinha
+                    else if (alvoDireita.getX() - MARGEM <= 0){
+
+
+                        alvoDireita.direcao = Direcao.CIMA;
+                    }
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
