@@ -21,6 +21,7 @@ public class Registro {
         kryo.register(HashMap.class);
         kryo.register(PacketResultadoJogador.class);
         kryo.register(PacketEntrouJogador.class);
+        kryo.register(PacketComecarJogo.class);
     }
 
 }
