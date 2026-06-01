@@ -46,6 +46,8 @@ public class GameScreen implements Screen {
 
     private Cliente cliente;
     private Servidor servidor;
+    private float posicaoXUltimaPeca;
+    private float posicaoYUltimaPeca;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -148,6 +150,8 @@ public class GameScreen implements Screen {
                         alvoDireita.direcao = Direcao.CIMA;
                     }
 
+                    posicaoXUltimaPeca = pecaSolta.getX();
+                    posicaoYUltimaPeca = pecaSolta.getY();
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
 
@@ -335,27 +339,13 @@ public class GameScreen implements Screen {
             stage.addActor(pecaVisualAdversario);
             pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
 
-            // dimensionamento
-            final boolean estaDeitada = pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90;
-            final float larguraVisual = estaDeitada ? pecaVisualAdversario.getHeight() : pecaVisualAdversario.getWidth();
-
             // posicionamento da peça e da zona
             if (jogada.noFinal) {
-                final float deslocamentoX = estaDeitada ? (pecaVisualAdversario.getWidth() / 2f) : 0;
-                final float deslocamentoY = estaDeitada ? -(pecaVisualAdversario.getWidth() / 2f) : -(pecaVisualAdversario.getHeight() / 4f);
-
-                alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
-                pecaVisualAdversario.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
-                alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
-
+                alvoDireita.setPosition(alvoDireita.getX(), alvoDireita.getY());
             } else {
-                final float deslocamentoX = estaDeitada ? (pecaVisualAdversario.getWidth() / 2f) : pecaVisualAdversario.getWidth();
-                final float deslocamentoY = estaDeitada ? -(pecaVisualAdversario.getWidth() / 2f) : -(pecaVisualAdversario.getHeight() / 4f);
-
-                alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
-                pecaVisualAdversario.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
-                alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+                alvoEsquerda.setPosition(alvoEsquerda.getX(), alvoEsquerda.getY());
             }
+                pecaVisualAdversario.setPosition(posicaoXUltimaPeca, posicaoYUltimaPeca);
         }
     }
 

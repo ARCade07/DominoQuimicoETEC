@@ -22,22 +22,29 @@ public enum Direcao {
     CIMA{
         @Override
         public float calcularLarguraVisual(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
+            // Em tese, todas as peças estarão deitadas
+            // Vamos usar a largura visual para atualizar o Y da zona, movendo ela pra cima
+            // Por isso pegamos a altura
+            larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
+            return larguraVisual;
         }
         @Override
         public float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
+            deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2) : pecaSolta.getHeight();
+            return deslocamentoX;
         }
         @Override
         public float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+            deslocamentoY = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
+            return deslocamentoY;
         }
 
         @Override
         public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta) {
-            // Atualiza o y da peça
-            pecaSolta.setPosition(alvo.getX(), alvo.getY());
+            // O 'x' da zona permanece o mesmo, apenas o 'y' é alterado -> Soma a altura da peça
+            alvo.setPosition(alvo.getX(), alvo.getY() + larguraVisual + pecaSolta.getHeight());
 
+            pecaSolta.setPosition(alvo.getX() + deslocamentoX, alvo.getY() - deslocamentoY);
         }
     },
     BAIXO{
