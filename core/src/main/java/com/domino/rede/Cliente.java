@@ -76,6 +76,17 @@ public class Cliente {
                         Gdx.app.postRunnable(() -> {telaLobby.atualizaJogadoresNaTela(quantidade);});
                     }
                 }
+                if(objeto instanceof PacketComecarJogo){
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            GameScreen telaJogo = new GameScreen();
+                            telaJogo.setCliente(Cliente.this);
+                            setGameScreen(telaJogo);
+                            ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaJogo);
+                        }
+                    });
+                }
             }
         });
 
@@ -86,6 +97,10 @@ public class Cliente {
             cliente.stop();
             throw new RuntimeException(e);
         }
+    }
+
+    public int idCliente(){
+        return cliente.getID();
     }
 
     public void setGameScreen(GameScreen telaJogo){

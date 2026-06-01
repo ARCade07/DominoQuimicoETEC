@@ -424,6 +424,7 @@ public class TelaLobby implements Screen {
 
                 if (servidor != null) {
                     telaJogo.setServidor(servidor);
+                    servidor.botaoInicioClicado(cliente.idCliente());
                     servidor.decidirQuemComeca();
 
                 }

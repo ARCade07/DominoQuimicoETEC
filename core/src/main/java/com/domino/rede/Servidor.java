@@ -104,6 +104,11 @@ public class Servidor {
         }
     }
 
+    public void botaoInicioClicado(int idHost){
+        PacketComecarJogo packetComecarJogo = new PacketComecarJogo();
+        servidor.sendToAllExceptTCP(idHost, packetComecarJogo);
+    }
+
     public void decidirQuemComeca(){
         Random random = new Random();
 
