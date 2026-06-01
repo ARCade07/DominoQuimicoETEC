@@ -413,6 +413,25 @@ public class TelaLobby implements Screen {
         GerenciadorAcessibilidade.aplicarFoco(btnIniciar);
         ordemNavegacao.add(btnIniciar);
 
+        btnIniciar.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                GameScreen telaJogo = new GameScreen();
+
+
+                telaJogo.setCliente(cliente);
+                cliente.setGameScreen(telaJogo);
+
+                if (servidor != null) {
+                    telaJogo.setServidor(servidor);
+                    servidor.decidirQuemComeca();
+
+                }
+
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaJogo);
+            }
+        });
+
         coluna.add(btnIniciar).width(450).height(85).center().padTop(30);
     }
 
