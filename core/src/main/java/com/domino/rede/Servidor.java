@@ -32,10 +32,21 @@ public class Servidor {
             public void connected(Connection connection){
                 jogadoresConectados.add(connection.getID());
                 System.out.println("Jogador " + connection.getID() + " conectou!");
-                PacketEntrouJogador packetEntrouJogador = new PacketEntrouJogador();
-                packetEntrouJogador.quantidadeJogadores = jogadoresConectados.size();
-                System.out.println("Enviando PacketEntrouJogador " + packetEntrouJogador.quantidadeJogadores);
-                servidor.sendToAllTCP(packetEntrouJogador);
+                PacketLobby packetLobby = new PacketLobby();
+                packetLobby.idJogadoresConectados = jogadoresConectados;
+                servidor.sendToAllTCP(packetLobby);
+            }
+            @Override
+            public void disconnected(Connection connection){
+                int idJogadorQueSaiu = connection.getID();
+
+                jogadoresConectados.remove(Integer.valueOf(idJogadorQueSaiu));
+
+                PacketLobby packetLobby = new PacketLobby();
+                packetLobby.idJogadoresConectados = jogadoresConectados;
+
+                servidor.sendToAllTCP(packetLobby);
+
             }
             @Override
             public void received(Connection connection, Object object) {
