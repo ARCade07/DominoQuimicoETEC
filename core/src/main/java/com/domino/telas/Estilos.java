@@ -77,7 +77,11 @@ public class Estilos {
         estiloCampoSemFundo.background = criarTexturaCor(new Color(0, 0, 0, 0));
     }
 
-    private static BitmapFont gerarFonte(String arquivo, float tamanho) {
+    public static BitmapFont gerarFonte(String arquivo, float tamanho) {
+        return gerarFonte(arquivo, tamanho, 0, 0);
+    }
+
+    public static BitmapFont gerarFonte(String arquivo, float tamanho, float pad, float borderWidth) {
         FreeTypeFontGenerator gerador = new FreeTypeFontGenerator(Gdx.files.internal(arquivo));
         FreeTypeFontGenerator.FreeTypeFontParameter parametro = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parametro.size = (int) tamanho;
@@ -86,6 +90,20 @@ public class Estilos {
         parametro.minFilter = Texture.TextureFilter.MipMapLinearLinear;
         parametro.magFilter = Texture.TextureFilter.Linear;
         parametro.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "áéíóúÁÉÍÓÚãõÃÕâêîôûÂÊÎÔÛçÇ↔←";
+
+        if (borderWidth > 0) {
+            parametro.borderWidth = borderWidth;
+            parametro.borderColor = new Color(0, 0, 0, 0);
+        }
+        if (pad > 0) {
+            parametro.padTop = (int) pad;
+            parametro.padBottom = (int) pad;
+            parametro.padLeft = (int) pad;
+            parametro.padRight = (int) pad;
+            parametro.spaceX = (int) pad;
+            parametro.spaceY = (int) pad;
+        }
+
         BitmapFont fonte = gerador.generateFont(parametro);
         fonte.setUseIntegerPositions(false);
         gerador.dispose();
@@ -129,7 +147,33 @@ public class Estilos {
         return new NinePatchDrawable(remendo);
     }
 
-    private static TextureRegionDrawable criarTexturaGradiente(Color corTopo, Color corBase) {
+    public static NinePatchDrawable criarBotao3D(Color corCorpo, Color corSombra, int raio, int profundidade) {
+        int escala = 4, t = 100 * escala, r = raio * escala, p = profundidade * escala;
+        Pixmap pix = new Pixmap(t, t, Pixmap.Format.RGBA8888);
+        pix.setBlending(Pixmap.Blending.None);
+        pix.setColor(corSombra);
+        pix.fillCircle(r, t - r - 1, r);
+        pix.fillCircle(t - r - 1, t - r - 1, r);
+        pix.fillRectangle(r, t - 2 * r, t - 2 * r, 2 * r);
+        pix.fillRectangle(0, t - r - 1 - p, t, p);
+
+        pix.setColor(corCorpo);
+        pix.fillCircle(r, r, r);
+        pix.fillCircle(t - r - 1, r, r);
+        pix.fillCircle(r, t - r - 1 - p, r);
+        pix.fillCircle(t - r - 1, t - r - 1 - p, r);
+        pix.fillRectangle(r, 0, t - 2 * r, t - p);
+        pix.fillRectangle(0, r, t, t - 2 * r - p);
+
+        Texture tex = new Texture(pix, true);
+        tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        pix.dispose();
+        NinePatch np = new NinePatch(tex, r, r, r, r + p);
+        np.scale(1f / escala, 1f / escala);
+        return new NinePatchDrawable(np);
+    }
+
+    public static TextureRegionDrawable criarTexturaGradiente(Color corTopo, Color corBase) {
         int altura = 512;
         Pixmap mapaPixels = new Pixmap(1, altura, Pixmap.Format.RGBA8888);
 
@@ -149,7 +193,7 @@ public class Estilos {
         return new TextureRegionDrawable(textura);
     }
 
-    private static TextureRegionDrawable criarTexturaCor(Color cor) {
+    public static TextureRegionDrawable criarTexturaCor(Color cor) {
         Pixmap mapaPixels = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         mapaPixels.setColor(cor);
         mapaPixels.fill();
@@ -158,6 +202,57 @@ public class Estilos {
         mapaPixels.dispose();
         return new TextureRegionDrawable(textura);
     }
+
+    public static TextureRegionDrawable criarIconeOlho(Color cor, boolean fechado, Color corErro) {
+        int tamanho = 64;
+        Pixmap pix = new Pixmap(tamanho, tamanho, Pixmap.Format.RGBA8888);
+
+        pix.setBlending(Pixmap.Blending.None);
+        pix.setColor(0, 0, 0, 0);
+        pix.fill();
+
+        pix.setColor(cor);
+        pix.fillTriangle(6, 32, 32, 12, 58, 32);
+        pix.fillTriangle(6, 32, 32, 52, 58, 32);
+
+        pix.setColor(0, 0, 0, 0);
+        pix.fillTriangle(12, 32, 32, 17, 52, 32);
+        pix.fillTriangle(12, 32, 32, 47, 52, 32);
+
+        pix.setBlending(Pixmap.Blending.SourceOver);
+
+        pix.setColor(cor);
+        pix.fillCircle(32, 32, 9);
+
+        if (fechado && corErro != null) {
+            pix.setColor(corErro);
+            for (int i = -3; i <= 3; i++) {
+                pix.drawLine(12 + i, 52, 52 + i, 12);
+            }
+        }
+
+        Texture tex = new Texture(pix, true);
+        tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        pix.dispose();
+        return new TextureRegionDrawable(tex);
+    }
+
+    public static TextureRegionDrawable criarCoroaTextura(Color cor) {
+        int w = 60;
+        int h = 45;
+        Pixmap pix = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        pix.setBlending(Pixmap.Blending.None);
+        pix.setColor(cor);
+        pix.fillRectangle(6, 30, 48, 9);
+        pix.fillTriangle(6, 30, 21, 30, 3, 6);
+        pix.fillTriangle(21, 30, 39, 30, 30, 0);
+        pix.fillTriangle(39, 30, 54, 30, 57, 6);
+        Texture tex = new Texture(pix, true);
+        tex.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        pix.dispose();
+        return new TextureRegionDrawable(tex);
+    }
+
 
     public static void dispose() {
         if (fonteNormal != null) fonteNormal.dispose();
