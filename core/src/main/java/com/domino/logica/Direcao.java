@@ -34,7 +34,7 @@ public enum Direcao {
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta) {
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
             // Atualiza o y da peça
             pecaSolta.setPosition(alvo.getX(), alvo.getY());
 
@@ -55,7 +55,7 @@ public enum Direcao {
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta) {
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
 
         }
     },
@@ -64,22 +64,19 @@ public enum Direcao {
         // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
         @Override
         public float calcularLarguraVisual(PecaVisual pecaSolta, boolean estaDeitada){
-            larguraVisual = estaDeitada ? pecaSolta.getWidth() : pecaSolta.getHeight();
-            return larguraVisual;
+            return estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
         }
         @Override
         public float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada){
-            deslocamentoX = estaDeitada ? pecaSolta.getWidth() : 0;
-            return deslocamentoX;
+            return estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
         }
         @Override
         public float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada){
-            deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
-            return deslocamentoY;
+            return estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
         }
         // Referência = alvo direito
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvoDireita, float yOriginalAlvoDireita, PecaVisual pecaSolta){
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvoDireita, float yOriginalAlvoDireita, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY){
             // Volta o alvo pro Y original pra calcular o Y da peça
             alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
 
@@ -93,33 +90,26 @@ public enum Direcao {
         // Direita pra esquerda, só muda o deslocamentoX em relação ao NORMAL
         @Override
         public float calcularLarguraVisual(PecaVisual pecaSolta, boolean estaDeitada){
-            larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-            return larguraVisual;
+            return estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
         }
         @Override
         public float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada){
-            deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : pecaSolta.getWidth();
-            return deslocamentoX;
+            return estaDeitada ? (pecaSolta.getWidth() / 2f) : pecaSolta.getWidth();
         }
         @Override
         public float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada){
-            deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
-            return deslocamentoY;
+            return estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta) {
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvoEsquerda, float yOriginalAlvoEsquerda, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
 
         }
     };
-
-    private static float larguraVisual;
-    private static float deslocamentoX;
-    private static float deslocamentoY;
 
     public abstract float calcularLarguraVisual(PecaVisual pecaSolta, boolean estaDeitada);
     public abstract float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada);
     public abstract float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada);
 
-    public abstract void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta);
+    public abstract void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY);
 }

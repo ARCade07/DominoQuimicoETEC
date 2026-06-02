@@ -117,7 +117,7 @@ public class GameScreen implements Screen {
                     float deslocamentoX = alvoDireita.direcao.calcularDeslocamentoX(pecaSolta, estaDeitada);
                     float deslocamentoY = alvoDireita.direcao.calcularDeslocamentoY(pecaSolta, estaDeitada);
 
-                    alvoDireita.direcao.calcularCoordenadas(alvoDireita, yOriginalAlvoDireita, pecaSolta);
+                    alvoDireita.direcao.calcularCoordenadas(alvoDireita, yOriginalAlvoDireita, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
                     /* AVISO:
                     lembrar de atualizar a zona.direção nos packets também e enviar para todos os clientes.
