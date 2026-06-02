@@ -233,9 +233,9 @@ public class PopUpCriaPartida {
 
                     Cliente cliente = new Cliente("localhost");
                     fecharEFecharRecursos();
-                    TelaLobby telaLobby = new TelaLobby(servidor, cliente);
-                    ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
-                    cliente.setTelaLobby(telaLobby);
+                    LobbyScreen lobbyScreen = new LobbyScreen(servidor, cliente);
+                    ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
+                    cliente.setTelaLobby(lobbyScreen);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -280,9 +280,9 @@ public class PopUpCriaPartida {
                         System.out.println("Conectando ao IP: " + campoIp.getText() + " e indo para o Lobby...");
                         Cliente cliente = new Cliente(campoIp.getText());
                         fecharEFecharRecursos();
-                        TelaLobby telaLobby = new TelaLobby(null, cliente);
-                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
-                        cliente.setTelaLobby(telaLobby);
+                        LobbyScreen lobbyScreen = new LobbyScreen(null, cliente);
+                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
+                        cliente.setTelaLobby(lobbyScreen);
                     }
                 });
 

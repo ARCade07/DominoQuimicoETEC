@@ -3,7 +3,7 @@ package com.domino.rede;
 import com.badlogic.gdx.Gdx;
 import com.domino.rede.packets.*;
 import com.domino.telas.GameScreen;
-import com.domino.telas.TelaLobby;
+import com.domino.telas.LobbyScreen;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -14,7 +14,7 @@ public class Cliente {
     // instancia o cliente
     Client cliente = new Client();
     private GameScreen gameScreen;
-    private TelaLobby telaLobby;
+    private LobbyScreen lobbyScreen;
     private String enderecoIP;
     public boolean minhaVez = false;
     private int quantidadeJogadoresConectados = -1;
@@ -69,11 +69,12 @@ public class Cliente {
 
                     System.out.println("Quantidade: " + entrouJogador.quantidadeJogadores);
 
-                    if(telaLobby != null){
+                    if(lobbyScreen != null){
 
                         final int quantidade = entrouJogador.quantidadeJogadores;
 
-                        Gdx.app.postRunnable(() -> {telaLobby.atualizaJogadoresNaTela(quantidade);});
+                        Gdx.app.postRunnable(() -> {
+                            lobbyScreen.atualizaJogadoresNaTela(quantidade);});
                     }
                 }
                 if(objeto instanceof PacketComecarJogo){
@@ -107,8 +108,8 @@ public class Cliente {
         this.gameScreen = telaJogo;
     }
 
-    public void setTelaLobby(TelaLobby telaLobby){
-        this.telaLobby = telaLobby;
+    public void setTelaLobby(LobbyScreen lobbyScreen){
+        this.lobbyScreen = lobbyScreen;
         System.out.println(
             "setTelaLobby chamado"
         );
@@ -120,7 +121,7 @@ public class Cliente {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    telaLobby.atualizaJogadoresNaTela(quantidade);
+                    lobbyScreen.atualizaJogadoresNaTela(quantidade);
                 }
             });
         }
