@@ -145,7 +145,7 @@ public class PopUpCriaPartida {
         tfStyle.focusedBackground = criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoTela(), GerenciadorAcessibilidade.getCorDestaqueFoco(), 8, 2);
         tfStyle.focusedFontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
 
-        TextureRegionDrawable cursorTex = GerenciadorAcessibilidade.criarTexturaGradiente(GerenciadorAcessibilidade.getCorTextoPadrao(), GerenciadorAcessibilidade.getCorTextoPadrao());
+        TextureRegionDrawable cursorTex = Estilos.criarTexturaGradiente(GerenciadorAcessibilidade.getCorTextoPadrao(), GerenciadorAcessibilidade.getCorTextoPadrao());
         cursorTex.setMinWidth(2);
         tfStyle.cursor = cursorTex;
         skin.add("default", tfStyle);
