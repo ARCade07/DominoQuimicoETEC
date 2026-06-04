@@ -34,7 +34,7 @@ public enum Direcao {
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
             pecaSolta.setPosition(alvo.getX() + deslocamentoX, alvo.getY() + deslocamentoY);
 
             float alturaVisual = (pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90) ? pecaSolta.getWidth() : pecaSolta.getHeight();
@@ -56,10 +56,10 @@ public enum Direcao {
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
             float alturaVisual = (pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90) ? pecaSolta.getWidth() : pecaSolta.getHeight();
 
-            pecaSolta.setPosition(alvo.getX() + pecaSolta.getWidth(), alvo.getY() + deslocamentoY);
+            pecaSolta.setPosition(alvo.getX() + pecaSolta.getWidth() + 20f, alvo.getY() + deslocamentoY);
             alvo.setPosition(alvo.getX(), alvo.getY() - alturaVisual);
         }
     },
@@ -80,14 +80,11 @@ public enum Direcao {
         }
         // Referência = alvo direito
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvoDireita, float yOriginalAlvoDireita, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY){
-            // Volta o alvo pro Y original pra calcular o Y da peça
-            alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
-
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvoDireita, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY){
             // Move a peça
-            pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+            pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY + 100);
             // Move a zona
-            alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+            alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, alvoDireita.getY());
         }
     },
     INVERTIDO{
@@ -106,11 +103,9 @@ public enum Direcao {
         }
 
         @Override
-        public void calcularCoordenadas(ZonaDeSoltarPeca alvoEsquerda, float yOriginalAlvoEsquerda, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
-            alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
-
-            pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
-            alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+        public void calcularCoordenadas(ZonaDeSoltarPeca alvoEsquerda, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
+            pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX + 20f, alvoEsquerda.getY() + deslocamentoY + 100);
+            alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoEsquerda.getY());
         }
     };
 
@@ -118,5 +113,5 @@ public enum Direcao {
     public abstract float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada);
     public abstract float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada);
 
-    public abstract void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY);
+    public abstract void calcularCoordenadas(ZonaDeSoltarPeca alvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY);
 }
