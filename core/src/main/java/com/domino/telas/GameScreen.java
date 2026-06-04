@@ -36,7 +36,7 @@ public class GameScreen implements Screen {
 
     private final float yOriginalAlvoEsquerda;
     private final float yOriginalAlvoDireita;
-    private final float MARGEM = 30f;
+    private final float MARGEM = 170f;
 
     // Texturas
     private Texture texturaZonas;
@@ -121,32 +121,11 @@ public class GameScreen implements Screen {
 
                     alvoDireita.direcao.calcularCoordenadas(alvoDireita, yOriginalAlvoDireita, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
-                    /* AVISO:
-                    lembrar de atualizar a zona.direção nos packets também e enviar para todos os clientes.
-                    Se isso não acontecer, vai quebrar o jogo para outros jogadores.
-                     */
-
                     // Faz a cobrinha
                     if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
-                        // Pra acontecer isso, a direção dessa zona tem que ser NORMAL.
-
-                        // se direção = invertido -> sentido = direita para esquerda. como esse é zona direita, direção = cima.
-                        // se direção = invertido -> inverter a rotação (-90° para 90° e vice versa)
-
-                        // como vou fazer verificação da subida / descida? stage.getHeight
-
-                        // se chegou no limite de altura e tem q dobrar dnv -> direção = invertido
-
-                        /* PROBLEMA:
-                        Ele atualiza a direção localmente para apenas 1 dos jogadores. O cliente não recebe a mudança na direção e isso da problema.
-                        Tem que arrumar isso antes pra conseguir testar se as coordenadas estão corretas
-                         */
                         alvoDireita.direcao = Direcao.CIMA;
                     }
-                    // Outra cobrinha
                     else if (alvoDireita.getX() - MARGEM <= 0){
-
-
                         alvoDireita.direcao = Direcao.CIMA;
                     }
 
@@ -208,23 +187,22 @@ public class GameScreen implements Screen {
 
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
-                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
-                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : pecaSolta.getWidth();
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+                    // Gira a peça para arrumar visualmente no tabuleiro
+                    if (alvoEsquerda.direcao == Direcao.BAIXO) pecaSolta.setRotation(pecaSolta.getRotation() + 90);
 
-                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
-                    alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
+                    final float larguraVisual = alvoEsquerda.direcao.calcularLarguraVisual(pecaSolta, estaDeitada);
+                    final float deslocamentoX = alvoEsquerda.direcao.calcularDeslocamentoX(pecaSolta, estaDeitada);
+                    final float deslocamentoY = alvoEsquerda.direcao.calcularDeslocamentoY(pecaSolta, estaDeitada);
 
-                    // Move a peça
-                    pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+                    alvoEsquerda.direcao.calcularCoordenadas(alvoEsquerda, yOriginalAlvoEsquerda, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
-                    // Atualiza a zona
-                    //if (tabuleiro.primeiraJogada()){
-                    // Se for a primeira jogada, atualiza a outra zona também
-                    //alvoDireita.setPosition(alvoDireita.getX() - larguraVisual, alvoEsquerda.getY());
-                    //}
-                    alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+                    if (alvoEsquerda.getX() - MARGEM <= 0){
+                        alvoEsquerda.direcao = Direcao.BAIXO;
+                    }
+                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+                        alvoEsquerda.direcao = Direcao.BAIXO;
+                    }
+                    // Outra cobrinha
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -335,17 +313,44 @@ public class GameScreen implements Screen {
 
             Texture textura = getTextura(jogada.info1, jogada.info2);
             PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, textura);
+            pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
+            final boolean estaDeitada = (pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90);
 
             stage.addActor(pecaVisualAdversario);
-            pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
-
             // posicionamento da peça e da zona
             if (jogada.noFinal) {
-                alvoDireita.setPosition(alvoDireita.getX(), alvoDireita.getY());
+                // Gira a peça para arrumar visualmente no tabuleiro
+                if (alvoDireita.direcao == Direcao.CIMA) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() + 90);
+
+                final float larguraVisual = alvoDireita.direcao.calcularLarguraVisual(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoX = alvoDireita.direcao.calcularDeslocamentoX(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoY = alvoDireita.direcao.calcularDeslocamentoY(pecaVisualAdversario, estaDeitada);
+
+                alvoDireita.direcao.calcularCoordenadas(alvoDireita, yOriginalAlvoDireita, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
+
+                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
+                    alvoDireita.direcao = Direcao.CIMA;
+                }
+                else if (alvoDireita.getX() - MARGEM <= 0){
+                    alvoDireita.direcao = Direcao.CIMA;
+                }
             } else {
-                alvoEsquerda.setPosition(alvoEsquerda.getX(), alvoEsquerda.getY());
+                if (alvoEsquerda.direcao == Direcao.BAIXO) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() + 90);
+
+                final float larguraVisual = alvoEsquerda.direcao.calcularLarguraVisual(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoX = alvoEsquerda.direcao.calcularDeslocamentoX(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoY = alvoEsquerda.direcao.calcularDeslocamentoY(pecaVisualAdversario, estaDeitada);
+
+                alvoEsquerda.direcao.calcularCoordenadas(alvoEsquerda, yOriginalAlvoEsquerda, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
+
+                // Cobrinha
+                if (alvoEsquerda.getX() - MARGEM <= 0){
+                    alvoEsquerda.direcao = Direcao.BAIXO;
+                }
+                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+                    alvoEsquerda.direcao = Direcao.BAIXO;
+                }
             }
-                pecaVisualAdversario.setPosition(posicaoXUltimaPeca, posicaoYUltimaPeca);
         }
     }
 

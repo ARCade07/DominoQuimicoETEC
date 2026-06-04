@@ -26,18 +26,19 @@ public enum Direcao {
         }
         @Override
         public float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
+            return estaDeitada ? 0 : (pecaSolta.getWidth() / 2f);
         }
         @Override
         public float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+            return estaDeitada ? pecaSolta.getWidth(): (pecaSolta.getHeight() / 4f);
         }
 
         @Override
         public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
-            // Atualiza o y da peça
-            pecaSolta.setPosition(alvo.getX(), alvo.getY());
+            pecaSolta.setPosition(alvo.getX() + deslocamentoX, alvo.getY() + deslocamentoY);
 
+            float alturaVisual = (pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90) ? pecaSolta.getWidth() : pecaSolta.getHeight();
+            alvo.setPosition(alvo.getX(), alvo.getY() + alturaVisual);
         }
     },
     BAIXO{
@@ -47,16 +48,19 @@ public enum Direcao {
         }
         @Override
         public float calcularDeslocamentoX(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
+            return estaDeitada ? 0 : (pecaSolta.getWidth() / 2f);
         }
         @Override
         public float calcularDeslocamentoY(PecaVisual pecaSolta, boolean estaDeitada){
-            return estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+            return estaDeitada ? 0 : -(pecaSolta.getHeight() / 4f);
         }
 
         @Override
         public void calcularCoordenadas(ZonaDeSoltarPeca alvo, float yOriginalAlvo, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
+            float alturaVisual = (pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90) ? pecaSolta.getWidth() : pecaSolta.getHeight();
 
+            pecaSolta.setPosition(alvo.getX() + pecaSolta.getWidth(), alvo.getY() + deslocamentoY);
+            alvo.setPosition(alvo.getX(), alvo.getY() - alturaVisual);
         }
     },
     NORMAL{
@@ -103,7 +107,10 @@ public enum Direcao {
 
         @Override
         public void calcularCoordenadas(ZonaDeSoltarPeca alvoEsquerda, float yOriginalAlvoEsquerda, PecaVisual pecaSolta, float larguraVisual, float deslocamentoX, float deslocamentoY) {
+            alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
 
+            pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+            alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
         }
     };
 
