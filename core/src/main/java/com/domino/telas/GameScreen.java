@@ -37,7 +37,6 @@ public class GameScreen implements Screen {
     private final float MARGEM = 170f;
 
     // Texturas
-    private Texture texturaZonas;
     private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
     private Texture texturaPeca_b_b;
@@ -60,10 +59,10 @@ public class GameScreen implements Screen {
         this.inicilizarTexturas();
 
         // Prepara as zonas
-        alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
+        alvoEsquerda = new ZonaDeSoltarPeca(false);
         alvoEsquerda.setPosition((stage.getWidth() / 2) - 220, (stage.getHeight() / 2));
 
-        alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
+        alvoDireita = new ZonaDeSoltarPeca(true);
         alvoDireita.setPosition((stage.getWidth() / 2), (stage.getHeight() / 2));
 
         stage.addActor(alvoEsquerda);
@@ -77,15 +76,17 @@ public class GameScreen implements Screen {
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoDireita) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                // O mouse passou por cima. Fica verde só para visualização
-                getActor().setColor(Color.WHITE);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 1f);
+                }
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                // O mouse saiu de cima.
-                getActor().setColor(Color.BLACK);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 0.5f);
+                }
             }
 
             @Override
@@ -159,13 +160,17 @@ public class GameScreen implements Screen {
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoEsquerda) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                getActor().setColor(Color.WHITE);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 1f);
+                }
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                getActor().setColor(Color.BLACK);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 0.5f);
+                }
             }
 
             @Override
@@ -240,7 +245,6 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-        this.texturaZonas = new Texture("libgdx.png");
         this.texturaPeca_a_a = new Texture("peca_a_a.png");
         this.texturaPeca_a_b = new Texture("peca_a_b.png");
         this.texturaPeca_b_b = new Texture("peca_b_b.png");
