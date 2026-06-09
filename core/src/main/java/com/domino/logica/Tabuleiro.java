@@ -33,8 +33,7 @@ public class Tabuleiro {
 
             return true;
         }
-        boolean primeiraJogada = false;
-        if (this.primeiraJogada()) primeiraJogada = true;
+        boolean primeiraJogada = this.primeiraJogada();
 
         List<Tipo> tiposCompativeis = new ArrayList<>();
         if (noFinal){

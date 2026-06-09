@@ -36,11 +36,9 @@ public class GameScreen implements Screen {
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
-    private float yOriginalAlvoEsquerda;
-    private float yOriginalAlvoDireita;
+    private final float MARGEM = 170f;
 
     // Texturas
-    private Texture texturaZonas;
     private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
     private Texture texturaPeca_b_b;
@@ -66,13 +64,11 @@ public class GameScreen implements Screen {
         this.inicilizarTexturas();
 
         // Prepara as zonas
-        alvoEsquerda = new ZonaDeSoltarPeca(false, texturaZonas);
-        yOriginalAlvoEsquerda = (stage.getHeight() / 2) - (alvoEsquerda.getHeight() / 3);
-        alvoEsquerda.setPosition((stage.getWidth() / 2) - 200, yOriginalAlvoEsquerda);
+        alvoEsquerda = new ZonaDeSoltarPeca(false);
+        alvoEsquerda.setPosition((stage.getWidth() / 2) - 220, (stage.getHeight() / 2));
 
-        alvoDireita = new ZonaDeSoltarPeca(true, texturaZonas);
-        yOriginalAlvoDireita = (stage.getHeight() / 2) - (alvoDireita.getHeight() / 3);
-        alvoDireita.setPosition(stage.getWidth() / 2, yOriginalAlvoDireita);
+        alvoDireita = new ZonaDeSoltarPeca(true);
+        alvoDireita.setPosition((stage.getWidth() / 2), (stage.getHeight() / 2));
 
         stage.addActor(alvoEsquerda);
         stage.addActor(alvoDireita);
@@ -85,15 +81,17 @@ public class GameScreen implements Screen {
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoDireita) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                // O mouse passou por cima. Fica verde só para visualização
-                getActor().setColor(Color.WHITE);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 1f);
+                }
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                // O mouse saiu de cima.
-                getActor().setColor(Color.BLACK);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 0.5f);
+                }
             }
 
             @Override
@@ -113,23 +111,29 @@ public class GameScreen implements Screen {
 
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
-                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
-                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : 0;
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+                    // Gira a peça para arrumar visualmente no tabuleiro
+                    if (alvoDireita.direcao == Direcao.CIMA) pecaSolta.setRotation(pecaSolta.getRotation() + 90);
+                    if (alvoDireita.direcao == Direcao.INVERTIDO) pecaSolta.setRotation(pecaSolta.getRotation() - 180);
 
-                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
-                    alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
+                    // Calcula dimensões da peça solta (varia conforme a direção)
+                    float larguraVisual = alvoDireita.direcao.calcularLarguraVisual(pecaSolta, estaDeitada);
+                    float deslocamentoX = alvoDireita.direcao.calcularDeslocamentoX(pecaSolta, estaDeitada);
+                    float deslocamentoY = alvoDireita.direcao.calcularDeslocamentoY(pecaSolta, estaDeitada);
 
-                    // Move a peça
-                    pecaSolta.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
+                    alvoDireita.direcao.calcularCoordenadas(alvoDireita, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
-                    // Atualiza a zona
-                    //if (tabuleiro.primeiraJogada()){
-                        // Se for a primeira jogada, atualiza a outra zona também
-                        //alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, alvoDireita.getY());
-                    //}
-                    alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+                    // Faz a cobrinha
+                    if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
+                        alvoDireita.direcao = Direcao.CIMA;
+                    }
+                    else if (alvoDireita.getX() - MARGEM <= 0){
+                        alvoDireita.direcao = Direcao.CIMA;
+                    }
+                    // Cobrinha horizontal
+                    if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
+                        alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
+                        alvoDireita.setPosition(alvoDireita.getX() - 220, alvoDireita.getY() - (larguraVisual / 2f));
+                    }
 
                     Peca pecaLogica = pecaSolta.getPecaLogica();
                     pecasLogicasNaMao.remove(pecaLogica);
@@ -192,13 +196,17 @@ public class GameScreen implements Screen {
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoEsquerda) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                getActor().setColor(Color.WHITE);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 1f);
+                }
                 return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                getActor().setColor(Color.BLACK);
+                if (payload.getDragActor() != null){
+                    payload.getDragActor().setColor(1f, 1f, 1f, 0.5f);
+                }
             }
 
             @Override
@@ -218,23 +226,29 @@ public class GameScreen implements Screen {
 
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
-                    // Se a peça estiver deitada, perde metade da altura e ganha metade da largura (100 x 200)
-                    final float larguraVisual = estaDeitada ? pecaSolta.getHeight() : pecaSolta.getWidth();
-                    final float deslocamentoX = estaDeitada ? (pecaSolta.getWidth() / 2f) : pecaSolta.getWidth();
-                    final float deslocamentoY = estaDeitada ? -(pecaSolta.getWidth() / 2f) : -(pecaSolta.getHeight() / 4f);
+                    // Gira a peça para arrumar visualmente no tabuleiro
+                    if (alvoEsquerda.direcao == Direcao.BAIXO) pecaSolta.setRotation(pecaSolta.getRotation() + 90);
+                    if (alvoEsquerda.direcao == Direcao.NORMAL) pecaSolta.setRotation(pecaSolta.getRotation() - 180);
 
-                    // Atualiza o y da zona rapidamente para ajustar o y da peça solta
-                    alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
+                    final float larguraVisual = alvoEsquerda.direcao.calcularLarguraVisual(pecaSolta, estaDeitada);
+                    final float deslocamentoX = alvoEsquerda.direcao.calcularDeslocamentoX(pecaSolta, estaDeitada);
+                    final float deslocamentoY = alvoEsquerda.direcao.calcularDeslocamentoY(pecaSolta, estaDeitada);
 
-                    // Move a peça
-                    pecaSolta.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
+                    alvoEsquerda.direcao.calcularCoordenadas(alvoEsquerda, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
-                    // Atualiza a zona
-                    //if (tabuleiro.primeiraJogada()){
-                    // Se for a primeira jogada, atualiza a outra zona também
-                    //alvoDireita.setPosition(alvoDireita.getX() - larguraVisual, alvoEsquerda.getY());
-                    //}
-                    alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+                    // Cobrinha vertical
+                    if (alvoEsquerda.getX() - MARGEM <= 0){
+                        alvoEsquerda.direcao = Direcao.BAIXO;
+                    }
+                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+                        alvoEsquerda.direcao = Direcao.BAIXO;
+                    }
+                    // Cobrinha horizontal -> Tem q tomar cuidado com o horizontal group da mão do jogador
+                    // altura da peça = 200.
+                    if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){
+                        pecaSolta.setPosition(pecaSolta.getX() + 120f, pecaSolta.getY());
+                    }
+                    if (alvoEsquerda.getY() <= 200) alvoEsquerda.direcao = Direcao.NORMAL;
 
                     Peca pecaLogica = pecaSolta.getPecaLogica();
                     pecasLogicasNaMao.remove(pecaLogica);
@@ -303,7 +317,6 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-        this.texturaZonas = new Texture("libgdx.png");
         this.texturaPeca_a_a = new Texture("peca_a_a.png");
         this.texturaPeca_a_b = new Texture("peca_a_b.png");
         this.texturaPeca_b_b = new Texture("peca_b_b.png");
@@ -388,30 +401,54 @@ public class GameScreen implements Screen {
 
             Texture textura = getTextura(jogada.info1, jogada.info2);
             PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, textura);
+            pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
+            final boolean estaDeitada = (pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90);
 
             stage.addActor(pecaVisualAdversario);
-            pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
-
-            // dimensionamento
-            final boolean estaDeitada = pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90;
-            final float larguraVisual = estaDeitada ? pecaVisualAdversario.getHeight() : pecaVisualAdversario.getWidth();
-
             // posicionamento da peça e da zona
             if (jogada.noFinal) {
-                final float deslocamentoX = estaDeitada ? (pecaVisualAdversario.getWidth() / 2f) : 0;
-                final float deslocamentoY = estaDeitada ? -(pecaVisualAdversario.getWidth() / 2f) : -(pecaVisualAdversario.getHeight() / 4f);
+                // Gira a peça para arrumar visualmente no tabuleiro
+                if (alvoDireita.direcao == Direcao.CIMA) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() + 90);
+                if (alvoDireita.direcao == Direcao.INVERTIDO) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() - 180);
 
-                alvoDireita.setPosition(alvoDireita.getX(), yOriginalAlvoDireita);
-                pecaVisualAdversario.setPosition(alvoDireita.getX() + deslocamentoX, alvoDireita.getY() + deslocamentoY);
-                alvoDireita.setPosition(alvoDireita.getX() + larguraVisual, yOriginalAlvoDireita - (alvoDireita.getHeight() / 3));
+                final float larguraVisual = alvoDireita.direcao.calcularLarguraVisual(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoX = alvoDireita.direcao.calcularDeslocamentoX(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoY = alvoDireita.direcao.calcularDeslocamentoY(pecaVisualAdversario, estaDeitada);
 
+                alvoDireita.direcao.calcularCoordenadas(alvoDireita, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
+
+                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
+                    alvoDireita.direcao = Direcao.CIMA;
+                }
+                else if (alvoDireita.getX() - MARGEM <= 0){
+                    alvoDireita.direcao = Direcao.CIMA;
+                }
+                if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
+                    alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
+                    alvoDireita.setPosition(alvoDireita.getX() - alvoDireita.getWidth(), alvoDireita.getY() - (larguraVisual) / 2f);
+                }
             } else {
-                final float deslocamentoX = estaDeitada ? (pecaVisualAdversario.getWidth() / 2f) : pecaVisualAdversario.getWidth();
-                final float deslocamentoY = estaDeitada ? -(pecaVisualAdversario.getWidth() / 2f) : -(pecaVisualAdversario.getHeight() / 4f);
+                if (alvoEsquerda.direcao == Direcao.BAIXO) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() + 90);
+                if (alvoEsquerda.direcao == Direcao.NORMAL) pecaVisualAdversario.setRotation(pecaVisualAdversario.getRotation() - 180);
 
-                alvoEsquerda.setPosition(alvoEsquerda.getX(), yOriginalAlvoEsquerda);
-                pecaVisualAdversario.setPosition(alvoEsquerda.getX() + deslocamentoX, alvoEsquerda.getY() + deslocamentoY);
-                alvoEsquerda.setPosition(alvoEsquerda.getX() - larguraVisual, yOriginalAlvoEsquerda - (alvoEsquerda.getHeight() / 3));
+                final float larguraVisual = alvoEsquerda.direcao.calcularLarguraVisual(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoX = alvoEsquerda.direcao.calcularDeslocamentoX(pecaVisualAdversario, estaDeitada);
+                final float deslocamentoY = alvoEsquerda.direcao.calcularDeslocamentoY(pecaVisualAdversario, estaDeitada);
+
+                alvoEsquerda.direcao.calcularCoordenadas(alvoEsquerda, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
+
+                // Cobrinha
+                if (alvoEsquerda.getX() - MARGEM <= 0){
+                    alvoEsquerda.direcao = Direcao.BAIXO;
+                }
+                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+                    alvoEsquerda.direcao = Direcao.BAIXO;
+                }
+                if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){ // Só entra aqui depois de ter feito a cobra
+                    // Soma 120px para compensar a largura da zona com a largura da peça
+                    pecaVisualAdversario.setPosition(pecaVisualAdversario.getX() + 120f, pecaVisualAdversario.getY());
+                }
+                if (alvoEsquerda.getY() <= 200) alvoEsquerda.direcao = Direcao.NORMAL;
             }
         }
     }

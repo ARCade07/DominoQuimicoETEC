@@ -13,6 +13,18 @@ public enum Tipo {
         public Tipo getConexoes(){
             return Tipo.BASE;
         }
+    },
+    OXIDO("Óxido"){
+        @Override
+        public Tipo getConexoes(){
+            return Tipo.OXIDO;
+        }
+    },
+    SAL("Sal"){
+        @Override
+        public Tipo getConexoes(){
+            return Tipo.SAL;
+        }
     };
 
     private final String nome;
