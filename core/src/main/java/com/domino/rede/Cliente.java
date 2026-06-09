@@ -2,11 +2,10 @@ package com.domino.rede;
 
 import com.badlogic.gdx.Gdx;
 import com.domino.rede.packets.*;
-import com.domino.telas.GameScreen;
-import com.domino.telas.LobbyScreen;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.domino.telas.*;
 
 import java.io.IOException;
 import java.util.List;

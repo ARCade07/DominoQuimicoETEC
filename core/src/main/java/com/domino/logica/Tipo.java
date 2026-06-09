@@ -33,6 +33,10 @@ public enum Tipo {
         this.nome = nome;
     }
 
+    public static Tipo fromString(String tipo1) {
+        return Tipo.valueOf(tipo1.toUpperCase());
+    }
+
     public String getNome(){
         return this.nome;
     }
