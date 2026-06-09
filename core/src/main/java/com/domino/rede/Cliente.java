@@ -9,6 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Cliente {
     // instancia o cliente
@@ -17,7 +18,7 @@ public class Cliente {
     private LobbyScreen lobbyScreen;
     private String enderecoIP;
     public boolean minhaVez = false;
-    private int quantidadeJogadoresConectados = -1;
+    private List<Integer> jogadoresConectados;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -60,21 +61,19 @@ public class Cliente {
                         System.out.println("Jogador: " + resultadoJogador.idJogador + " | Pontuação: " + resultadoJogador.pontuacao);
                     }
                 }
-                if(objeto instanceof PacketEntrouJogador){
+                if(objeto instanceof PacketLobby){
                     System.out.println("PACKET RECEBIDO!");
 
-                    PacketEntrouJogador entrouJogador = (PacketEntrouJogador) objeto;
+                    PacketLobby packetLobby = (PacketLobby) objeto;
 
-                    quantidadeJogadoresConectados = entrouJogador.quantidadeJogadores;
-
-                    System.out.println("Quantidade: " + entrouJogador.quantidadeJogadores);
+                    jogadoresConectados = packetLobby.idJogadoresConectados;
 
                     if(lobbyScreen != null){
 
-                        final int quantidade = entrouJogador.quantidadeJogadores;
+                        final List<Integer> idJogadoresConectados = packetLobby.idJogadoresConectados;
 
                         Gdx.app.postRunnable(() -> {
-                            lobbyScreen.atualizaJogadoresNaTela(quantidade);});
+                            lobbyScreen.atualizaJogadoresNaTela(idJogadoresConectados);});
                     }
                 }
                 if(objeto instanceof PacketComecarJogo){
@@ -88,6 +87,17 @@ public class Cliente {
                         }
                     });
                 }
+            }
+            @Override
+            public void disconnected(Connection conexao){
+                System.out.println("Conexão perdida com o servidor");
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        StartScreen startScreen = new StartScreen();
+                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(startScreen);
+                    }
+                });
             }
         });
 
@@ -115,13 +125,12 @@ public class Cliente {
         );
 
         // resolve a race condition
-        System.out.println("ultimaQuantidadeJogadores = " + quantidadeJogadoresConectados);
-        if (quantidadeJogadoresConectados != -1) {
-            final int quantidade = quantidadeJogadoresConectados;
+        if (jogadoresConectados != null) {
+            final List<Integer> idJogadoresConectados = jogadoresConectados;
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    lobbyScreen.atualizaJogadoresNaTela(quantidade);
+                    lobbyScreen.atualizaJogadoresNaTela(idJogadoresConectados);
                 }
             });
         }
