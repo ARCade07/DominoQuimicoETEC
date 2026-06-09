@@ -33,8 +33,7 @@ import java.util.List;
 public class GameScreen implements Screen {
 
     // Separação Arquitetural (Camadas Gráficas)
-    private final Stage worldStage;
-    private final Stage hudStage;
+    private final Stage stage;
 
     // Gerenciador de Input e Interações Visuais
     private final DragAndDrop dragAndDrop;
@@ -75,40 +74,41 @@ public class GameScreen implements Screen {
     private List<Peca> pecasLogicasNaMao;
 
     public GameScreen() {
-        // 1. Inicializa camadas isoladas com Viewports fixos
-        worldStage = new Stage(new FitViewport(1920, 1080));
-        hudStage = new Stage(new FitViewport(1920, 1080));
+        // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
+        stage = new Stage(new FitViewport(1920, 1080));
+        // 'Stage' é quem vai receber os cliques do mouse
+        Gdx.input.setInputProcessor(stage);
+
 
         // 2. Orquestração e Hierarquia de Entrada de Dispositivos (Inputs)
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        OrthographicCamera cameraMundo = (OrthographicCamera) worldStage.getCamera();
-
-        multiplexer.addProcessor(hudStage);                  // Interface (Mão do jogador) consome clicks primeiro
-        multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
-        multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
-        Gdx.input.setInputProcessor(multiplexer);
+//        InputMultiplexer multiplexer = new InputMultiplexer();
+//        OrthographicCamera cameraMundo = (OrthographicCamera) stage.getCamera();
+//
+//        multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
+//        multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
+//        Gdx.input.setInputProcessor(multiplexer);
 
         // 3. Montagem e Alinhamento Centralizado do Cenário Cinematográfico
         this.background = new Background();
 
         this.background.setPosition(
-            (worldStage.getWidth() / 2f) - (this.background.getWidth() / 2f),
-            (worldStage.getHeight() / 2f) - (this.background.getHeight() / 2f)
+            (stage.getWidth() / 2f) - (this.background.getWidth() / 2f),
+            (stage.getHeight() / 2f) - (this.background.getHeight() / 2f)
         );
-        worldStage.addActor(this.background);
+        stage.addActor(this.background);
 
         // Inicialização de texturas dependentes
         this.inicilizarTexturas();
 
         // Prepara as zonas
-        alvoEsquerda = new ZonaDeSoltarPeca(false);
-        alvoEsquerda.setPosition((worldStage.getWidth() / 2) - 220, (worldStage.getHeight() / 2));
+        alvoEsquerda = new ZonaDeSoltarPeca(false, libgdx);
+        alvoEsquerda.setPosition((stage.getWidth() / 2) - 220, (stage.getHeight() / 2));
 
-        alvoDireita = new ZonaDeSoltarPeca(true);
-        alvoDireita.setPosition((worldStage.getWidth() / 2), (worldStage.getHeight() / 2));
+        alvoDireita = new ZonaDeSoltarPeca(true, libgdx);
+        alvoDireita.setPosition((stage.getWidth() / 2), (stage.getHeight() / 2));
 
-        worldStage.addActor(alvoEsquerda);
-        worldStage.addActor(alvoDireita);
+        stage.addActor(alvoEsquerda);
+        stage.addActor(alvoDireita);
 
         // Lógica do Drag and Drop
         dragAndDrop = new DragAndDrop();
@@ -139,7 +139,7 @@ public class GameScreen implements Screen {
                     System.out.println("Compatível");
 
                     // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
-                    worldStage.addActor(pecaSolta);
+                    stage.addActor(pecaSolta);
 
                     // Atualiza rotação da peça (atualizada na classe Tabuleiro)
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
@@ -158,14 +158,14 @@ public class GameScreen implements Screen {
                     alvoDireita.direcao.calcularCoordenadas(alvoDireita, pecaSolta, larguraVisual, deslocamentoX, deslocamentoY);
 
                     // Faz a cobrinha
-                    if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= worldStage.getWidth()){
+                    if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
                         alvoDireita.direcao = Direcao.CIMA;
                     }
                     else if (alvoDireita.getX() - MARGEM <= 0){
                         alvoDireita.direcao = Direcao.CIMA;
                     }
                     // Cobrinha horizontal
-                    if (alvoDireita.getY() + alvoDireita.getHeight() >= worldStage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
+                    if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
                         alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
                         alvoDireita.setPosition(alvoDireita.getX() - 220, alvoDireita.getY() - (larguraVisual / 2f));
                     }
@@ -229,7 +229,7 @@ public class GameScreen implements Screen {
                     System.out.println("Compatível");
 
                     // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
-                    worldStage.addActor(pecaSolta);
+                    stage.addActor(pecaSolta);
 
                     // Atualiza rotação
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
@@ -250,7 +250,7 @@ public class GameScreen implements Screen {
                     if (alvoEsquerda.getX() - MARGEM <= 0){
                         alvoEsquerda.direcao = Direcao.BAIXO;
                     }
-                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= worldStage.getWidth()){
+                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
                         alvoEsquerda.direcao = Direcao.BAIXO;
                     }
                     // Cobrinha horizontal -> Tem q tomar cuidado com o horizontal group da mão do jogador
@@ -350,13 +350,13 @@ public class GameScreen implements Screen {
     private void inicializarPecas(){
         HorizontalGroup pecasNaMao = new HorizontalGroup();
         pecasNaMao.space(15);
-        pecasNaMao.setPosition(hudStage.getWidth() / 4, 125);
-        hudStage.addActor(pecasNaMao);
+        pecasNaMao.setPosition(stage.getWidth() / 4, 125);
+        stage.addActor(pecasNaMao);
 
         List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
 
         PecaDao p = new PecaDao(new ConnectionFactory());
-        List<Peca> pecasLogicasNaMao = p.buscarPecasAleatorias(7);
+        this.pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
             // MUDANÇA TEMPORÁRIA PRA TESTAR TEXTURAS
@@ -466,7 +466,7 @@ public class GameScreen implements Screen {
             pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
             final boolean estaDeitada = (pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90);
 
-            worldStage.addActor(pecaVisualAdversario);
+            stage.addActor(pecaVisualAdversario);
             // posicionamento da peça e da zona
             if (jogada.noFinal) {
                 // Gira a peça para arrumar visualmente no tabuleiro
@@ -479,13 +479,13 @@ public class GameScreen implements Screen {
 
                 alvoDireita.direcao.calcularCoordenadas(alvoDireita, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
 
-                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= worldStage.getWidth()){
+                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
                     alvoDireita.direcao = Direcao.CIMA;
                 }
                 else if (alvoDireita.getX() - MARGEM <= 0){
                     alvoDireita.direcao = Direcao.CIMA;
                 }
-                if (alvoDireita.getY() + alvoDireita.getHeight() >= worldStage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
+                if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
                     alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
                     alvoDireita.setPosition(alvoDireita.getX() - alvoDireita.getWidth(), alvoDireita.getY() - (larguraVisual) / 2f);
                 }
@@ -503,7 +503,7 @@ public class GameScreen implements Screen {
                 if (alvoEsquerda.getX() - MARGEM <= 0){
                     alvoEsquerda.direcao = Direcao.BAIXO;
                 }
-                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= worldStage.getWidth()){
+                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
                     alvoEsquerda.direcao = Direcao.BAIXO;
                 }
                 if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){ // Só entra aqui depois de ter feito a cobra
@@ -523,25 +523,21 @@ public class GameScreen implements Screen {
         // Limpeza em preto absoluto camufla os cortes secos de proporção de tela do Viewport (FitViewport)
         ScreenUtils.clear(Color.BLACK);
 
-        worldStage.act(delta);
-        hudStage.act(delta);
+        stage.act(delta);
 
-        worldStage.draw();
-        hudStage.draw();
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        worldStage.getViewport().update(width, height, true);
-        hudStage.getViewport().update(width, height, true);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void dispose() {
         if (cliente != null) cliente.fechar();
 
-        worldStage.dispose();
-        hudStage.dispose();
+        stage.dispose();
 
         // Evita vazamentos e estouro de memória de vídeo externa (VRAM / Pointer Leaks)
         if (background != null) background.dispose();

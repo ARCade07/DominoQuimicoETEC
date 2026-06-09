@@ -11,7 +11,8 @@ public class ZonaDeSoltarPeca extends Image {
 
     public Direcao direcao;
 
-    public ZonaDeSoltarPeca(boolean isLadoDireito) {
+    public ZonaDeSoltarPeca(boolean isLadoDireito, Texture t) {
+        super(t);
         this.isLadoDireito = isLadoDireito;
         this.setSize(220, 320); // Um pouco maior que a peça
         if (isLadoDireito) this.direcao = Direcao.NORMAL;
