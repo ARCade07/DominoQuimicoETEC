@@ -1,9 +1,12 @@
 package com.domino.telas;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -29,12 +32,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen {
-    private final Stage stage;
-    private final DragAndDrop dragAndDrop;
 
+    // Separação Arquitetural (Camadas Gráficas)
+    private final Stage worldStage;
+    private final Stage hudStage;
+
+    // Gerenciador de Input e Interações Visuais
+    private DragAndDrop dragAndDrop;
+
+    // Elementos de Regra de Negócio e Infraestrutura
     private final Tabuleiro tabuleiro = new Tabuleiro();
-    private final ZonaDeSoltarPeca alvoEsquerda;
-    private final ZonaDeSoltarPeca alvoDireita;
+    private ZonaDeSoltarPeca alvoEsquerda;
+    private ZonaDeSoltarPeca alvoDireita;
 
     private final float MARGEM = 170f;
 
@@ -42,7 +51,13 @@ public class GameScreen implements Screen {
     private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
     private Texture texturaPeca_b_b;
+    // Recursos Gráficos e Gerenciamento de Assets
+    private Texture texturaZonas;
+    private Texture texturaBase;
+    private BitmapFont fontePadrao;
+    private Background background;
 
+    // Camada de Comunicação em Rede
     private Cliente cliente;
     private Servidor servidor;
     private int quantidadePecas = 7;
@@ -50,17 +65,33 @@ public class GameScreen implements Screen {
     private List<Peca> pecasLogicasNaMao;
 
     public GameScreen() {
-        // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
-        stage = new Stage(new FitViewport(1920, 1080));
-        // 'Stage' é quem vai receber os cliques do mouse
-        Gdx.input.setInputProcessor(stage);
+        // 1. Inicializa camadas isoladas com Viewports fixos
+        worldStage = new Stage(new FitViewport(1920, 1080));
+        hudStage = new Stage(new FitViewport(1920, 1080));
 
-        // Coloca o background
-        Texture backgroundTextura = new Texture("background.png");
-        Background background = new Background(backgroundTextura);
-        stage.addActor(background);
+        // 2. Orquestração e Hierarquia de Entrada de Dispositivos (Inputs)
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        OrthographicCamera cameraMundo = (OrthographicCamera) worldStage.getCamera();
 
-        // Inicia texturas
+        multiplexer.addProcessor(hudStage);                  // Interface (Mão do jogador) consome clicks primeiro
+        multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
+        multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
+        multiplexer.addProcessor(worldStage);                // Elementos do tabuleiro recebem inputs por último
+        Gdx.input.setInputProcessor(multiplexer);
+
+        // 3. Montagem e Alinhamento Centralizado do Cenário Cinematográfico
+        this.background = new Background();
+
+        float centroMundoX = worldStage.getWidth() / 2f;
+        float centroMundoY = worldStage.getHeight() / 2f;
+
+        this.background.setPosition(
+            centroMundoX - (this.background.getWidth() / 2f),
+            centroMundoY - (this.background.getHeight() / 2f)
+        );
+        worldStage.addActor(this.background);
+
+        // Inicialização de texturas dependentes
         this.inicilizarTexturas();
 
         // Prepara as zonas
@@ -70,14 +101,12 @@ public class GameScreen implements Screen {
         alvoDireita = new ZonaDeSoltarPeca(true);
         alvoDireita.setPosition((stage.getWidth() / 2), (stage.getHeight() / 2));
 
-        stage.addActor(alvoEsquerda);
-        stage.addActor(alvoDireita);
+        worldStage.addActor(alvoEsquerda);
+        worldStage.addActor(alvoDireita);
 
-        // Lógica do Drag and Drop
+        // 4. Lógica e Engenharia de Drag and Drop
         dragAndDrop = new DragAndDrop();
 
-        // Onde pode soltar (target)
-        // Na direita (final = true)
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoDireita) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
@@ -96,19 +125,12 @@ public class GameScreen implements Screen {
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                System.out.println("Peça solta no lado direito");
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), true)){
-                    // Para debug
-                    System.out.println("Compatível");
+                    worldStage.addActor(pecaSolta);
 
-                    // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
-                    stage.addActor(pecaSolta);
-
-                    // Atualiza rotação da peça (atualizada na classe Tabuleiro)
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
-
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
                     // Gira a peça para arrumar visualmente no tabuleiro
@@ -169,15 +191,8 @@ public class GameScreen implements Screen {
                         cliente.enviarQuantidadePecas(atualizaQuantidade);
                     }
                 } else {
-                    System.out.println("Peça incompatível");
-
                     float xOriginal = source.getActor().getX();
                     float yOriginal = source.getActor().getY();
-
-                    float xMouse = source.getActor().getX();
-                    float yMouse = source.getActor().getY();
-
-                    pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
 
                     if(pontuacao > 0){
@@ -192,7 +207,7 @@ public class GameScreen implements Screen {
                 System.out.println("Pontuação: " + pontuacao);
             }
         });
-        // Para a esquerda (final = false)
+
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoEsquerda) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
@@ -211,19 +226,12 @@ public class GameScreen implements Screen {
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                System.out.println("Peça solta no lado esquerdo");
                 PecaVisual pecaSolta = (PecaVisual) payload.getObject();
 
                 if (tabuleiro.colocarPeca(pecaSolta.getPecaLogica(), false)){
-                    // Para debug
-                    System.out.println("Compatível");
+                    worldStage.addActor(pecaSolta);
 
-                    // Tira a peça do HorizontalGroup e coloca em Stage para poder trocar coordenadas sem conflito
-                    stage.addActor(pecaSolta);
-
-                    // Atualiza rotação
                     pecaSolta.setRotation(pecaSolta.getPecaLogica().getRotacao());
-
                     final boolean estaDeitada = pecaSolta.getRotation() == 90 || pecaSolta.getRotation() == -90;
 
                     // Gira a peça para arrumar visualmente no tabuleiro
@@ -284,15 +292,8 @@ public class GameScreen implements Screen {
                         cliente.enviarQuantidadePecas(atualizaQuantidade);
                     }
                 } else {
-                    System.out.println("Peça incompatível");
-
                     float xOriginal = source.getActor().getX();
                     float yOriginal = source.getActor().getY();
-
-                    float xMouse = source.getActor().getX();
-                    float yMouse = source.getActor().getY();
-
-                    pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
 
                     if(pontuacao > 100){
@@ -308,6 +309,7 @@ public class GameScreen implements Screen {
 
             }
         });
+
         this.inicializarPecas();
     }
 
@@ -320,38 +322,33 @@ public class GameScreen implements Screen {
         this.texturaPeca_a_a = new Texture("peca_a_a.png");
         this.texturaPeca_a_b = new Texture("peca_a_b.png");
         this.texturaPeca_b_b = new Texture("peca_b_b.png");
+        this.texturaZonas = ZonaDeSoltarPeca.criarTextura();
+        this.texturaBase = new Texture("pecafinal.png");
+        this.fontePadrao = new BitmapFont();
     }
 
     private void inicializarPecas(){
-        HorizontalGroup pecasNaMao = new  HorizontalGroup();
+        HorizontalGroup pecasNaMao = new HorizontalGroup();
         pecasNaMao.space(15);
-        pecasNaMao.setPosition(stage.getWidth() / 4, 125);
-        stage.addActor(pecasNaMao);
+        pecasNaMao.setPosition(hudStage.getWidth() / 4, 125);
+        hudStage.addActor(pecasNaMao);
 
         List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
-
         PecaDao p = new PecaDao(new ConnectionFactory());
         pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
-            String info1 = pecaNaMao.getInfo1();
-            String info2 = pecaNaMao.getInfo2();
-
-            Texture texturaPeca = this.getTextura(info1, info2);
-
-            PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaPeca);
+            PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaBase, fontePadrao);
             pecaVisualNaMao.add(pecaVisual);
         }
 
         for (PecaVisual pecaVisual : pecaVisualNaMao) {
             pecasNaMao.addActor(pecaVisual);
 
-            // Configura o drag and drop pra cada peça
             dragAndDrop.addSource(new DragAndDrop.Source(pecaVisual) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-
-                    if(!cliente.minhaVez){
+                    if(cliente != null && !cliente.minhaVez){
                         System.out.println("Vez de adversário");
                         return null;
                     }
@@ -359,11 +356,10 @@ public class GameScreen implements Screen {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
                     payload.setObject(pecaVisual);
 
-                    Image fantasma = new Image(pecaVisual.getSprite());
+                    Image fantasma = new Image(texturaBase);
                     fantasma.setSize(100, 200);
                     fantasma.setColor(1, 1, 1, 0.5f);
 
-                    // Centraliza o fantasma no mouse (dependendo de onde você clica na peça)
                     dragAndDrop.setDragActorPosition(fantasma.getWidth()/2, -fantasma.getHeight()/2);
                     payload.setDragActor(fantasma);
 
@@ -371,20 +367,6 @@ public class GameScreen implements Screen {
                 }
             });
         }
-    }
-
-    // pega a textura da peça que foi jogada pelo oponente
-    private Texture getTextura(String info1, String info2) {
-        // caso a peça seja uma bucha
-        if (info1.equals("A") && info2.equals("A")) return texturaPeca_a_a;
-        if (info1.equals("B") && info2.equals("B")) return texturaPeca_b_b;
-
-        // caso mão seja uma bucha
-        if ((info1.equals("A") && info2.equals("B")) || (info1.equals("B") && info2.equals("A"))) {
-            return texturaPeca_a_b;
-        }
-
-        return null;
     }
 
     public void receberJogadaRede(PacketJogada jogada) {
@@ -398,6 +380,7 @@ public class GameScreen implements Screen {
         Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
 
         if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
+            PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, texturaBase, fontePadrao);
 
             Texture textura = getTextura(jogada.info1, jogada.info2);
             PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, textura);
@@ -453,37 +436,41 @@ public class GameScreen implements Screen {
         }
     }
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-    public void setServidor(Servidor servidor) {
-        this.servidor = servidor;
-    }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public void setServidor(Servidor servidor) { this.servidor = servidor; }
 
     @Override
     public void render(float delta) {
-        // Limpa a tela com uma cor de fundo (cinza escuro)
-        ScreenUtils.clear(new Color(0.15f, 0.15f, 0.15f, 1f));
+        // Limpeza em preto absoluto camufla os cortes secos de proporção de tela do Viewport (FitViewport)
+        ScreenUtils.clear(Color.BLACK);
 
-        // Atualiza as animações e desenha todos os atores que estiverem no palco
-        stage.act(delta);
-        stage.draw();
+        worldStage.act(delta);
+        hudStage.act(delta);
+
+        worldStage.draw();
+        hudStage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        // Atualiza a visualização se a janela mudar de tamanho
-        stage.getViewport().update(width, height, true);
+        worldStage.getViewport().update(width, height, true);
+        hudStage.getViewport().update(width, height, true);
     }
 
     @Override
     public void dispose() {
         if (cliente != null) cliente.fechar();
-//        if (servidor != null) servidor.fechar();
-        stage.dispose(); // Libera a memória ao fechar a tela
+
+        worldStage.dispose();
+        hudStage.dispose();
+
+        // Evita vazamentos e estouro de memória de vídeo externa (VRAM / Pointer Leaks)
+        if (texturaZonas != null) texturaZonas.dispose();
+        if (texturaBase != null) texturaBase.dispose();
+        if (fontePadrao != null) fontePadrao.dispose();
+        if (background != null) background.dispose();
     }
 
-    // Métodos obrigatórios da interface Screen
     @Override public void show() {}
     @Override public void pause() {}
     @Override public void resume() {}
