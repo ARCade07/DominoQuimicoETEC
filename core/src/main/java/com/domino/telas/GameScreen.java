@@ -37,9 +37,23 @@ public class GameScreen implements Screen {
     private final float MARGEM = 170f;
 
     // Texturas
-    private Texture texturaPeca_a_a;
     private Texture texturaPeca_a_b;
-    private Texture texturaPeca_b_b;
+    private Texture texturaPeca_a_o;
+    private Texture texturaPeca_a_s;
+
+    private Texture texturaPeca_b_a;
+    private Texture texturaPeca_b_o;
+    private Texture texturaPeca_b_s;
+
+    private Texture texturaPeca_o_a;
+    private Texture texturaPeca_o_b;
+    private Texture texturaPeca_o_s;
+
+    private Texture texturaPeca_s_a;
+    private Texture texturaPeca_s_b;
+    private Texture texturaPeca_s_o;
+
+    private Texture libgdx;
 
     private Cliente cliente;
     private Servidor servidor;
@@ -245,9 +259,23 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-        this.texturaPeca_a_a = new Texture("peca_a_a.png");
         this.texturaPeca_a_b = new Texture("peca_a_b.png");
-        this.texturaPeca_b_b = new Texture("peca_b_b.png");
+        this.texturaPeca_a_o = new Texture("peca_a_o.png");
+        this.texturaPeca_a_s = new Texture("peca_a_s.png");
+
+        this.texturaPeca_b_a = new Texture("peca_b_a.png");
+        this.texturaPeca_b_o = new Texture("peca_b_o.png");
+        this.texturaPeca_b_s = new Texture("peca_b_s.png");
+
+        this.texturaPeca_o_a = new Texture("peca_o_a.png");
+        this.texturaPeca_o_b = new Texture("peca_o_b.png");
+        this.texturaPeca_o_s = new Texture("peca_o_s.png");
+
+        this.texturaPeca_s_a = new Texture("peca_s_a.png");
+        this.texturaPeca_s_b = new Texture("peca_s_b.png");
+        this.texturaPeca_s_o = new Texture("peca_s_o.png");
+
+        this.libgdx = new Texture("libgdx.png");
     }
 
     private void inicializarPecas(){
@@ -262,10 +290,27 @@ public class GameScreen implements Screen {
         List<Peca> pecasLogicasNaMao = p.buscarPecasAleatorias(7);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
-            String info1 = pecaNaMao.getInfo1();
-            String info2 = pecaNaMao.getInfo2();
+            // MUDANÇA TEMPORÁRIA PRA TESTAR TEXTURAS
+            //String info1 = pecaNaMao.getInfo1();
+            //String info2 = pecaNaMao.getInfo2();
+            //Texture texturaPeca = this.getTextura(info1, info2);
+            Tipo tipo1 = pecaNaMao.getTipo1();
+            Tipo tipo2 = pecaNaMao.getTipo2();
 
-            Texture texturaPeca = this.getTextura(info1, info2);
+            String tipo1S = "";
+            String tipo2S = "";
+
+            if (tipo1 == Tipo.ACIDO) tipo1S = "A";
+            if (tipo1 == Tipo.BASE) tipo1S = "B";
+            if (tipo1 == Tipo.SAL) tipo1S = "S";
+            if (tipo1 == Tipo.OXIDO) tipo1S = "O";
+
+            if (tipo2 == Tipo.ACIDO) tipo2S = "A";
+            if (tipo2 == Tipo.BASE) tipo2S = "B";
+            if (tipo2 == Tipo.SAL) tipo2S = "S";
+            if (tipo2 == Tipo.OXIDO) tipo2S = "O";
+
+            Texture texturaPeca = this.getTextura(tipo1S, tipo2S);
 
             PecaVisual pecaVisual = new PecaVisual(pecaNaMao, texturaPeca);
             pecaVisualNaMao.add(pecaVisual);
@@ -303,24 +348,45 @@ public class GameScreen implements Screen {
 
     // pega a textura da peça que foi jogada pelo oponente
     private Texture getTextura(String info1, String info2) {
-        // caso a peça seja uma bucha
-        if (info1.equals("A") && info2.equals("A")) return texturaPeca_a_a;
-        if (info1.equals("B") && info2.equals("B")) return texturaPeca_b_b;
+        if (info1.equals("A") && info2.equals("B")) return texturaPeca_a_b;
+        if (info1.equals("A") && info2.equals("O")) return texturaPeca_a_o;
+        if (info1.equals("A") && info2.equals("S")) return texturaPeca_a_s;
 
-        // caso mão seja uma bucha
-        if ((info1.equals("A") && info2.equals("B")) || (info1.equals("B") && info2.equals("A"))) {
-            return texturaPeca_a_b;
-        }
+        if (info1.equals("B") && info2.equals("A")) return texturaPeca_b_a;
+        if (info1.equals("B") && info2.equals("O")) return texturaPeca_b_o;
+        if (info1.equals("B") && info2.equals("S")) return texturaPeca_b_s;
 
-        return null;
+        if (info1.equals("O") && info2.equals("A")) return texturaPeca_o_a;
+        if (info1.equals("O") && info2.equals("B")) return texturaPeca_o_b;
+        if (info1.equals("O") && info2.equals("S")) return texturaPeca_o_s;
+
+        if (info1.equals("S") && info2.equals("A")) return texturaPeca_s_a;
+        if (info1.equals("S") && info2.equals("B")) return texturaPeca_s_b;
+        if (info1.equals("S") && info2.equals("O")) return texturaPeca_s_o;
+
+        return libgdx;
     }
 
     public void receberJogadaRede(PacketJogada jogada) {
         Peca pecaAdversario = new Peca(jogada.info1, jogada.tipo1, jogada.info2, jogada.tipo2);
 
         if (tabuleiro.colocarPeca(pecaAdversario, jogada.noFinal)) {
+            // MUDANÇA TEMPORÁRIA PRA PEGAR A TEXTURA
+            var tipo1PecaAdversario = "";
+            var tipo2PecaAdversario = "";
 
-            Texture textura = getTextura(jogada.info1, jogada.info2);
+            if (jogada.tipo1 == Tipo.ACIDO) tipo1PecaAdversario = "A";
+            if (jogada.tipo1 == Tipo.BASE) tipo1PecaAdversario = "B";
+            if (jogada.tipo1 == Tipo.SAL) tipo1PecaAdversario = "S";
+            if (jogada.tipo1 == Tipo.OXIDO) tipo1PecaAdversario = "O";
+
+            if (jogada.tipo2 == Tipo.ACIDO) tipo2PecaAdversario = "A";
+            if (jogada.tipo2 == Tipo.BASE) tipo2PecaAdversario = "B";
+            if (jogada.tipo2 == Tipo.SAL) tipo2PecaAdversario = "S";
+            if (jogada.tipo2 == Tipo.OXIDO) tipo2PecaAdversario = "O";
+
+            Texture textura = getTextura(tipo1PecaAdversario, tipo2PecaAdversario);
+
             PecaVisual pecaVisualAdversario = new PecaVisual(pecaAdversario, textura);
             pecaVisualAdversario.setRotation(pecaVisualAdversario.getPecaLogica().getRotacao());
             final boolean estaDeitada = (pecaVisualAdversario.getRotation() == 90 || pecaVisualAdversario.getRotation() == -90);
