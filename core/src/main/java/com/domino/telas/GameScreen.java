@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -38,12 +37,12 @@ public class GameScreen implements Screen {
     private final Stage hudStage;
 
     // Gerenciador de Input e Interações Visuais
-    private DragAndDrop dragAndDrop;
+    private final DragAndDrop dragAndDrop;
 
     // Elementos de Regra de Negócio e Infraestrutura
     private final Tabuleiro tabuleiro = new Tabuleiro();
-    private ZonaDeSoltarPeca alvoEsquerda;
-    private ZonaDeSoltarPeca alvoDireita;
+    private final ZonaDeSoltarPeca alvoEsquerda;
+    private final ZonaDeSoltarPeca alvoDireita;
 
     private final float MARGEM = 170f;
 
@@ -64,10 +63,9 @@ public class GameScreen implements Screen {
     private Texture texturaPeca_s_b;
     private Texture texturaPeca_s_o;
 
+    private final Background background;
 
     private Texture libgdx;
-    private BitmapFont fontePadrao;
-    private Background background;
 
     // Camada de Comunicação em Rede
     private Cliente cliente;
@@ -88,7 +86,6 @@ public class GameScreen implements Screen {
         multiplexer.addProcessor(hudStage);                  // Interface (Mão do jogador) consome clicks primeiro
         multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
         multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
-        multiplexer.addProcessor(worldStage);                // Elementos do tabuleiro recebem inputs por último
         Gdx.input.setInputProcessor(multiplexer);
 
         // 3. Montagem e Alinhamento Centralizado do Cenário Cinematográfico
@@ -105,10 +102,10 @@ public class GameScreen implements Screen {
 
         // Prepara as zonas
         alvoEsquerda = new ZonaDeSoltarPeca(false);
-        alvoEsquerda.setPosition((worldStage.getWidth() / 2) - 220, (stage.getHeight() / 2));
+        alvoEsquerda.setPosition((worldStage.getWidth() / 2) - 220, (worldStage.getHeight() / 2));
 
         alvoDireita = new ZonaDeSoltarPeca(true);
-        alvoDireita.setPosition((worldStage.getWidth() / 2), (stage.getHeight() / 2));
+        alvoDireita.setPosition((worldStage.getWidth() / 2), (worldStage.getHeight() / 2));
 
         worldStage.addActor(alvoEsquerda);
         worldStage.addActor(alvoDireita);
@@ -482,13 +479,13 @@ public class GameScreen implements Screen {
 
                 alvoDireita.direcao.calcularCoordenadas(alvoDireita, pecaVisualAdversario, larguraVisual, deslocamentoX, deslocamentoY);
 
-                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
+                if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= worldStage.getWidth()){
                     alvoDireita.direcao = Direcao.CIMA;
                 }
                 else if (alvoDireita.getX() - MARGEM <= 0){
                     alvoDireita.direcao = Direcao.CIMA;
                 }
-                if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
+                if (alvoDireita.getY() + alvoDireita.getHeight() >= worldStage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
                     alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
                     alvoDireita.setPosition(alvoDireita.getX() - alvoDireita.getWidth(), alvoDireita.getY() - (larguraVisual) / 2f);
                 }
@@ -506,7 +503,7 @@ public class GameScreen implements Screen {
                 if (alvoEsquerda.getX() - MARGEM <= 0){
                     alvoEsquerda.direcao = Direcao.BAIXO;
                 }
-                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= worldStage.getWidth()){
                     alvoEsquerda.direcao = Direcao.BAIXO;
                 }
                 if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){ // Só entra aqui depois de ter feito a cobra
@@ -547,7 +544,6 @@ public class GameScreen implements Screen {
         hudStage.dispose();
 
         // Evita vazamentos e estouro de memória de vídeo externa (VRAM / Pointer Leaks)
-        if (fontePadrao != null) fontePadrao.dispose();
         if (background != null) background.dispose();
     }
 
