@@ -10,10 +10,12 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class UsuarioDao {
     // Onde os documentos BSON serão guardados:
@@ -91,6 +93,20 @@ public class UsuarioDao {
         return null;
     }
 
+    public boolean redefinirSenha(String email, String novaSenhaDigitada) {
+        String hashSenha = BCrypt.withDefaults().hashToString(12, novaSenhaDigitada.toCharArray());
+
+        var atualizacoes = Updates.combine(
+            Updates.set("senha", hashSenha),
+            Updates.unset("tokenRecuperacao"),
+            Updates.unset("tokenExpiracao")
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+        
+        return resultado.getModifiedCount() > 0;
+    }
+
     public Usuario buscarPorEmail(String email) {
         Document doc = docsUsuarios.find(Filters.eq("email", email)).first();
 
@@ -99,6 +115,29 @@ public class UsuarioDao {
         }
 
         return converterDocumentoParaUsuario(doc);
+    }
+
+    public boolean salvarTokenRecuperacao(String email, String tokenRecuperacao){
+        long tempo = TimeUnit.MINUTES.toMillis(15);
+        long expiracao = System.currentTimeMillis() + tempo;
+
+        var atualizacoes = Updates.combine(
+            Updates.set("tokenRecuperacao", tokenRecuperacao),
+            Updates.set("tokenExpiracao", expiracao)
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+
+        return resultado.getMatchedCount() > 0;
+    }
+
+    public boolean validarToken(String email, String tokenDigitado) {
+        Usuario u = buscarPorEmail(email);
+
+        if (u != null && tokenDigitado.equals(u.getTokenRecuperacao())) {
+            return System.currentTimeMillis() <= u.getTokenExpiracao();
+        }
+        return false;
     }
 
     public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
@@ -128,6 +167,10 @@ public class UsuarioDao {
         u.setEmail(doc.getString("email"));
         u.setSenha(doc.getString("senha"));
         u.setTokenSessao(doc.getString("tokenSessao"));
+        u.setTokenRecuperacao(doc.getString("tokenRecuperacao"));
+
+        Long expiracao = doc.getLong("tokenExpiracao");
+        if (expiracao != null) u.setTokenExpiracao(expiracao);
 
         // Pega o sub-documento de estatísticas do bd
         Document docEstat = (Document) doc.get("estatisticas");
