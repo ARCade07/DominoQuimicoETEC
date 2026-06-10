@@ -185,6 +185,15 @@ public class GameScreen implements Screen {
 //                        pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
+                        if(pecasLogicasNaMao.isEmpty()){
+                            pacote.ultimaJogada = true;
+
+                            PacketPontuacao pontuacaoFinal = new PacketPontuacao();
+                            pontuacaoFinal.pontuacao = pontuacao;
+
+                            cliente.enviarPontuacao(pontuacaoFinal);
+                        }
+
                         cliente.enviarJogada(pacote);
                     }
                 } else {
@@ -198,6 +207,14 @@ public class GameScreen implements Screen {
 
                     pecaSolta.setPosition(xMouse, yMouse);
                     pecaSolta.addAction(Actions.moveTo(xOriginal, yOriginal, 0.5f));
+
+                    if(pontuacao > 100){
+                        pontuacao -= 50;
+                    }
+
+                    if(cliente != null){
+                        passarVez();
+                    }
 
                 }
             }
