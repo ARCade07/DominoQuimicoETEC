@@ -175,7 +175,11 @@ public class TelaFimDeJogo extends BaseScreen {
         btnSair.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new RankingScreen());
+                if(servidor != null) servidor.fechar();
+                else{
+                    cliente.fechar();
+                }
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
             }
         });
 
