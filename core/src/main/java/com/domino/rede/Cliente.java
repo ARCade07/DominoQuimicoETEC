@@ -1,6 +1,7 @@
 package com.domino.rede;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Timer;
 import com.domino.rede.packets.*;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -59,6 +60,21 @@ public class Cliente {
 
                         System.out.println("Jogador: " + resultadoJogador.idJogador + " | Pontuação: " + resultadoJogador.pontuacao);
                     }
+
+
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            Timer.schedule(new Timer.Task() {
+                                @Override
+                                public void run() {
+                                    TelaFimDeJogo fimDeJogo = new TelaFimDeJogo(resultado, conexao.getID());
+                                    ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(fimDeJogo);
+                                }
+                            }, 3.0f);
+                        }
+                    });
                 }
                 if(objeto instanceof PacketLobby){
                     System.out.println("PACKET RECEBIDO!");
