@@ -232,6 +232,7 @@ public class PopUpCriaPartida {
                     Servidor servidor = new Servidor();
 
                     Cliente cliente = new Cliente("localhost");
+                    cliente.setServidor(servidor);
                     fecharEFecharRecursos();
                     LobbyScreen lobbyScreen = new LobbyScreen(servidor, cliente);
                     ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);

@@ -22,8 +22,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
+import com.domino.rede.Cliente;
+import com.domino.rede.Servidor;
 import com.domino.rede.packets.PacketResultadoJogo;
 import com.domino.rede.packets.PacketResultadoJogador;
+import com.domino.rede.packets.PacketVoltaProLobby;
 
 public class TelaFimDeJogo extends BaseScreen {
 
@@ -37,6 +40,8 @@ public class TelaFimDeJogo extends BaseScreen {
 
     private Array<Actor> ordemNavegacao;
     private final ResultadoJogador[] resultados;
+    private Servidor servidor;
+    private Cliente cliente;
 
     private static class ResultadoJogador {
         String nome;
@@ -50,7 +55,9 @@ public class TelaFimDeJogo extends BaseScreen {
         }
     }
 
-    public TelaFimDeJogo(PacketResultadoJogo resultadoRede, int meuId) {
+    public TelaFimDeJogo(PacketResultadoJogo resultadoRede, int meuId ,Cliente cliente, Servidor servidor) {
+        this.cliente = cliente;
+        this.servidor = servidor;
         resultados = new ResultadoJogador[resultadoRede.resultadoFinal.size()];
         for (int i = 0; i < resultadoRede.resultadoFinal.size(); i++) {
             PacketResultadoJogador r = resultadoRede.resultadoFinal.get(i);
@@ -189,12 +196,17 @@ public class TelaFimDeJogo extends BaseScreen {
         GerenciadorAcessibilidade.aplicarFoco(btnJogarNovamente);
         ordemNavegacao.add(btnJogarNovamente);
 
-        btnJogarNovamente.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new LobbyScreen());
-            }
-        });
+        if(servidor != null){
+
+            btnJogarNovamente.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    servidor.botaoJogarNovamente();
+
+                }
+            });
+        }
+
 
         areaBotoes.add(btnSair).width(350).height(80).padRight(30);
         areaBotoes.add(btnJogarNovamente).width(450).height(80);

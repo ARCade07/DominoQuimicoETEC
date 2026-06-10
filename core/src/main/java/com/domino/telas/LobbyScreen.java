@@ -191,11 +191,13 @@ public class LobbyScreen extends BaseScreen {
         btnIniciar.addListener(new ClickListener() {
             public void clicked(InputEvent e, float x, float y) {
                 GameScreen telaJogo = new GameScreen();
-                telaJogo.setCliente(cliente);
-                cliente.setGameScreen(telaJogo);
+//                telaJogo.setCliente(cliente);
+//                cliente.setGameScreen(telaJogo);
 
                 if (servidor != null) {
+                    System.out.println("Isso esta acontecendo");
                     telaJogo.setServidor(servidor);
+                    System.out.println("Enviando packetComecarJogo");
                     servidor.botaoInicioClicado(cliente.idCliente());
                     servidor.decidirQuemComeca();
                 }

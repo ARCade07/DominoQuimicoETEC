@@ -124,9 +124,15 @@ public class Servidor {
         }
     }
 
+    public void botaoJogarNovamente (){
+        PacketVoltaProLobby voltaProLobby = new PacketVoltaProLobby();
+        servidor.sendToAllTCP(voltaProLobby);
+    }
+
     public void botaoInicioClicado(int idHost){
         PacketComecarJogo packetComecarJogo = new PacketComecarJogo();
-        servidor.sendToAllExceptTCP(idHost, packetComecarJogo);
+//        servidor.sendToAllExceptTCP(idHost, packetComecarJogo);
+        servidor.sendToAllTCP(packetComecarJogo);
     }
 
     public void decidirQuemComeca(){

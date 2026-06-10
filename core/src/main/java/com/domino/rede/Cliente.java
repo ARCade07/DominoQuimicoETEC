@@ -19,6 +19,7 @@ public class Cliente {
     private String enderecoIP;
     public boolean minhaVez = false;
     private List<Integer> jogadoresConectados;
+    private Servidor servidor;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -69,7 +70,7 @@ public class Cliente {
                             Timer.schedule(new Timer.Task() {
                                 @Override
                                 public void run() {
-                                    TelaFimDeJogo fimDeJogo = new TelaFimDeJogo(resultado, conexao.getID());
+                                    TelaFimDeJogo fimDeJogo = new TelaFimDeJogo(resultado, conexao.getID(), Cliente.this, servidor);
                                     ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(fimDeJogo);
                                 }
                             }, 3.0f);
@@ -92,6 +93,7 @@ public class Cliente {
                     }
                 }
                 if(objeto instanceof PacketComecarJogo){
+                    System.out.println("PacketComecarJogo recebido com sucesso");
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
@@ -99,6 +101,16 @@ public class Cliente {
                             telaJogo.setCliente(Cliente.this);
                             setGameScreen(telaJogo);
                             ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaJogo);
+                        }
+                    });
+                }
+                if(objeto instanceof PacketVoltaProLobby){
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            LobbyScreen telaLobby = new LobbyScreen(servidor, Cliente.this);
+                            setTelaLobby(telaLobby);
+                            ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
                         }
                     });
                 }
@@ -131,6 +143,10 @@ public class Cliente {
 
     public void setGameScreen(GameScreen telaJogo){
         this.gameScreen = telaJogo;
+    }
+
+    public void setServidor (Servidor servidor){
+        this.servidor = servidor;
     }
 
     public void setTelaLobby(LobbyScreen lobbyScreen){
