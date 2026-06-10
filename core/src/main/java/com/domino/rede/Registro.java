@@ -22,6 +22,7 @@ public class Registro {
         kryo.register(PacketResultadoJogador.class);
         kryo.register(PacketLobby.class);
         kryo.register(PacketComecarJogo.class);
+        kryo.register(PacketVoltaProLobby.class);
     }
 
 }
