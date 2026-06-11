@@ -25,6 +25,7 @@ public class Estilos {
     // Estilos
     public static Label.LabelStyle estiloTextoNormal;
     public static Label.LabelStyle estiloTextoNegrito;
+    public static Label.LabelStyle estiloTextoPeca;
     public static Button.ButtonStyle estiloBotaoGrupo;
     public static TextButton.TextButtonStyle estiloBotaoEntrar;
     public static TextField.TextFieldStyle estiloCampoTexto;
@@ -37,13 +38,14 @@ public class Estilos {
 
     public static void inicializar() {
         // 1. Gerar Fontes
-        fonteNormal = gerarFonte("Inter_24pt-Medium.ttf", 24 * MULTIPLICADOR_HD);
-        fonteNegrito = gerarFonte("Inter_24pt-Bold.ttf", 24 * MULTIPLICADOR_HD);
-        fonteCampoTexto = gerarFonte("Inter_24pt-Medium.ttf", 24);
+        fonteNormal = gerarFonte("Exo2-Medium.ttf", 24 * MULTIPLICADOR_HD);
+        fonteNegrito = gerarFonte("Exo2-Bold.ttf", 24 * MULTIPLICADOR_HD);
+        fonteCampoTexto = gerarFonte("Exo2-Medium.ttf", 24);
 
         // 2. Criar Estilos de Texto
         estiloTextoNormal = new Label.LabelStyle(fonteNormal, Color.WHITE);
         estiloTextoNegrito = new Label.LabelStyle(fonteNegrito, Color.WHITE);
+        estiloTextoPeca = new Label.LabelStyle(fonteNegrito, Color.BLACK);
 
         // 3. Criar Texturas Base Globais
         fundoGradiente = criarTexturaGradiente(Color.valueOf("4A0000"), Color.valueOf("0D0202"));

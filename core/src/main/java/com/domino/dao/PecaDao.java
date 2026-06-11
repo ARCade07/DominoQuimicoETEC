@@ -18,6 +18,20 @@ public class PecaDao {
         this.docsPecas = connection.getDatabase().getCollection("pecas");
     }
 
+    public List<Peca> buscarTodasAsPecas() {
+        List<Peca> listaDePecas = new ArrayList<>();
+
+        try (MongoCursor<Document> cursor = docsPecas.find().iterator()) {
+            while (cursor.hasNext()){
+                Document doc = cursor.next();
+                Peca peca = converterDocumentoParaPeca(doc);
+                listaDePecas.add(peca);
+            }
+        }
+
+        return listaDePecas;
+    }
+
     // Qntd é a quantidade de peças iniciais na mão do jogador
     public List<Peca> buscarPecasAleatorias(int qntd) {
         List<Peca> listaDePecas = new ArrayList<>();

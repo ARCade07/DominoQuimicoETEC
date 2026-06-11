@@ -45,10 +45,10 @@ public class GameScreen implements Screen {
     private final float MARGEM = 170f;
 
     // Texturas
-
-
-
-
+            
+            
+            
+            
     private final Background background;
 
     private Texture texturaBasePeca;
@@ -333,10 +333,10 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-
-
-
-
+                        
+                        
+                        
+                        
         this.texturaBasePeca = new Texture("pecafinal.png");
         this.libgdx = new Texture("libgdx.png");
     }
@@ -352,9 +352,9 @@ public class GameScreen implements Screen {
         ServicoPecas servicoPecas = new ServicoPecas();
         List<Peca> todasAsPecas = servicoPecas.buscarTodasAsPecas();
         java.util.Collections.shuffle(todasAsPecas);
-
+        
         this.pecasLogicasNaMao = new ArrayList<>(todasAsPecas.subList(0, Math.min(7, todasAsPecas.size())));
-
+        
         // As peças restantes podem ir pro draw stack
         List<Peca> drawStack = new ArrayList<>(todasAsPecas.subList(this.pecasLogicasNaMao.size(), todasAsPecas.size()));
         // TODO: utilizar o drawStack no jogo
@@ -394,7 +394,7 @@ public class GameScreen implements Screen {
         }
     }
 
-
+    
 
     public void receberJogadaRede(PacketJogada jogada) {
         if(jogada.proximoAJogar == -1){
