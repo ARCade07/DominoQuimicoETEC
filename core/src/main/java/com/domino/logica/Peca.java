@@ -1,5 +1,7 @@
 package com.domino.logica;
 
+import java.util.List;
+
 public class Peca {
     private final Tipo tipo1;
     private final Tipo tipo2;
@@ -47,10 +49,10 @@ public class Peca {
         return this.tipo2;
     }
 
-    public Tipo getConexoes1(){
+    public List<Tipo> getConexoes1(){
         return this.tipo1.getConexoes();
     }
-    public Tipo getConexoes2(){
+    public List<Tipo> getConexoes2(){
         return this.tipo2.getConexoes();
     }
 

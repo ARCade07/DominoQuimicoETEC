@@ -1,29 +1,37 @@
 package com.domino.logica;
 
+import java.util.List;
+
 public enum Tipo {
 
     ACIDO("Ácido"){
         @Override
-        public Tipo getConexoes(){
-            return Tipo.ACIDO;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.ACIDO, Tipo.AGUA);
         }
     },
     BASE("Base"){
         @Override
-        public Tipo getConexoes(){
-            return Tipo.BASE;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.BASE, Tipo.AGUA);
         }
     },
     OXIDO("Óxido"){
         @Override
-        public Tipo getConexoes(){
-            return Tipo.OXIDO;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.OXIDO, Tipo.AGUA);
         }
     },
     SAL("Sal"){
         @Override
-        public Tipo getConexoes(){
-            return Tipo.SAL;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.SAL, Tipo.AGUA);
+        }
+    },
+    AGUA("Água"){
+        @Override
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.ACIDO, Tipo.BASE, Tipo.OXIDO, Tipo.SAL, Tipo.AGUA);
         }
     };
 
@@ -37,9 +45,5 @@ public enum Tipo {
         return Tipo.valueOf(tipo1.toUpperCase());
     }
 
-    public String getNome(){
-        return this.nome;
-    }
-
-    public abstract Tipo getConexoes();
+    public abstract List<Tipo> getConexoes();
 }

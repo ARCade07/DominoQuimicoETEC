@@ -39,20 +39,20 @@ public class Tabuleiro {
         if (noFinal){
             // Informações da última peça do tabuleiro
             Peca ultimaPeca =  pecasNoTabuleiro.getLast();
-            Tipo tipoCompativelLado1 = ultimaPeca.getConexoes1();
-            Tipo tipoCompativelLado2 = ultimaPeca.getConexoes2();
+            List<Tipo> tiposCompativeisLado1 = ultimaPeca.getConexoes1();
+            List<Tipo> tiposCompativeisLado2 = ultimaPeca.getConexoes2();
 
             if (!ultimaPeca.isLado1Ocupado()){
-                tiposCompativeis.add(tipoCompativelLado1);
+                tiposCompativeis.addAll(tiposCompativeisLado1);
             }
             if (!ultimaPeca.isLado2Ocupado()){
-                tiposCompativeis.add(tipoCompativelLado2);
+                tiposCompativeis.addAll(tiposCompativeisLado2);
             }
 
             if (primeiraJogada){
                 // Só olha pro lado direito (final = true)
                 tiposCompativeis.clear();
-                tiposCompativeis.add(tipoCompativelLado2);
+                tiposCompativeis.addAll(tiposCompativeisLado2);
             }
 
             // Informações da peça que vai ser colocada no tabuleiro
@@ -70,7 +70,7 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado1Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo1Peca)) ultimaPeca.setLado1Ocupado(true);
+                if (tiposCompativeisLado1.contains(tipo1Peca)) ultimaPeca.setLado1Ocupado(true);
                 else ultimaPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addLast(peca);
@@ -90,7 +90,7 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado2Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo2Peca)) ultimaPeca.setLado1Ocupado(true);
+                if (tiposCompativeisLado1.contains(tipo2Peca)) ultimaPeca.setLado1Ocupado(true);
                 else ultimaPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addLast(peca);
@@ -103,20 +103,20 @@ public class Tabuleiro {
         } else  /* No começo */ {
             // Informações da primeira peça do tabuleiro
             Peca primeiraPeca =  pecasNoTabuleiro.getFirst();
-            Tipo tipoCompativelLado1 = primeiraPeca.getConexoes1();
-            Tipo tipoCompativelLado2 = primeiraPeca.getConexoes2();
+            List<Tipo> tiposCompativeisLado1 = primeiraPeca.getConexoes1();
+            List<Tipo> tipoCompativeisLado2 = primeiraPeca.getConexoes2();
 
             if (!primeiraPeca.isLado1Ocupado()){
-                tiposCompativeis.add(tipoCompativelLado1);
+                tiposCompativeis.addAll(tiposCompativeisLado1);
             }
             if (!primeiraPeca.isLado2Ocupado()){
-                tiposCompativeis.add(tipoCompativelLado2);
+                tiposCompativeis.addAll(tipoCompativeisLado2);
             }
 
             if (primeiraJogada){
                 // Só olha pro lado esquerdo (final = false)
                 tiposCompativeis.clear();
-                tiposCompativeis.add(tipoCompativelLado1);
+                tiposCompativeis.addAll(tiposCompativeisLado1);
             }
 
             // Informações da peça que vai ser colocada no tabuleiro
@@ -133,7 +133,7 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado1Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
+                if (tiposCompativeisLado1.contains(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
                 else primeiraPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addFirst(peca);
@@ -153,7 +153,7 @@ public class Tabuleiro {
 
                 // Ocupa os lados da peça
                 peca.setLado2Ocupado(true);
-                if (tipoCompativelLado1.equals(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
+                if (tipoCompativeisLado2.contains(tipo1Peca)) primeiraPeca.setLado1Ocupado(true);
                 else primeiraPeca.setLado2Ocupado(true);
 
                 pecasNoTabuleiro.addFirst(peca);
