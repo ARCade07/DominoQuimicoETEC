@@ -1,15 +1,12 @@
 package com.domino.telas;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -31,26 +28,18 @@ import java.util.List;
 
 public class GameScreen implements Screen {
 
-    // Separação Arquitetural (Camadas Gráficas)
     private final Stage stage;
-
-    // Gerenciador de Input e Interações Visuais
     private final DragAndDrop dragAndDrop;
 
-    // Elementos de Regra de Negócio e Infraestrutura
     private final Tabuleiro tabuleiro = new Tabuleiro();
     private final ZonaDeSoltarPeca alvoEsquerda;
     private final ZonaDeSoltarPeca alvoDireita;
 
     private final float MARGEM = 170f;
 
-    // Texturas
-
-
-
-
     private final Background background;
 
+    //Texturas
     private Texture texturaBasePeca;
     private Texture libgdx;
 
@@ -67,16 +56,7 @@ public class GameScreen implements Screen {
         // 'Stage' é quem vai receber os cliques do mouse
         Gdx.input.setInputProcessor(stage);
 
-
-        // 2. Orquestração e Hierarquia de Entrada de Dispositivos (Inputs)
-//        InputMultiplexer multiplexer = new InputMultiplexer();
-//        OrthographicCamera cameraMundo = (OrthographicCamera) stage.getCamera();
-//
-//        multiplexer.addProcessor(new ZoomInputHandler(cameraMundo)); // Gerenciador isolado de escala (Roda do Mouse)
-//        multiplexer.addProcessor(new PanInputHandler(cameraMundo));  // Gerenciador isolado de translação (Arrasto do mapa)
-//        Gdx.input.setInputProcessor(multiplexer);
-
-        // 3. Montagem e Alinhamento Centralizado do Cenário Cinematográfico
+        // Coloca o background
         this.background = new Background();
 
         this.background.setPosition(
@@ -85,14 +65,14 @@ public class GameScreen implements Screen {
         );
         stage.addActor(this.background);
 
-        // Inicialização de texturas dependentes
+        // Inicia texturas
         this.inicilizarTexturas();
 
         // Prepara as zonas
-        alvoEsquerda = new ZonaDeSoltarPeca(false, libgdx);
+        alvoEsquerda = new ZonaDeSoltarPeca(false);
         alvoEsquerda.setPosition((stage.getWidth() / 2) - 220, (stage.getHeight() / 2));
 
-        alvoDireita = new ZonaDeSoltarPeca(true, libgdx);
+        alvoDireita = new ZonaDeSoltarPeca(true);
         alvoDireita.setPosition((stage.getWidth() / 2), (stage.getHeight() / 2));
 
         stage.addActor(alvoEsquerda);
@@ -101,6 +81,8 @@ public class GameScreen implements Screen {
         // Lógica do Drag and Drop
         dragAndDrop = new DragAndDrop();
 
+        // Onde pode soltar (target)
+        // Na direita (final = true)
         dragAndDrop.addTarget(new DragAndDrop.Target(alvoDireita) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
@@ -149,9 +131,10 @@ public class GameScreen implements Screen {
                     if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
                         alvoDireita.direcao = Direcao.CIMA;
                     }
-                    else if (alvoDireita.getX() - MARGEM <= 0){
-                        alvoDireita.direcao = Direcao.CIMA;
-                    }
+                    // Com isso comentado, a cobrinha vai infinitamente pra esquerda
+//                    else if (alvoDireita.getX() - MARGEM <= 0){
+//                        alvoDireita.direcao = Direcao.CIMA;
+//                    }
                     // Cobrinha horizontal
                     if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
                         alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
@@ -166,11 +149,10 @@ public class GameScreen implements Screen {
 
                     pontuacao += 100;
 
-
                     if (cliente != null) {
                         // pega a peça que foi colocada pelo cliente no tabuleiro
                         PacketJogada pacote = new PacketJogada(pecaSolta.getPecaLogica());
-//                        pacote.copiarPeca(pecaSolta.getPecaLogica());
+                        //pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = true;
 
                         if(pecasLogicasNaMao.isEmpty()){
@@ -255,9 +237,10 @@ public class GameScreen implements Screen {
                     if (alvoEsquerda.getX() - MARGEM <= 0){
                         alvoEsquerda.direcao = Direcao.BAIXO;
                     }
-                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
-                        alvoEsquerda.direcao = Direcao.BAIXO;
-                    }
+                    // Cobrinha vai pra direita pra sempre
+//                    else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+//                        alvoEsquerda.direcao = Direcao.BAIXO;
+//                    }
                     // Cobrinha horizontal -> Tem q tomar cuidado com o horizontal group da mão do jogador
                     // altura da peça = 200.
                     if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){
@@ -273,11 +256,10 @@ public class GameScreen implements Screen {
 
                     pontuacao += 100;
 
-
                     if (cliente != null) {
                         //pega a peça que foi colocada pelo cliente no tabuleiro
                         PacketJogada pacote = new PacketJogada(pecaSolta.getPecaLogica());
-//                        pacote.copiarPeca(pecaSolta.getPecaLogica());
+                        //pacote.copiarPeca(pecaSolta.getPecaLogica());
                         pacote.noFinal = false;
 
                         if(pecasLogicasNaMao.isEmpty()){
@@ -317,10 +299,8 @@ public class GameScreen implements Screen {
                     if(cliente != null){
                         passarVez();
                     }
-
                 }
                 System.out.println("Pontuação: " + pontuacao);
-
             }
         });
 
@@ -333,10 +313,6 @@ public class GameScreen implements Screen {
     }
 
     private void inicilizarTexturas(){
-
-
-
-
         this.texturaBasePeca = new Texture("pecafinal.png");
         this.libgdx = new Texture("libgdx.png");
     }
@@ -393,8 +369,6 @@ public class GameScreen implements Screen {
             });
         }
     }
-
-
 
     public void receberJogadaRede(PacketJogada jogada) {
         if(jogada.proximoAJogar == -1){
