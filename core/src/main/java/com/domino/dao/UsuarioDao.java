@@ -160,6 +160,18 @@ public class UsuarioDao {
     }
 
     // metodo para converter BSON (Documento) para Objeto java
+    public List<Usuario> buscarTopJogadores(int limite) {
+        List<Usuario> ranking = new ArrayList<>();
+        FindIterable<Document> resultados = docsUsuarios.find()
+            .sort(Sorts.descending("estatisticas.pontuacao"))
+            .limit(limite);
+
+        for (Document doc : resultados) {
+            ranking.add(converterDocumentoParaUsuario(doc));
+        }
+
+        return ranking;
+    }
     private Usuario converterDocumentoParaUsuario(Document doc) {
         Usuario u = new Usuario();
 
@@ -168,6 +180,7 @@ public class UsuarioDao {
         u.setNome(doc.getString("nome"));
         u.setEmail(doc.getString("email"));
         u.setSenha(doc.getString("senha"));
+        u.setRole(doc.getString("role"));
         u.setTokenSessao(doc.getString("tokenSessao"));
         u.setTokenRecuperacao(doc.getString("tokenRecuperacao"));
 
