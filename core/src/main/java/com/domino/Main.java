@@ -16,7 +16,7 @@ public class Main extends Game {
     public void create() {
 
         Estilos.inicializar();
-        this.setScreen(new StartScreen());
+        this.setScreen(new LoginScreen());
     }
     @Override
     public void dispose() {
