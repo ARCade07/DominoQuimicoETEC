@@ -1,6 +1,7 @@
 package com.domino;
 
 import com.badlogic.gdx.Game;
+import com.domino.modelos.Sessao;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.telas.GameScreen;
@@ -22,5 +23,6 @@ public class Main extends Game {
     public void dispose() {
         super.dispose();
         Estilos.dispose();
+        Sessao.limparSessao();
     }
 }
