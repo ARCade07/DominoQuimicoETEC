@@ -15,4 +15,8 @@ public class Sessao {
     public static void limparSessao() {
         usuarioAtual = null;
     }
+
+    public static boolean isLogado() {
+        return usuarioAtual != null;
+    }
 }
