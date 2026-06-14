@@ -1,6 +1,7 @@
 package com.domino;
 
 import com.badlogic.gdx.Game;
+import com.domino.bd.ConnectionFactory;
 import com.domino.modelos.Sessao;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
@@ -24,5 +25,6 @@ public class Main extends Game {
         super.dispose();
         Estilos.dispose();
         Sessao.limparSessao();
+        ConnectionFactory.getInstance().fecharConexao();
     }
 }
