@@ -30,6 +30,10 @@ public class LoginScreen extends BaseScreen {
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
 
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+        this.login = new ControladorLogin(this.usuarioDao);
+
         montarTela();
     }
 
