@@ -24,3 +24,12 @@ public class ControladorRanking {
 
         return dados;
     }
+
+    public RankingScreen.EntradaRanking gerarEntradaJogadorLogado(Usuario usuarioLogado) {
+        int pontuacaoExibicao = usuarioLogado.getEstat().getPontuacao();
+
+        int posicaoTemporaria = 999;
+
+        return new RankingScreen.EntradaRanking(posicaoTemporaria, usuarioLogado.getNome(), pontuacaoExibicao, true);
+    }
+}
