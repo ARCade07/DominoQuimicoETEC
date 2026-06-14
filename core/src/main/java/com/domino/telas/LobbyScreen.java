@@ -113,6 +113,12 @@ public class LobbyScreen extends BaseScreen {
         btnVoltar.addListener(new ClickListener() {
             public void clicked(InputEvent e, float x, float y) {
                 btnVoltar.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
+                if(servidor != null){
+                    servidor.fechar();
+                }
+                else{
+                    cliente.fechar();
+                }
                 if (Sessao.isLogado()) {
                     Usuario u = Sessao.getUsuario();
                     String papel = u.getRole();
@@ -124,6 +130,7 @@ public class LobbyScreen extends BaseScreen {
                 } else {
                     ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
                 }
+
             }
         });
 
