@@ -11,7 +11,7 @@ public class ServicoPecas {
 
     // Construtor cria e gerencia a conexão com o banco internamente, evitando acoplamento na GameScreen
     public ServicoPecas() {
-        ConnectionFactory connection = new ConnectionFactory();
+        ConnectionFactory connection = ConnectionFactory.getInstance();
         this.pecaDao = new PecaDao(connection);
     }
 
