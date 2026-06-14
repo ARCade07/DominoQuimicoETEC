@@ -61,7 +61,17 @@ public class TeacherScreen extends BaseScreen {
 
         //Botões
         fundo.add(criarBotao(texRanking, "Ranking", () -> {
-            System.out.println("Lógica para ir para a tela de Ranking");})).width(600).height(100).padBottom(45).center().row();
+            System.out.println("Abrindo o Ranking...");
+
+            ControladorRanking ranking = new ControladorRanking();
+
+            Usuario usuarioLogado = Sessao.getUsuario();
+
+            RankingScreen.EntradaRanking[] listaTop = ranking.gerarRanking(usuarioDao, usuarioLogado);
+            RankingScreen.EntradaRanking jogadorAtual = ranking.gerarEntradaJogadorLogado(usuarioLogado);
+
+            RankingScreen telaRanking = new RankingScreen(jogadorAtual, listaTop);
+            ((Game) Gdx.app.getApplicationListener()).setScreen(telaRanking);})).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texConfig, "Configuracoes",() -> {
             System.out.println("Lógica para abrir Configurações");
         })).width(600).height(100).padBottom(45).center().row();
