@@ -97,9 +97,30 @@ public class LoginScreen extends BaseScreen {
         botaoEntrar.getLabel().setFontScale(1.2f / Estilos.MULTIPLICADOR_HD);
         botaoEntrar.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
+                String emailDigitado = campoUsername.getText();
+                String senhaDigitada = campoSenha.getText();
                 //Teste para ver se funcionou o clicker (tirar depois)
+
+                boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
                 System.out.println("Clicou em Entrar!");
                 //Adicionar função para verificar usuario e senha no banco
+                if (sucesso) {
+
+                    Usuario usuarioLogado = login.getUsuarioLogado();
+                    Sessao.setUsuario(usuarioLogado);
+                    String papel = usuarioLogado.getRole();
+                    System.out.println();
+                    System.out.println("Login efetuado com sucesso como " + papel);
+                    if (papel != null && (papel.equalsIgnoreCase("Professor"))){
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                    } else {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                    }
+                } else {
+                    System.out.println("Erro: E-mail ou senha incorretos!");
+                    campoSenha.setText("");
+                }
+
             }
         });
         cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(15).center().row();
