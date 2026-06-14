@@ -4,16 +4,17 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.domino.bd.ConnectionFactory;
 import com.domino.modelos.Estatisticas;
 import com.domino.modelos.Usuario;
+import com.domino.telas.RankingScreen;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -103,7 +104,7 @@ public class UsuarioDao {
         );
 
         UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
-        
+
         return resultado.getModifiedCount() > 0;
     }
 
@@ -140,11 +141,12 @@ public class UsuarioDao {
         return false;
     }
 
-    public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
+    public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros, int pontuacao) {
         var atualizacoes = Updates.combine(
             Updates.inc("estatisticas.partidasJogadas", 1),
             Updates.inc("estatisticas.acertos", quantAcertos),
-            Updates.inc("estatisticas.erros", quantErros)
+            Updates.inc("estatisticas.erros", quantErros),
+            Updates.inc("estatisticas.pontuacao", pontuacao)
         );
 
         if (ganhou) {
@@ -183,7 +185,7 @@ public class UsuarioDao {
             estat.setPartidasPerdidas(docEstat.getInteger("partidasPerdidas", 0));
             estat.setErros(docEstat.getInteger("erros", 0));
             estat.setAcertos(docEstat.getInteger("acertos", 0));
-
+            estat.setPontuacao(docEstat.getInteger("pontuacao", 0));
             u.setEstat(estat);
         }
         return u;
