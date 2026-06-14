@@ -1,6 +1,8 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -8,11 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorLogin;
+import com.domino.controladores.ControladorRanking;
+import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Sessao;
+import com.domino.modelos.Usuario;
 
 public class TeacherScreen extends BaseScreen {
 
     private Texture texLogoCps, texChemDom, texEtec;
     private Texture texRanking, texConfig, texSair;
+    private UsuarioDao usuarioDao;
+    private ControladorRanking ranking;
 
     public TeacherScreen() {
         super();
