@@ -24,6 +24,10 @@ public class ForgotPasswordScreen extends BaseScreen {
     public ForgotPasswordScreen() {
         super();
 
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+        this.recuperador = new ControladorRecuperacao(this.usuarioDao);
+
         montarTela();
     }
 
