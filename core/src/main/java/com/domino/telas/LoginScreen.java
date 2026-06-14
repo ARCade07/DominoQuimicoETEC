@@ -87,6 +87,7 @@ public class LoginScreen extends BaseScreen {
         linkEsqueceuSenha.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new ForgotPasswordScreen());
             }
         });
         cartaoLogin.add(linkEsqueceuSenha).right().padBottom(20).row();
