@@ -31,6 +31,10 @@ public class CadastroScreen extends BaseScreen {
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
         texEmail = new Texture(Gdx.files.internal("Email.png"));
 
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+        this.registro = new ControladorRegistro(this.usuarioDao);
+
         montarTela();
     }
 
