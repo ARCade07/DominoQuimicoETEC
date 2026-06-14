@@ -44,6 +44,13 @@ public class ConnectionFactory {
         return instanciaBD;
     }
 
+    public void fecharConexao(){
+        if (mongoClient != null) {
+            mongoClient.close();
+            System.out.println("Conexão com o banco encerrada.");
+        }
+    }
+
     public MongoDatabase getDatabase() {
         return database;
     }
