@@ -35,6 +35,9 @@ public class TeacherScreen extends BaseScreen {
         texConfig = new Texture(Gdx.files.internal("configuracoes.png"));
         texSair = new Texture(Gdx.files.internal("sair.png"));
 
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+
         montarTela();
     }
 
