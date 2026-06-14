@@ -87,24 +87,6 @@ public class LoginScreen extends BaseScreen {
         linkEsqueceuSenha.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String emailDigitado = campoUsername.getText();
-                String senhaDigitada = campoSenha.getText();
-
-                ConnectionFactory conexao = new ConnectionFactory();
-                UsuarioDao usuarioDao = new UsuarioDao(conexao);
-                Usuario usuarioLogado = usuarioDao.realizarLogin(emailDigitado, senhaDigitada);
-                if (usuarioLogado != null) {
-                    System.out.println("Login bem-sucedido! Token: " + usuarioLogado.getTokenSessao());
-
-                    // Vai para a tela do jogo
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new GameScreen());
-                } else {
-                    System.out.println("Erro: E-mail ou senha incorretos!");
-                    campoSenha.setText("");
-                }
-                //Teste para ver se funcionou o clicker (tirar depois)
-                System.out.println("Clicou em Esqueci a Senha!");
-                //Função para trocar de tela e função de mandar e-mail para troca de senha
             }
         });
         cartaoLogin.add(linkEsqueceuSenha).right().padBottom(20).row();
