@@ -103,7 +103,18 @@ public class CadastroScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 //Teste para ver se funcionou o clicker (tirar depois)
                 System.out.println("Clicou em Cadastrar");
+                String usernameDigitado = campoUsername.getText();
+                String emailDigitado = campoEmail.getText();
+                String senhaDigitada = campoSenha.getText();
+                Usuario u = new Usuario(usernameDigitado, emailDigitado, senhaDigitada);
                 //Adicionar função para verificar se os campos de senha e confirmar senha possuem o mesmo conteúdo
+                boolean sucesso = registro.registrarUsuario(u);
+                if (sucesso) {
+                    System.out.println("Usuário registrado com sucesso.");
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                } else {
+                    System.out.println("Não foi possível realizar o registro");
+                }
                 //Adicionar função para adicionar usuario e senha no banco
             }
         });
