@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 public class CadastroScreen extends BaseScreen {
 
@@ -88,11 +87,11 @@ public class CadastroScreen extends BaseScreen {
         botaoCadastrar.getLabel().setFontScale(1.2f / Estilos.MULTIPLICADOR_HD);
         botaoCadastrar.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                PopUpCadastro popUp = new PopUpCadastro(stage);
+                PopUpMensagem popUp = new PopUpMensagem(stage);
                 //Adicionar função para adicionar usuario e senha no banco
-                popUp.showSucesso();
+                popUp.showSucesso("Cadastrado com sucesso!");
                 //Caso algo der errado ao adicionar usuario e senha no banco
-                popUp.showErro();
+                popUp.showErro("Erro ao cadastrar");
             }
         });
         cartaoCadastro.add(botaoCadastrar).width(180).height(60).padBottom(15).center().row();

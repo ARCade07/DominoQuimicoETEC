@@ -21,8 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
-public class PopUpCadastro {
+public class PopUpMensagem {
     private final Stage stage;
+    private String mensagemTexto;
     private Skin skin;
     private BitmapFont fontePadrao;
     private Texture texturaFundoEscuro;
@@ -33,7 +34,7 @@ public class PopUpCadastro {
 
     private static final float MULTIPLICADOR_HD = 3.0f;
 
-    public PopUpCadastro(Stage stage) {
+    public PopUpMensagem(Stage stage) {
         this.stage = stage;
 
         Pixmap pixmapFundo = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -48,19 +49,21 @@ public class PopUpCadastro {
         criarSkinAcessivel();
     }
 
-    public void showSucesso() {
+    public void prepararPopUpMensagem() {
         ouvintesOriginais.addAll(stage.getRoot().getListeners());
         stage.getRoot().clearListeners();
-
         stage.addActor(cortina);
+    }
+
+    public void showSucesso(String mensagem) {
+        this.mensagemTexto = mensagem;
+        prepararPopUpMensagem();
         mostrarPopUpSucesso();
     }
 
-    public void showErro() {
-        ouvintesOriginais.addAll(stage.getRoot().getListeners());
-        stage.getRoot().clearListeners();
-
-        stage.addActor(cortina);
+    public void showErro(String mensagem) {
+        this.mensagemTexto = mensagem;
+        prepararPopUpMensagem();
         mostrarPopUpErro();
     }
 
@@ -141,7 +144,7 @@ public class PopUpCadastro {
         popupAtual = new Dialog("", skin, "dialog");
         popupAtual.pad(40);
 
-        Label mensagem = new Label("Cadastro realizado com sucesso!", skin);
+        Label mensagem = new Label(this.mensagemTexto, skin);
         mensagem.setAlignment(Align.center);
         popupAtual.getContentTable().add(mensagem).padBottom(35).row();
 
@@ -171,7 +174,7 @@ public class PopUpCadastro {
         popupAtual = new Dialog("", skin, "dialog");
         popupAtual.pad(40);
 
-        Label mensagem = new Label("Algo deu errado", skin);
+        Label mensagem = new Label(this.mensagemTexto, skin);
         mensagem.setAlignment(Align.center);
         popupAtual.getContentTable().add(mensagem).padBottom(35).row();
 
