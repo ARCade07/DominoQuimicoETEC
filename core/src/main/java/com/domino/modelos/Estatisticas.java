@@ -6,6 +6,7 @@ public class Estatisticas {
     int partidasPerdidas;
     int erros;
     int acertos;
+    int pontuacao;
 
     public int getPartidasJogadas() {
         return partidasJogadas;
@@ -45,5 +46,13 @@ public class Estatisticas {
 
     public void setAcertos(int acertos) {
         this.acertos = acertos;
+    }
+
+    public int getPontuacao() {
+        return pontuacao;
+    }
+
+    public void setPontuacao(int pontuacao) {
+        this.pontuacao = pontuacao;
     }
 }
