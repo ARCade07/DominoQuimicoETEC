@@ -17,7 +17,7 @@ public class CadastroScreen extends BaseScreen {
     public CadastroScreen() {
         super();
 
-        //Texturas específicas tela de login
+        //Texturas específicas tela de cadastro
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
         texEmail = new Texture(Gdx.files.internal("Email.png"));
@@ -88,10 +88,11 @@ public class CadastroScreen extends BaseScreen {
         botaoCadastrar.getLabel().setFontScale(1.2f / Estilos.MULTIPLICADOR_HD);
         botaoCadastrar.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                //Teste para ver se funcionou o clicker (tirar depois)
-                System.out.println("Clicou em Cadastrar");
-                //Adicionar função para verificar se os campos de senha e confirmar senha possuem o mesmo conteúdo
+                PopUpCadastro popUp = new PopUpCadastro(stage);
                 //Adicionar função para adicionar usuario e senha no banco
+                popUp.showSucesso();
+                //Caso algo der errado ao adicionar usuario e senha no banco
+                popUp.showErro();
             }
         });
         cartaoCadastro.add(botaoCadastrar).width(180).height(60).padBottom(15).center().row();
