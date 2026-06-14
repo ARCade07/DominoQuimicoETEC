@@ -6,10 +6,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorRecuperacao;
+import com.domino.dao.UsuarioDao;
 
 public class ResetPasswordScreen extends BaseScreen {
 
     private Texture texSenha;
+
+    private UsuarioDao usuarioDao;
+    private ControladorRecuperacao recuperador;
 
     public ResetPasswordScreen() {
         super();
