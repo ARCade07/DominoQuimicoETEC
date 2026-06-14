@@ -71,6 +71,13 @@ public class ForgotPasswordScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 //Teste para ver se funcionou o clicker (tirar depois)
                 System.out.println("Clicou em Enviar!");
+                String emailDigitado = campoEmail.getText();
+                boolean sucesso = recuperador.enviarCodigo(emailDigitado);
+                if (sucesso) {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new ResetPasswordScreen());
+                } else {
+                    System.out.println("Não foi possível enviar o código de verificação.");
+                }
                 //Adicionar função para enviar e-mail para usuário
             }
         });
