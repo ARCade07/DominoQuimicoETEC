@@ -13,7 +13,7 @@ public class ConnectionFactory {
     private MongoClient mongoClient;
     private MongoDatabase database;
 
-    public ConnectionFactory(){
+    private ConnectionFactory(){
         try {
             Dotenv dotenv = Dotenv.load();
             String connectionString = dotenv.get("MONGO_URI");
