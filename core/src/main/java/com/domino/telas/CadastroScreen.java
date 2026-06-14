@@ -1,5 +1,6 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -7,12 +8,20 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorLogin;
+import com.domino.controladores.ControladorRegistro;
+import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Usuario;
 
 public class CadastroScreen extends BaseScreen {
 
     private Texture texUsuario;
     private Texture texSenha;
     private Texture texEmail;
+
+    private UsuarioDao usuarioDao;
+    private ControladorRegistro registro;
 
     public CadastroScreen() {
         super();
