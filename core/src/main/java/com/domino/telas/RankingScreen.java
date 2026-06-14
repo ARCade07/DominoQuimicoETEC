@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.domino.modelos.Sessao;
+import com.domino.modelos.Usuario;
 
 public class RankingScreen extends BaseScreen {
 
@@ -128,7 +130,17 @@ public class RankingScreen extends BaseScreen {
                 btnVoltar.addAction(Actions.sequence(
                     Actions.scaleTo(0.95f, 0.95f, 0.05f),
                     Actions.scaleTo(1.0f, 1.0f, 0.05f)));
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new TutorialScreen());
+                if (Sessao.isLogado()) {
+                    Usuario u = Sessao.getUsuario();
+                    String papel = u.getRole();
+                    if (papel != null && papel.equalsIgnoreCase("Professor")) {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                    } else {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                    }
+                } else {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                }
             }
         });
 
