@@ -37,6 +37,13 @@ public class ConnectionFactory {
         }
     }
 
+    public static ConnectionFactory getInstance(){
+        if (instanciaBD == null) {
+            instanciaBD = new ConnectionFactory();
+        }
+        return instanciaBD;
+    }
+
     public MongoDatabase getDatabase() {
         return database;
     }
