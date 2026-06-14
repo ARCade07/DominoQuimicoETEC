@@ -9,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class ConnectionFactory {
 
+    private static ConnectionFactory instanciaBD;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
