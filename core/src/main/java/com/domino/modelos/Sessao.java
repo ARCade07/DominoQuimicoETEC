@@ -12,4 +12,7 @@ public class Sessao {
         return usuarioAtual;
     }
 
+    public static void limparSessao() {
+        usuarioAtual = null;
+    }
 }
