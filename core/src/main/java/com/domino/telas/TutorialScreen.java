@@ -1,5 +1,6 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.domino.modelos.Sessao;
+import com.domino.modelos.Usuario;
 
 public class TutorialScreen extends BaseScreen {
 
@@ -62,9 +65,21 @@ public class TutorialScreen extends BaseScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 btnVoltar.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new RankingScreen());
+                if (Sessao.isLogado()) {
+                    Usuario u = Sessao.getUsuario();
+                    String papel = u.getRole();
+                    if (papel != null && papel.equalsIgnoreCase("Professor")) {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                    } else {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                    }
+                } else {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                }
+
             }
         });
+
 
         Table layerSuperior = new Table();
         layerSuperior.setFillParent(true);

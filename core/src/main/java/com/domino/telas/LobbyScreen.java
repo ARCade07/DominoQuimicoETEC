@@ -1,5 +1,6 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.domino.modelos.Sessao;
+import com.domino.modelos.Usuario;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 
@@ -110,7 +113,17 @@ public class LobbyScreen extends BaseScreen {
         btnVoltar.addListener(new ClickListener() {
             public void clicked(InputEvent e, float x, float y) {
                 btnVoltar.addAction(Actions.sequence(Actions.scaleTo(0.95f, 0.95f, 0.05f), Actions.scaleTo(1.0f, 1.0f, 0.05f)));
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(new RankingScreen());
+                if (Sessao.isLogado()) {
+                    Usuario u = Sessao.getUsuario();
+                    String papel = u.getRole();
+                    if (papel != null && papel.equalsIgnoreCase("Professor")) {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                    } else {
+                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                    }
+                } else {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                }
             }
         });
 
