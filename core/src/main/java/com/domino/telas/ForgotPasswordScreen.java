@@ -71,6 +71,7 @@ public class ForgotPasswordScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 //Teste para ver se funcionou o clicker (tirar depois)
                 System.out.println("Clicou em Cancelar");
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
                 //Função para trocar de tela
             }
         });
