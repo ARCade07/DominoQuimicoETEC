@@ -9,13 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorLogin;
+import com.domino.controladores.ControladorRecuperacao;
+import com.domino.controladores.ControladorRegistro;
 import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Sessao;
 import com.domino.modelos.Usuario;
 
 public class LoginScreen extends BaseScreen {
 
     private Texture texUsuario;
     private Texture texSenha;
+    private UsuarioDao usuarioDao;
+    private ControladorLogin login;
 
     public LoginScreen() {
         super();
@@ -119,6 +125,7 @@ public class LoginScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 //Teste para ver se funcionou o clicker (tirar depois)
                 System.out.println("Clicou em Cadastrar-se!");
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new CadastroScreen());
                 //Função para trocar de tela
             }
         });
