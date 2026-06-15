@@ -162,7 +162,7 @@ public class UsuarioDao {
     // metodo para converter BSON (Documento) para Objeto java
     public List<Usuario> buscarTopJogadores(int limite) {
         List<Usuario> ranking = new ArrayList<>();
-        FindIterable<Document> resultados = docsUsuarios.find()
+        FindIterable<Document> resultados = docsUsuarios.find(Filters.eq("role", "ALUNO"))
             .sort(Sorts.descending("estatisticas.pontuacao"))
             .limit(limite);
 
