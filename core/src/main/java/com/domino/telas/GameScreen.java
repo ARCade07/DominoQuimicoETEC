@@ -345,6 +345,12 @@ public class GameScreen implements Screen {
         // As peças restantes podem ir pro monte
         List<Peca> monte = new ArrayList<>(todasAsPecas.subList(this.pecasLogicasNaMao.size(), todasAsPecas.size()));
 
+        // Adiciona 3 águas manualmente ao jogo. É possível alterar facilmente a quantidade de águas no jogo alterando a qtde
+        int qtdeAgua = 3;
+        for (int i = 0; i < qtdeAgua; i++){
+            monte.add(new Peca("Água", Tipo.AGUA, "Água", Tipo.AGUA));
+        }
+
         // CRIANDO O MONTE
         // Botão do monte
         Button botaoMonte = new Button(Estilos.estiloBotaoGrupo);
