@@ -70,10 +70,13 @@ public class StartScreen extends BaseScreen {
             System.out.println("Lógica para abrir Configurações");
         })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texUser, "Pontuação", () -> {
-            Usuario usuarioLogado = Sessao.getUsuario();
+            String email = Sessao.getUsuario().getEmail();
+            Usuario usuarioLogado = usuarioDao.buscarPorEmail(email);
 
-            RankingScreen.EntradaRanking[] listaTop = ranking.gerarRanking(usuarioDao, usuarioLogado);
-            RankingScreen.EntradaRanking jogadorAtual = ranking.gerarEntradaJogadorLogado(usuarioDao, usuarioLogado);
+            Sessao.setUsuario(usuarioLogado);
+
+            RankingScreen.EntradaRanking[] listaTop = ranking.gerarRanking(usuarioLogado);
+            RankingScreen.EntradaRanking jogadorAtual = ranking.gerarEntradaJogadorLogado(usuarioLogado);
             RankingScreen telaRanking = new RankingScreen(jogadorAtual, listaTop);
             ((Game) Gdx.app.getApplicationListener()).setScreen(telaRanking);
         })).width(600).height(100).padBottom(45).center().row();
