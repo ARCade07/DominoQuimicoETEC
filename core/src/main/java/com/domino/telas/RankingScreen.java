@@ -82,6 +82,12 @@ public class RankingScreen extends BaseScreen {
         montarTela();
     }
 
+    private boolean isProfessor() {
+        if (!Sessao.isLogado()) return false;
+        Usuario u = Sessao.getUsuario();
+        return u.getRole() != null && u.getRole().equalsIgnoreCase("Professor");
+    }
+
     private void montarTela() {
         boolean ac = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.ALTO_CONTRASTE;
         boolean prota = GerenciadorAcessibilidade.modoVisaoAtual == GerenciadorAcessibilidade.ModoVisao.PROTANOPIA_DEUTERANOPIA;
@@ -107,7 +113,12 @@ public class RankingScreen extends BaseScreen {
 
         Table raiz = new Table();
         raiz.setFillParent(true);
-        raiz.top().left();
+
+        if (isProfessor()) {
+            raiz.top().center();
+        } else {
+            raiz.top().left();
+        }
 
         if (ac) {
             raiz.setBackground(Estilos.criarTexturaCor(corFundo));
@@ -139,9 +150,7 @@ public class RankingScreen extends BaseScreen {
                     Actions.scaleTo(0.95f, 0.95f, 0.05f),
                     Actions.scaleTo(1.0f, 1.0f, 0.05f)));
                 if (Sessao.isLogado()) {
-                    Usuario u = Sessao.getUsuario();
-                    String papel = u.getRole();
-                    if (papel != null && papel.equalsIgnoreCase("Professor")) {
+                    if (isProfessor()) {
                         ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
                     } else {
                         ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
@@ -158,10 +167,12 @@ public class RankingScreen extends BaseScreen {
         layerSuperior.add(btnVoltar).width(270).height(98).pad(30);
         stage.addActor(layerSuperior);
 
-        Table painelJogador = criarPainelJogador(jogadorAtual, sBrancoNeg, sFraco, corCartao, corBorda);
-
         Table areaConteudo = new Table();
-        areaConteudo.top().left();
+        if (isProfessor()) {
+            areaConteudo.top().center();
+        } else {
+            areaConteudo.top().left();
+        }
 
         Label lblTitulo = criarRotulo("RANKING", sTitulo, 2.8f);
         areaConteudo.add(lblTitulo).center().padTop(0).padBottom(40).row();
@@ -194,8 +205,13 @@ public class RankingScreen extends BaseScreen {
             areaConteudo.add(scroll).grow();
         }
 
-        raiz.add(painelJogador).width(430).growY().padTop(200).padBottom(30).padLeft(30).padRight(30);
-        raiz.add(areaConteudo).grow().padTop(200).padBottom(30).padRight(100).padLeft(30);
+        if (isProfessor()) {
+            raiz.add(areaConteudo).grow().padTop(160).padBottom(40).padLeft(100).padRight(100);
+        } else {
+            Table painelJogador = criarPainelJogador(jogadorAtual, sBrancoNeg, sFraco, corCartao, corBorda);
+            raiz.add(painelJogador).width(430).growY().padTop(200).padBottom(30).padLeft(30).padRight(30);
+            raiz.add(areaConteudo).grow().padTop(200).padBottom(30).padRight(100).padLeft(30);
+        }
 
         GerenciadorAcessibilidade.configurarNavegacao(stage, btnVoltar);
     }

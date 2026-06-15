@@ -9,11 +9,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorRanking;
+import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Sessao;
+import com.domino.modelos.Usuario;
 
 public class StartScreen extends BaseScreen {
 
     private Texture texLogoCps, texChemDom, texEtec;
     private Texture texPlay, texConfig, texSair, texUser, texTutorial;
+    private UsuarioDao usuarioDao;
+    private ControladorRanking ranking;
 
     public StartScreen() {
         super();
@@ -27,6 +34,10 @@ public class StartScreen extends BaseScreen {
         texSair = new Texture(Gdx.files.internal("sair.png"));
         texUser = new Texture(Gdx.files.internal("user.png"));
         texTutorial = new Texture(Gdx.files.internal("tutorial.png"));
+
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+        this.ranking = new ControladorRanking(usuarioDao);
 
         montarTela();
     }
@@ -59,7 +70,12 @@ public class StartScreen extends BaseScreen {
             System.out.println("Lógica para abrir Configurações");
         })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texUser, "Pontuação", () -> {
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new RankingScreen());
+            Usuario usuarioLogado = Sessao.getUsuario();
+
+            RankingScreen.EntradaRanking[] listaTop = ranking.gerarRanking(usuarioDao, usuarioLogado);
+            RankingScreen.EntradaRanking jogadorAtual = ranking.gerarEntradaJogadorLogado(usuarioDao, usuarioLogado);
+            RankingScreen telaRanking = new RankingScreen(jogadorAtual, listaTop);
+            ((Game) Gdx.app.getApplicationListener()).setScreen(telaRanking);
         })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texTutorial, "Tutorial", () -> {
             ((Game) Gdx.app.getApplicationListener()).setScreen(new TutorialScreen());
