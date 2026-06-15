@@ -8,7 +8,12 @@ import java.util.List;
 
 public class ControladorRanking {
 
+
     private UsuarioDao u;
+
+    public ControladorRanking(UsuarioDao u){
+        this.u = u;
+    }
 
     public RankingScreen.EntradaRanking[] gerarRanking(UsuarioDao dao, Usuario usuarioLogado) {
         List<Usuario> topUsuarios = dao.buscarTopJogadores(25);
