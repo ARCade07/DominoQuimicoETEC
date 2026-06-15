@@ -48,6 +48,8 @@ public class GameScreen implements Screen {
     private Servidor servidor;
     private int quantidadePecas = 7;
     private int pontuacao;
+    private int acertos;
+    private int erros;
     private List<Peca> pecasLogicasNaMao;
 
     public GameScreen() {
@@ -148,6 +150,7 @@ public class GameScreen implements Screen {
                     pecaSolta.clearListeners();
 
                     pontuacao += 100;
+                    acertos++;
 
                     if (cliente != null) {
                         // pega a peça que foi colocada pelo cliente no tabuleiro
@@ -160,7 +163,8 @@ public class GameScreen implements Screen {
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
-
+                            cliente.acertos = acertos;
+                            cliente.erros = erros;
                             cliente.enviarPontuacao(pontuacaoFinal);
                         }
 
@@ -180,6 +184,7 @@ public class GameScreen implements Screen {
 
                     if(pontuacao > 100){
                         pontuacao -= 50;
+                        erros++;
                     }
 
                     if(cliente != null){
@@ -255,6 +260,7 @@ public class GameScreen implements Screen {
                     pecaSolta.clearListeners();
 
                     pontuacao += 100;
+                    acertos++;
 
                     if (cliente != null) {
                         //pega a peça que foi colocada pelo cliente no tabuleiro
@@ -267,6 +273,8 @@ public class GameScreen implements Screen {
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
+                            cliente.acertos = acertos;
+                            cliente.erros = erros;
 
                             cliente.enviarPontuacao(pontuacaoFinal);
                         }
@@ -294,6 +302,7 @@ public class GameScreen implements Screen {
 
                     if(pontuacao > 100){
                         pontuacao -= 50;
+                        erros++;
                     }
 
                     if(cliente != null){
@@ -374,6 +383,8 @@ public class GameScreen implements Screen {
         if(jogada.proximoAJogar == -1){
             PacketPontuacao packetPontuacao = new PacketPontuacao();
             packetPontuacao.pontuacao = pontuacao;
+            cliente.acertos = acertos;
+            cliente.erros = erros;
 
             cliente.enviarPontuacao(packetPontuacao);
         }

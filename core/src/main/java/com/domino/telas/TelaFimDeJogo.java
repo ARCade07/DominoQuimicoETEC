@@ -42,6 +42,8 @@ public class TelaFimDeJogo extends BaseScreen {
     private final ResultadoJogador[] resultados;
     private Servidor servidor;
     private Cliente cliente;
+    private int acertos;
+    private int erros;
 
     private static class ResultadoJogador {
         String nome;
@@ -55,9 +57,11 @@ public class TelaFimDeJogo extends BaseScreen {
         }
     }
 
-    public TelaFimDeJogo(PacketResultadoJogo resultadoRede, int meuId ,Cliente cliente, Servidor servidor) {
+    public TelaFimDeJogo(PacketResultadoJogo resultadoRede, int meuId ,Cliente cliente, Servidor servidor, int acertos, int erros) {
         this.cliente = cliente;
         this.servidor = servidor;
+        this.acertos = acertos;
+        this.erros = erros;
         resultados = new ResultadoJogador[resultadoRede.resultadoFinal.size()];
         for (int i = 0; i < resultadoRede.resultadoFinal.size(); i++) {
             PacketResultadoJogador r = resultadoRede.resultadoFinal.get(i);

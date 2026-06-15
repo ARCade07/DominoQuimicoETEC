@@ -22,6 +22,8 @@ public class Cliente {
     private Servidor servidor;
     private int quantidadeDeJogadores;
     public String ipConectado;
+    public int acertos;
+    public int erros;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -72,7 +74,7 @@ public class Cliente {
                             Timer.schedule(new Timer.Task() {
                                 @Override
                                 public void run() {
-                                    TelaFimDeJogo fimDeJogo = new TelaFimDeJogo(resultado, conexao.getID(), Cliente.this, servidor);
+                                    TelaFimDeJogo fimDeJogo = new TelaFimDeJogo(resultado, conexao.getID(), Cliente.this, servidor, acertos, erros);
                                     ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(fimDeJogo);
                                 }
                             }, 3.0f);
