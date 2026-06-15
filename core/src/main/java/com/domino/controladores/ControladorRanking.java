@@ -15,12 +15,13 @@ public class ControladorRanking {
         this.u = u;
     }
 
-    public RankingScreen.EntradaRanking[] gerarRanking(UsuarioDao dao, Usuario usuarioLogado) {
-        List<Usuario> topUsuarios = dao.buscarTopJogadores(25);
+    public RankingScreen.EntradaRanking[] gerarRanking(Usuario usuarioLogado) {
+        List<Usuario> topUsuarios = u.buscarTopJogadores(25);
         RankingScreen.EntradaRanking[] dados = new RankingScreen.EntradaRanking[topUsuarios.size()];
 
         for (int i = 0; i < topUsuarios.size(); i++) {
             Usuario u = topUsuarios.get(i);
+
 
             boolean jogadorLogado = u.getId().equals(usuarioLogado.getId());
 
@@ -32,7 +33,7 @@ public class ControladorRanking {
         return dados;
     }
 
-    public RankingScreen.EntradaRanking gerarEntradaJogadorLogado(UsuarioDao dao, Usuario usuarioLogado) {
+    public RankingScreen.EntradaRanking gerarEntradaJogadorLogado(Usuario usuarioLogado) {
         int pontuacaoExibicao = usuarioLogado.getEstat().getPontuacao();
 
         int posicaoDoJogador = u.buscarPosicaoJogador(pontuacaoExibicao);
