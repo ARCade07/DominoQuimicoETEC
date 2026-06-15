@@ -16,6 +16,8 @@ import com.domino.dao.UsuarioDao;
 import com.domino.modelos.Sessao;
 import com.domino.modelos.Usuario;
 
+import javax.swing.*;
+
 public class LoginScreen extends BaseScreen {
 
     private Texture texUsuario;
@@ -104,19 +106,22 @@ public class LoginScreen extends BaseScreen {
                 boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
                 System.out.println("Clicou em Entrar!");
                 //Adicionar função para verificar usuario e senha no banco
+                PopUpMensagem popUp = new PopUpMensagem(stage);
                 if (sucesso) {
 
                     Usuario usuarioLogado = login.getUsuarioLogado();
                     Sessao.setUsuario(usuarioLogado);
                     String papel = usuarioLogado.getRole();
-                    System.out.println();
+
                     System.out.println("Login efetuado com sucesso como " + papel);
+                    popUp.showSucesso("Login efetuado com sucesso como " + papel);
                     if (papel != null && (papel.equalsIgnoreCase("Professor"))){
                         ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
                     } else {
                         ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
                     }
                 } else {
+                    popUp.showErro("Erro: E-mail ou senha incorretos!");
                     System.out.println("Erro: E-mail ou senha incorretos!");
                     campoSenha.setText("");
                 }
