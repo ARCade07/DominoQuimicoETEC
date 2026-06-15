@@ -20,7 +20,9 @@ public class Peca {
         this.info2 = info2;
         this.tipo2 = tipo2;
 
-        if (info1.equals(info2)) this.isBucha = true;
+        // Mudança nas regras: sem bucha no jogo
+        //if (info1.equals(info2)) this.isBucha = true;
+        this.isBucha = false;
     }
 
     public String getInfo1() {
