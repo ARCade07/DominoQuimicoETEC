@@ -406,9 +406,10 @@ public class GameScreen implements Screen {
                 if (alvoDireita.getX() + alvoDireita.getWidth() + MARGEM >= stage.getWidth()){
                     alvoDireita.direcao = Direcao.CIMA;
                 }
-                else if (alvoDireita.getX() - MARGEM <= 0){
-                    alvoDireita.direcao = Direcao.CIMA;
-                }
+                // Cobrinha fica infinita -> correção do bug
+//                else if (alvoDireita.getX() - MARGEM <= 0){
+//                    alvoDireita.direcao = Direcao.CIMA;
+//                }
                 if (alvoDireita.getY() + alvoDireita.getHeight() >= stage.getHeight() && alvoDireita.direcao != Direcao.INVERTIDO){
                     alvoDireita.direcao = Direcao.INVERTIDO; // Vai pra esquerda
                     alvoDireita.setPosition(alvoDireita.getX() - alvoDireita.getWidth(), alvoDireita.getY() - (larguraVisual) / 2f);
@@ -427,9 +428,10 @@ public class GameScreen implements Screen {
                 if (alvoEsquerda.getX() - MARGEM <= 0){
                     alvoEsquerda.direcao = Direcao.BAIXO;
                 }
-                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
-                    alvoEsquerda.direcao = Direcao.BAIXO;
-                }
+                // Corrigindo bug da limitação da cobra
+//                else if (alvoEsquerda.getX() + alvoEsquerda.getWidth() + MARGEM >= stage.getWidth()){
+//                    alvoEsquerda.direcao = Direcao.BAIXO;
+//                }
                 if (alvoEsquerda.getY() <= 200 && alvoEsquerda.direcao == Direcao.NORMAL){ // Só entra aqui depois de ter feito a cobra
                     // Soma 120px para compensar a largura da zona com a largura da peça
                     pecaVisualAdversario.setPosition(pecaVisualAdversario.getX() + 120f, pecaVisualAdversario.getY());
