@@ -53,6 +53,8 @@ public class GameScreen implements Screen {
     private int quantidadePecas = 7;
     private int pontuacao;
     private List<Peca> pecasLogicasNaMao;
+    private List<PecaVisual> pecaVisualNaMao;
+    private boolean ultimaVez = false;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -147,6 +149,7 @@ public class GameScreen implements Screen {
 
                     Peca pecaLogica = pecaSolta.getPecaLogica();
                     pecasLogicasNaMao.remove(pecaLogica);
+                    pecaVisualNaMao.remove(pecaSolta);
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -254,6 +257,7 @@ public class GameScreen implements Screen {
 
                     Peca pecaLogica = pecaSolta.getPecaLogica();
                     pecasLogicasNaMao.remove(pecaLogica);
+                    pecaVisualNaMao.remove(pecaSolta);
 
                     dragAndDrop.removeSource(source);
                     pecaSolta.clearListeners();
@@ -327,7 +331,7 @@ public class GameScreen implements Screen {
         pecasNaMao.setPosition(stage.getWidth() / 4, 125);
         stage.addActor(pecasNaMao);
 
-        List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
+        this.pecaVisualNaMao = new ArrayList<>();
         // Pega as peças do banco e embaralha
         ServicoPecas servicoPecas = new ServicoPecas();
         List<Peca> todasAsPecas = servicoPecas.buscarTodasAsPecas();
@@ -435,6 +439,16 @@ public class GameScreen implements Screen {
         }
     }
 
+    public void atualizarBrilhoPecas(boolean ehMinhaVez){
+        for (PecaVisual peca : pecaVisualNaMao) {
+            if (ehMinhaVez) {
+                peca.setColor(Color.WHITE);
+            } else {
+                peca.setColor(0.6f, 0.6f, 0.6f, 0.8f);
+            }
+        }
+    }
+
     public void receberJogadaRede(PacketJogada jogada) {
         if(jogada.proximoAJogar == -1){
             PacketPontuacao packetPontuacao = new PacketPontuacao();
@@ -511,8 +525,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        // Limpeza em preto absoluto camufla os cortes secos de proporção de tela do Viewport (FitViewport)
         ScreenUtils.clear(Color.BLACK);
+
+        if (cliente != null) {
+            if (cliente.minhaVez != ultimaVez) {
+                ultimaVez = cliente.minhaVez;
+                atualizarBrilhoPecas(ultimaVez);
+            }
+        }
 
         stage.act(delta);
 
