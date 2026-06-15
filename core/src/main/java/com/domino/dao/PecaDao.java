@@ -18,28 +18,14 @@ public class PecaDao {
         this.docsPecas = connection.getDatabase().getCollection("pecas");
     }
 
-    public List<Peca> buscarTodasAsPecas() {
-        List<Peca> listaDePecas = new ArrayList<>();
-
-        try (MongoCursor<Document> cursor = docsPecas.find().iterator()) {
-            while (cursor.hasNext()){
-                Document doc = cursor.next();
-                Peca peca = converterDocumentoParaPeca(doc);
-                listaDePecas.add(peca);
-            }
-        }
-
-        return listaDePecas;
-    }
-
     // Qntd é a quantidade de peças iniciais na mão do jogador
     public List<Peca> buscarPecasAleatorias(int qntd) {
         List<Peca> listaDePecas = new ArrayList<>();
-
-        // try-with-resources garante que o cursor seja fechado automaticamente, evitando vazamento de memória.
-        // Aggregate permite criar um pipeline de operações no banco antes de retornar os dados.
+        // try with resources para que a conexão com o banco seja fechada automaticamente.
+        // Aggregate é uma alternativa ao find. Além disso, nele os dados podem passam por diversas etapas
+        // antes de voltar.
         try (MongoCursor<Document> cursor = docsPecas.aggregate(
-            // Sample pega documentos aleatoriamente com base na quantidade solicitada
+            // Sample é a etapa para pegar aleatoriamente os docs
             List.of(Aggregates.sample(qntd))).iterator()) {
 
             while (cursor.hasNext()){

@@ -16,6 +16,6 @@ public class ServicoPecas {
     }
 
     public List<Peca> buscarTodasAsPecas() {
-        return this.pecaDao.buscarTodasAsPecas();
+        return this.pecaDao.buscarPecasAleatorias(35);
     }
 }

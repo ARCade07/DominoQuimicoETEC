@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -25,6 +28,7 @@ import com.domino.texturas.Background;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GameScreen implements Screen {
 
@@ -48,8 +52,6 @@ public class GameScreen implements Screen {
     private Servidor servidor;
     private int quantidadePecas = 7;
     private int pontuacao;
-    private int acertos;
-    private int erros;
     private List<Peca> pecasLogicasNaMao;
 
     public GameScreen() {
@@ -150,7 +152,6 @@ public class GameScreen implements Screen {
                     pecaSolta.clearListeners();
 
                     pontuacao += 100;
-                    acertos++;
 
                     if (cliente != null) {
                         // pega a peça que foi colocada pelo cliente no tabuleiro
@@ -163,8 +164,7 @@ public class GameScreen implements Screen {
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
-                            cliente.acertos = acertos;
-                            cliente.erros = erros;
+
                             cliente.enviarPontuacao(pontuacaoFinal);
                         }
 
@@ -184,7 +184,6 @@ public class GameScreen implements Screen {
 
                     if(pontuacao > 100){
                         pontuacao -= 50;
-                        erros++;
                     }
 
                     if(cliente != null){
@@ -260,7 +259,6 @@ public class GameScreen implements Screen {
                     pecaSolta.clearListeners();
 
                     pontuacao += 100;
-                    acertos++;
 
                     if (cliente != null) {
                         //pega a peça que foi colocada pelo cliente no tabuleiro
@@ -273,8 +271,6 @@ public class GameScreen implements Screen {
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
-                            cliente.acertos = acertos;
-                            cliente.erros = erros;
 
                             cliente.enviarPontuacao(pontuacaoFinal);
                         }
@@ -302,7 +298,6 @@ public class GameScreen implements Screen {
 
                     if(pontuacao > 100){
                         pontuacao -= 50;
-                        erros++;
                     }
 
                     if(cliente != null){
@@ -333,16 +328,77 @@ public class GameScreen implements Screen {
         stage.addActor(pecasNaMao);
 
         List<PecaVisual> pecaVisualNaMao = new ArrayList<>();
-
+        // Pega as peças do banco e embaralha
         ServicoPecas servicoPecas = new ServicoPecas();
         List<Peca> todasAsPecas = servicoPecas.buscarTodasAsPecas();
         java.util.Collections.shuffle(todasAsPecas);
 
+        // Cria sublistas para separar a mão do jogador e mandar o restante pro monte
         this.pecasLogicasNaMao = new ArrayList<>(todasAsPecas.subList(0, Math.min(7, todasAsPecas.size())));
 
-        // As peças restantes podem ir pro draw stack
-        List<Peca> drawStack = new ArrayList<>(todasAsPecas.subList(this.pecasLogicasNaMao.size(), todasAsPecas.size()));
-        // TODO: utilizar o drawStack no jogo
+        // As peças restantes podem ir pro monte
+        List<Peca> monte = new ArrayList<>(todasAsPecas.subList(this.pecasLogicasNaMao.size(), todasAsPecas.size()));
+
+        // CRIANDO O MONTE
+        // Botão do monte
+        Button botaoMonte = new Button(Estilos.estiloBotaoGrupo);
+        botaoMonte.add(new Image(libgdx));
+
+        botaoMonte.setSize(100, 100);
+        botaoMonte.setPosition(100, (stage.getHeight()/2));
+        botaoMonte.addListener(new ClickListener(){
+            public void clicked(InputEvent event, float x, float y){
+                // Para debug
+                System.out.println("Clicou no monte");
+
+                if (cliente != null && !cliente.minhaVez){
+                    System.out.println("Não pode comprar o monte se não for sua vez");
+                    return;
+                }
+
+                // Pegando uma peça aleatória do monte
+                Random random = new Random();
+                int num = random.nextInt(monte.size());
+                Peca pecaDoMonte = monte.get(num);
+                // Coloca na mão do jogador
+                pecasLogicasNaMao.add(pecaDoMonte);
+
+                // Bota textura na peça
+                Texture texturaPeca = texturaBasePeca;
+                PecaVisual pecaVisual = new PecaVisual(pecaDoMonte, texturaPeca);
+                pecaVisualNaMao.add(pecaVisual);
+
+                // Colocando na tela
+                pecasNaMao.addActor(pecaVisual);
+
+                // Configurando Drag and Drop da peça comprada
+                dragAndDrop.addSource(new DragAndDrop.Source(pecaVisual){
+                    @Override
+                    public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer){
+                        if (cliente != null && !cliente.minhaVez){
+                            System.out.println("Vez de adversário");
+                            return null;
+                        }
+                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                        payload.setObject(pecaVisual);
+
+                        PecaVisual fantasma = new PecaVisual(pecaVisual.getPecaLogica(), pecaVisual.getTextura());
+                        fantasma.getColor().a = 0.5f;
+
+                        // Centraliza o fantasma no mouse (dependendo de onde você clica na peça)
+                        dragAndDrop.setDragActorPosition(fantasma.getWidth()/2, -fantasma.getHeight()/2);
+                        payload.setDragActor(fantasma);
+
+                        return payload;
+                    }
+                });
+                // Passa a vez depois de comprar
+                System.out.println("Comprou e passou vez");
+                passarVez();
+            }
+        });
+        // Coloca o botão na tela depois de configurá-lo
+        stage.addActor(botaoMonte);
 
         for (Peca pecaNaMao : pecasLogicasNaMao){
             Texture texturaPeca = this.texturaBasePeca;
@@ -383,8 +439,6 @@ public class GameScreen implements Screen {
         if(jogada.proximoAJogar == -1){
             PacketPontuacao packetPontuacao = new PacketPontuacao();
             packetPontuacao.pontuacao = pontuacao;
-            cliente.acertos = acertos;
-            cliente.erros = erros;
 
             cliente.enviarPontuacao(packetPontuacao);
         }
