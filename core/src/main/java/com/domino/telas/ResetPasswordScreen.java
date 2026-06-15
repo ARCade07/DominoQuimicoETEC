@@ -85,12 +85,24 @@ public class ResetPasswordScreen extends BaseScreen {
         botaoRedefinirSenha.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 PopUpMensagem popUp = new PopUpMensagem(stage);
-                //Adicionar função para verificar se os dois campos possuem o mesmo conteúdo
-                popUp.showErro("Os campos de senham devem ser iguais!");
+                //Teste para ver se funcionou o clicker (tirar depois)
+                System.out.println("Clicou em redefinir senha!");
+                String senhaDigitada = campoSenha.getText();
+                String senhaConfirmacaoDigitada = campoConfirmarSenha.getText();
+                boolean sucesso = recuperador.confirmarNovaSenha(email ,senhaDigitada, senhaConfirmacaoDigitada);
+                if (sucesso) {
+                    popUp.showSucesso("Senha redefinida!");
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                } else {
+                    popUp.showErro("Erro ao redefinir senha. Os campos de senhas devem ser iguais!");
+                }
+
+
+
                 //Adicionar função para atualizar senha do usuário no banco
-                popUp.showSucesso("Senha redefinida!");
+                //Adicionar função para verificar se os dois campos possuem o mesmo conteúdo
+                //Adicionar função para atualizar senha do usuário no banco
                 //Caso dê erro ao redefinir senha
-                popUp.showErro("Erro ao redefinir senha!");
             }
         });
         cartaoRedefinirSenha.add(botaoRedefinirSenha).width(240).height(60).padBottom(20).row();
