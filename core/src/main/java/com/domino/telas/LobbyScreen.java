@@ -203,8 +203,8 @@ public class LobbyScreen extends BaseScreen {
                 cliente.fechar();
                 Cliente cliente2 = new Cliente(inputIp.getText());
                 LobbyScreen lobbyScreen = new LobbyScreen(null, cliente2, inputIp.getText());
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
                 cliente2.setTelaLobby(lobbyScreen);
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
             }
         });
         pConectar.add(btnConectar).width(350).height(65).row();
