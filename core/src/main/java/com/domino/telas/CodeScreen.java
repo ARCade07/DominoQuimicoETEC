@@ -7,9 +7,15 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.domino.bd.ConnectionFactory;
+import com.domino.controladores.ControladorRecuperacao;
+import com.domino.dao.UsuarioDao;
 
 public class CodeScreen extends BaseScreen {
+
+    private UsuarioDao usuarioDao;
     private String email;
+
     public CodeScreen(String email) {
         super();
         this.email = email;
