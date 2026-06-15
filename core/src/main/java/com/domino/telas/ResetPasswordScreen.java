@@ -16,11 +16,13 @@ public class ResetPasswordScreen extends BaseScreen {
 
     private UsuarioDao usuarioDao;
     private ControladorRecuperacao recuperador;
+    private String email;
 
-    public ResetPasswordScreen() {
+    public ResetPasswordScreen(String email) {
         super();
         //Textura específica tela de resetar senha
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
+        this.email = email;
 
         montarTela();
     }
