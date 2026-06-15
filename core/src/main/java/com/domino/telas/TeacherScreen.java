@@ -37,6 +37,7 @@ public class TeacherScreen extends BaseScreen {
 
         ConnectionFactory conexao = ConnectionFactory.getInstance();
         this.usuarioDao = new UsuarioDao(conexao);
+        this.ranking = new ControladorRanking(usuarioDao);
 
         montarTela();
     }
@@ -63,7 +64,6 @@ public class TeacherScreen extends BaseScreen {
         fundo.add(criarBotao(texRanking, "Ranking", () -> {
             System.out.println("Abrindo o Ranking...");
 
-            ControladorRanking ranking = new ControladorRanking();
 
             Usuario usuarioLogado = Sessao.getUsuario();
 
