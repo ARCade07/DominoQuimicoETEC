@@ -38,6 +38,15 @@ public class ControladorRanking {
 
         int posicaoDoJogador = u.buscarPosicaoJogador(pontuacaoExibicao);
 
-        return new RankingScreen.EntradaRanking(posicaoDoJogador, usuarioLogado.getNome(), pontuacaoExibicao, true);
+        int partidasPerdidas = usuarioLogado.getEstat().getPartidasPerdidas();
+        int partidasGanhas = usuarioLogado.getEstat().getPartidasGanhas();
+        int partidasJogadas = partidasGanhas + partidasPerdidas;
+
+        double taxaDeVitorias = 0.0;
+        if (partidasJogadas > 0) {
+            taxaDeVitorias = ((double) partidasGanhas / partidasJogadas) * 100.0;
+        }
+
+        return new RankingScreen.EntradaRanking(posicaoDoJogador, usuarioLogado.getNome(), pontuacaoExibicao, true, partidasJogadas, taxaDeVitorias);
     }
 }
