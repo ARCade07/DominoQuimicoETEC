@@ -30,16 +30,24 @@ public class RankingScreen extends BaseScreen {
         public final String nome;
         public final int pontuacao;
         public final boolean voce;
+        public final int partidas;
+        public final double taxaDeVitorias;
 
-        public EntradaRanking(int posicao, String nome, int pontuacao, boolean voce) {
+        public EntradaRanking(int posicao, String nome, int pontuacao, boolean voce, int partidas, double taxaVitorias) {
             this.posicao = posicao;
             this.nome = nome;
             this.pontuacao = pontuacao;
             this.voce = voce;
+            this.partidas = partidas;
+            this.taxaDeVitorias = taxaVitorias;
+        }
+
+        public EntradaRanking(int posicao, String nome, int pontuacao, boolean voce) {
+            this(posicao, nome, pontuacao, voce, 0, 0.0);
         }
 
         public EntradaRanking(int posicao, String nome, int pontuacao) {
-            this(posicao, nome, pontuacao, false);
+            this(posicao, nome, pontuacao, false, 0, 0.0);
         }
     }
 
