@@ -75,7 +75,7 @@ public class ForgotPasswordScreen extends BaseScreen {
                 String emailDigitado = campoEmail.getText();
                 boolean sucesso = recuperador.enviarCodigo(emailDigitado);
                 if (sucesso) {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new ResetPasswordScreen());
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new CodeScreen(emailDigitado));
                 } else {
                     popUp.showErro("Não foi possível enviar o código de verificação.");
                     System.out.println("Não foi possível enviar o código de verificação.");
