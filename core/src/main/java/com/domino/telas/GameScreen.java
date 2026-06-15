@@ -45,6 +45,7 @@ public class GameScreen implements Screen {
 
     //Texturas
     private Texture texturaBasePeca;
+    private Texture imagemMonte;
     private Texture libgdx;
 
     // Camada de Comunicação em Rede
@@ -322,6 +323,7 @@ public class GameScreen implements Screen {
 
     private void inicilizarTexturas(){
         this.texturaBasePeca = new Texture("pecafinal.png");
+        this.imagemMonte = new Texture("monte.png");
         this.libgdx = new Texture("libgdx.png");
     }
 
