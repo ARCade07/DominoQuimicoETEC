@@ -356,8 +356,8 @@ public class GameScreen implements Screen {
         Button botaoMonte = new Button(Estilos.estiloBotaoGrupo);
         botaoMonte.add(new Image(libgdx));
 
-        botaoMonte.setSize(100, 100);
-        botaoMonte.setPosition(100, (stage.getHeight()/2));
+        botaoMonte.setSize(150, 203);
+        botaoMonte.setPosition(80, (stage.getHeight()/2));
         botaoMonte.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y){
                 // Para debug
