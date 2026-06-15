@@ -22,11 +22,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
+import com.domino.bd.ConnectionFactory;
+import com.domino.dao.UsuarioDao;
+import com.domino.modelos.Sessao;
 import com.domino.rede.Cliente;
 import com.domino.rede.Servidor;
 import com.domino.rede.packets.PacketResultadoJogo;
 import com.domino.rede.packets.PacketResultadoJogador;
 import com.domino.rede.packets.PacketVoltaProLobby;
+import org.bson.types.ObjectId;
 
 public class TelaFimDeJogo extends BaseScreen {
 
@@ -63,13 +67,29 @@ public class TelaFimDeJogo extends BaseScreen {
         this.acertos = acertos;
         this.erros = erros;
         resultados = new ResultadoJogador[resultadoRede.resultadoFinal.size()];
+
+        int minhaPontuacao = 0;
+        boolean euGanhei = false;
+
         for (int i = 0; i < resultadoRede.resultadoFinal.size(); i++) {
             PacketResultadoJogador r = resultadoRede.resultadoFinal.get(i);
             boolean isVoce = (r.idJogador == meuId);
             resultados[i] = new ResultadoJogador(isVoce ? "Voce (Jogador " + r.idJogador + ")" : "Jogador " + r.idJogador, r.pontuacao, isVoce);
+
+            if (isVoce) {
+                minhaPontuacao = r.pontuacao;
+                euGanhei = (i == 0);
+            }
         }
 
         ordemNavegacao = new Array<>();
+
+        if (Sessao.isLogado()) {
+            System.out.println("Salvando estatísticas no banco");
+            UsuarioDao dao = new UsuarioDao(ConnectionFactory.getInstance());
+            ObjectId id = Sessao.getUsuario().getId();
+            dao.registrarPartida(id, euGanhei, this.acertos, this.erros, minhaPontuacao);
+        }
 
         carregarFontes();
         construirInterface();
