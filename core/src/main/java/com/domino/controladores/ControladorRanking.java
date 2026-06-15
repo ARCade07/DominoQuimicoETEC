@@ -8,6 +8,8 @@ import java.util.List;
 
 public class ControladorRanking {
 
+    private UsuarioDao u;
+
     public RankingScreen.EntradaRanking[] gerarRanking(UsuarioDao dao, Usuario usuarioLogado) {
         List<Usuario> topUsuarios = dao.buscarTopJogadores(25);
         RankingScreen.EntradaRanking[] dados = new RankingScreen.EntradaRanking[topUsuarios.size()];
@@ -25,11 +27,11 @@ public class ControladorRanking {
         return dados;
     }
 
-    public RankingScreen.EntradaRanking gerarEntradaJogadorLogado(Usuario usuarioLogado) {
+    public RankingScreen.EntradaRanking gerarEntradaJogadorLogado(UsuarioDao dao, Usuario usuarioLogado) {
         int pontuacaoExibicao = usuarioLogado.getEstat().getPontuacao();
 
-        int posicaoTemporaria = 999;
+        int posicaoDoJogador = u.buscarPosicaoJogador(pontuacaoExibicao);
 
-        return new RankingScreen.EntradaRanking(posicaoTemporaria, usuarioLogado.getNome(), pontuacaoExibicao, true);
+        return new RankingScreen.EntradaRanking(posicaoDoJogador, usuarioLogado.getNome(), pontuacaoExibicao, true);
     }
 }
