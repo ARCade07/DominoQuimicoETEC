@@ -19,6 +19,8 @@ public class CodeScreen extends BaseScreen {
     public CodeScreen(String email) {
         super();
         this.email = email;
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
 
         montarTela();
     }
