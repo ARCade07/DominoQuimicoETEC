@@ -55,7 +55,7 @@ public class GameScreen implements Screen {
     private int pontuacao;
     private List<Peca> pecasLogicasNaMao;
     private List<PecaVisual> pecaVisualNaMao;
-    private boolean ultimaVez = false;
+    private Boolean ultimaVez = null;
 
     public GameScreen() {
         // O FitViewport garante que o jogo não fique esticado se a janela mudar de tamanho
@@ -452,7 +452,7 @@ public class GameScreen implements Screen {
             if (ehMinhaVez) {
                 peca.setColor(Color.WHITE);
             } else {
-                peca.setColor(0.6f, 0.6f, 0.6f, 0.8f);
+                peca.setColor(0.3f, 0.3f, 0.3f, 0.5f);
             }
         }
     }
@@ -536,7 +536,7 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(Color.BLACK);
 
         if (cliente != null) {
-            if (cliente.minhaVez != ultimaVez) {
+            if (ultimaVez == null || cliente.minhaVez != ultimaVez) {
                 ultimaVez = cliente.minhaVez;
                 atualizarBrilhoPecas(ultimaVez);
             }
