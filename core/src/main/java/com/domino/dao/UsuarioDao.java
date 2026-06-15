@@ -172,6 +172,15 @@ public class UsuarioDao {
 
         return ranking;
     }
+
+    public int buscarPosicaoJogador(int pontuacaoJogador) {
+        var filtro = Filters.gt("estatisticas.pontuacao", pontuacaoJogador);
+
+        long quantidadeNaFrente = docsUsuarios.countDocuments(filtro);
+
+        return (int) quantidadeNaFrente + 1;
+    }
+
     private Usuario converterDocumentoParaUsuario(Document doc) {
         Usuario u = new Usuario();
 
