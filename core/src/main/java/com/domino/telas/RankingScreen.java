@@ -51,29 +51,10 @@ public class RankingScreen extends BaseScreen {
         }
     }
 
-    private static EntradaRanking[] gerarDadosTeste() {
-        EntradaRanking[] dados = new EntradaRanking[25];
-        dados[0] = new EntradaRanking(1, "Pom", 1250400);
-        dados[1] = new EntradaRanking(2, "Paulu B.", 1180900);
-        dados[2] = new EntradaRanking(3, "Pamonha Plays", 1095500);
-        dados[3] = new EntradaRanking(4, "Zezinho", 985300);
-        dados[4] = new EntradaRanking(5, "CacetaPlays", 875300);
-        dados[5] = new EntradaRanking(6, "Thomas T.", 785000);
-
-        for (int i = 6; i < 25; i++) {
-            dados[i] = new EntradaRanking(i + 1, "Jogador_" + (i + 1), 580000 - (i * 10000));
-        }
-        return dados;
-    }
-
-    private static final EntradaRanking[] DADOS_PADRAO = gerarDadosTeste();
 
     private final EntradaRanking jogadorAtual;
     private final EntradaRanking[] entradas;
 
-    public RankingScreen() {
-        this(new EntradaRanking(152, "Você", 650200, true), DADOS_PADRAO);
-    }
 
     public RankingScreen(EntradaRanking jogador, EntradaRanking[] lista) {
         super();
