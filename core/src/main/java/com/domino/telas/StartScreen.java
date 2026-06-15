@@ -1,5 +1,6 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class StartScreen extends BaseScreen {
 
     private Texture texLogoCps, texChemDom, texEtec;
-    private Texture texPlay, texConfig, texSair;
+    private Texture texPlay, texConfig, texSair, texUser;
 
     public StartScreen() {
         super();
@@ -24,6 +25,7 @@ public class StartScreen extends BaseScreen {
         texPlay = new Texture(Gdx.files.internal("play.png"));
         texConfig = new Texture(Gdx.files.internal("configuracoes.png"));
         texSair = new Texture(Gdx.files.internal("sair.png"));
+        texUser = new Texture(Gdx.files.internal("user.png"));
 
         montarTela();
     }
@@ -54,6 +56,9 @@ public class StartScreen extends BaseScreen {
             })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texConfig, "Configuracoes", () -> {
             System.out.println("Lógica para abrir Configurações");
+        })).width(600).height(100).padBottom(45).center().row();
+        fundo.add(criarBotao(texUser, "Pontuação", () -> {
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new RankingScreen());
         })).width(600).height(100).padBottom(45).center().row();
         fundo.add(criarBotao(texSair, "Sair",  () -> {
             System.out.println("Fechando o jogo...");
