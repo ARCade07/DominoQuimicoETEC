@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.domino.bd.ConnectionFactory;
 import com.domino.controladores.ControladorRanking;
 import com.domino.dao.UsuarioDao;
@@ -46,7 +47,11 @@ public class StartScreen extends BaseScreen {
         //Fundo
         Table fundo = new Table();
         fundo.setFillParent(true);
-        fundo.setBackground(Estilos.fundoGradiente);
+        TextureRegionDrawable fundoAcessivel = GerenciadorAcessibilidade.criarTexturaGradiente(
+            GerenciadorAcessibilidade.getCorFundoTela(),
+            GerenciadorAcessibilidade.getCorFundoCaixaRanking()
+        );
+        fundo.setBackground(fundoAcessivel);
         fundo.top();
         stage.addActor(fundo);
 
@@ -61,15 +66,17 @@ public class StartScreen extends BaseScreen {
         cabecalho.add(new Image(texEtec)).right().padTop(20).padRight(20);
 
         //Botões
-        fundo.add(criarBotao(texPlay, "Jogar", () -> {
+        Button botaoJogar = criarBotao(texPlay, "Jogar", () -> {
             System.out.println("Lógica para ir para a tela do jogo");
             PopUpCriaPartida popUp = new PopUpCriaPartida(stage);
-                popUp.show();
-            })).width(600).height(100).padBottom(45).center().row();
-        fundo.add(criarBotao(texConfig, "Configuracoes", () -> {
+            popUp.show();
+        });
+
+        Button botaoConfig = criarBotao(texConfig, "Configuracoes", () -> {
             System.out.println("Lógica para abrir Configurações");
-        })).width(600).height(100).padBottom(45).center().row();
-        fundo.add(criarBotao(texUser, "Pontuação", () -> {
+        });
+
+        Button botaoPontuacao = criarBotao(texUser, "Pontuação", () -> {
             String email = Sessao.getUsuario().getEmail();
             Usuario usuarioLogado = usuarioDao.buscarPorEmail(email);
 
@@ -79,21 +86,38 @@ public class StartScreen extends BaseScreen {
             RankingScreen.EntradaRanking jogadorAtual = ranking.gerarEntradaJogadorLogado(usuarioLogado);
             RankingScreen telaRanking = new RankingScreen(jogadorAtual, listaTop);
             ((Game) Gdx.app.getApplicationListener()).setScreen(telaRanking);
-        })).width(600).height(100).padBottom(45).center().row();
-        fundo.add(criarBotao(texTutorial, "Tutorial", () -> {
+        });
+
+        Button botaoTutorial = criarBotao(texTutorial, "Tutorial", () -> {
             ((Game) Gdx.app.getApplicationListener()).setScreen(new TutorialScreen());
-        })).width(600).height(100).padBottom(45).center().row();
-        fundo.add(criarBotao(texSair, "Sair",  () -> {
+        });
+
+        Button botaoSair = criarBotao(texSair, "Sair", () -> {
             System.out.println("Fechando o jogo...");
             Gdx.app.exit();
-        })).width(600).height(100).padBottom(45).center().row();
+        });
+
+        fundo.add(botaoJogar).width(600).height(100).padBottom(45).center().row();
+        fundo.add(botaoConfig).width(600).height(100).padBottom(45).center().row();
+        fundo.add(botaoPontuacao).width(600).height(100).padBottom(45).center().row();
+        fundo.add(botaoTutorial).width(600).height(100).padBottom(45).center().row();
+        fundo.add(botaoSair).width(600).height(100).padBottom(45).center().row();
+
+        GerenciadorAcessibilidade.configurarNavegacao(stage, botaoJogar, botaoConfig, botaoPontuacao, botaoTutorial, botaoSair);
     }
 
     private Button criarBotao(Texture icone, String texto, Runnable acao) {
         Button botao = new Button(Estilos.estiloBotaoGrupo);
         botao.add(new Image(icone)).size(55, 55).padLeft(15).padRight(10);
 
+        Label.LabelStyle estiloLabel = new Label.LabelStyle(Estilos.estiloTextoNormal);
+        estiloLabel.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
+
         Label labelTexto = new Label(texto, Estilos.estiloTextoNormal);
+
+        float escalaBase = 2f / Estilos.MULTIPLICADOR_HD;
+        labelTexto.setFontScale(escalaBase * GerenciadorAcessibilidade.getEscalaFonteUsuario());
+
         labelTexto.setFontScale(2f / Estilos.MULTIPLICADOR_HD);
         botao.add(labelTexto).expandX().padLeft(-25);
 
@@ -103,6 +127,8 @@ public class StartScreen extends BaseScreen {
                 acao.run();
             }
         });
+
+        GerenciadorAcessibilidade.aplicarFoco(botao);
 
         return botao;
     }
