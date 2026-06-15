@@ -174,7 +174,7 @@ public class UsuarioDao {
     }
 
     public int buscarPosicaoJogador(int pontuacaoJogador) {
-        var filtro = Filters.gt("estatisticas.pontuacao", pontuacaoJogador);
+        var filtro = Filters.and(Filters.eq("role", "ALUNO"), Filters.gt("estatisticas.pontuacao", pontuacaoJogador));
 
         long quantidadeNaFrente = docsUsuarios.countDocuments(filtro);
 
