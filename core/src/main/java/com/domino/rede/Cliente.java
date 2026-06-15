@@ -21,6 +21,7 @@ public class Cliente {
     private List<Integer> jogadoresConectados;
     private Servidor servidor;
     private int quantidadeDeJogadores;
+    public String ipConectado;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -110,7 +111,7 @@ public class Cliente {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            LobbyScreen telaLobby = new LobbyScreen(servidor, Cliente.this, servidor.obterIPLocal());
+                            LobbyScreen telaLobby = new LobbyScreen(servidor, Cliente.this, ipConectado);
                             setTelaLobby(telaLobby);
                             ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
                         }

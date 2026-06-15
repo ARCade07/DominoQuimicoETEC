@@ -280,6 +280,7 @@ public class PopUpCriaPartida {
                     public void clicked(InputEvent event, float x, float y) {
                         System.out.println("Conectando ao IP: " + campoIp.getText() + " e indo para o Lobby...");
                         Cliente cliente = new Cliente(campoIp.getText());
+                        cliente.ipConectado = campoIp.getText();
                         fecharEFecharRecursos();
                         LobbyScreen lobbyScreen = new LobbyScreen(null, cliente, campoIp.getText());
                         ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
