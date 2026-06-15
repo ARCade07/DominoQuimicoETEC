@@ -59,8 +59,14 @@ public class CodeScreen extends BaseScreen {
         botaoEnviar.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 //Implementar verificação de código
-
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new ResetPasswordScreen());
+                String codigoDigitado = campoCodigo.getText();
+                PopUpMensagem popUp = new PopUpMensagem(stage);
+                boolean sucesso = usuarioDao.validarToken(email, codigoDigitado);
+                if (sucesso) {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new ResetPasswordScreen(email));
+                } else {
+                    popUp.showErro("O código digitado não é valido.");
+                }
             }
         });
         cartaoCodigo.add(botaoEnviar).width(180).height(60).padBottom(20).row();
