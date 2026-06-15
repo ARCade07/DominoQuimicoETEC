@@ -9,8 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 public class CodeScreen extends BaseScreen {
-    public CodeScreen() {
+    private String email;
+    public CodeScreen(String email) {
         super();
+        this.email = email;
 
         montarTela();
     }
