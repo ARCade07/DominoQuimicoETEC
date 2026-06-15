@@ -1,5 +1,6 @@
 package com.domino.telas;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,6 +24,10 @@ public class ResetPasswordScreen extends BaseScreen {
         //Textura específica tela de resetar senha
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
         this.email = email;
+
+        ConnectionFactory conexao = ConnectionFactory.getInstance();
+        this.usuarioDao = new UsuarioDao(conexao);
+        this.recuperador = new ControladorRecuperacao(this.usuarioDao);
 
         montarTela();
     }
