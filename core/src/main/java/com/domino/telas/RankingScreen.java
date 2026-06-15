@@ -243,7 +243,7 @@ public class RankingScreen extends BaseScreen {
         caixaPartidas.setBackground(Estilos.criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaPartidas.pad(15, 20, 15, 20);
         caixaPartidas.add(criarRotulo("PARTIDAS", sFraco, escalaTexto)).expandX().left();
-        caixaPartidas.add(criarRotulo("42", sNeg, escalaValor)).right();
+        caixaPartidas.add(criarRotulo(String.valueOf(jogador.partidas), sNeg, escalaValor)).right();
         conteudoCentral.add(caixaPartidas).growX().padBottom(espacoEntreCaixas).row();
 
         // Caixa Vitórias
@@ -251,7 +251,8 @@ public class RankingScreen extends BaseScreen {
         caixaVitorias.setBackground(Estilos.criarBordaArredondadaTextura(corFundoCaixa, corBordaCaixa, 12, espessuraBorda));
         caixaVitorias.pad(15, 20, 15, 20);
         caixaVitorias.add(criarRotulo("VITÓRIAS", sFraco, escalaTexto)).expandX().left();
-        caixaVitorias.add(criarRotulo("65%", sNeg, escalaValor)).right();
+        String strVitorias = String.format("%.0f%%", jogador.taxaDeVitorias);
+        caixaVitorias.add(criarRotulo(strVitorias, sNeg, escalaValor)).right();
         conteudoCentral.add(caixaVitorias).growX().row();
 
         painel.add(conteudoCentral).expand().fillX().center();
