@@ -24,6 +24,7 @@ public class Cliente {
     public String ipConectado;
     public int acertos;
     public int erros;
+    public boolean desconexaoProposital;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -122,14 +123,17 @@ public class Cliente {
             }
             @Override
             public void disconnected(Connection conexao){
-                System.out.println("Conexão perdida com o servidor");
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        StartScreen startScreen = new StartScreen();
-                        ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(startScreen);
-                    }
-                });
+                if(!desconexaoProposital){
+                    System.out.println("Conexão perdida com o servidor");
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            StartScreen startScreen = new StartScreen();
+                            ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(startScreen);
+                        }
+                    });
+                }
+
             }
         });
 

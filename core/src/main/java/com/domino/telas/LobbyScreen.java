@@ -200,6 +200,7 @@ public class LobbyScreen extends BaseScreen {
         btnConectar.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                cliente.desconexaoProposital = true;
                 cliente.fechar();
                 Cliente cliente2 = new Cliente(inputIp.getText());
                 LobbyScreen lobbyScreen = new LobbyScreen(null, cliente2, inputIp.getText());
