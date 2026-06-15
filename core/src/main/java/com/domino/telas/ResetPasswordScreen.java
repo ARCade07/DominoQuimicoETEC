@@ -77,10 +77,13 @@ public class ResetPasswordScreen extends BaseScreen {
         botaoRedefinirSenha.getLabel().setFontScale(1.2f / Estilos.MULTIPLICADOR_HD);
         botaoRedefinirSenha.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                //Teste para ver se funcionou o clicker (tirar depois)
-                System.out.println("Clicou em redefinir senha!");
-                //Adicionar função para atualizar senha do usuário no banco
+                PopUpMensagem popUp = new PopUpMensagem(stage);
                 //Adicionar função para verificar se os dois campos possuem o mesmo conteúdo
+                popUp.showErro("Os campos de senham devem ser iguais!");
+                //Adicionar função para atualizar senha do usuário no banco
+                popUp.showSucesso("Senha redefinida!");
+                //Caso dê erro ao redefinir senha
+                popUp.showErro("Erro ao redefinir senha!");
             }
         });
         cartaoRedefinirSenha.add(botaoRedefinirSenha).width(240).height(60).padBottom(20).row();

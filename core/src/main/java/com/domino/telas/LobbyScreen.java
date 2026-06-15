@@ -27,6 +27,7 @@ import java.util.List;
 public class LobbyScreen extends BaseScreen {
     private Cliente cliente;
     private Servidor servidor;
+    private String ipServidor;
 
     // Estilos Locais
     private BitmapFont fNormal, fNegrito, fInput;
@@ -37,12 +38,13 @@ public class LobbyScreen extends BaseScreen {
     private Table listaJogadores;
     private TextureRegion tracoBranco;
 
-    public LobbyScreen() { this(null, null); }
+    public LobbyScreen() { this(null, null, null); }
 
-    public LobbyScreen(Servidor servidor, Cliente cliente) {
+    public LobbyScreen(Servidor servidor, Cliente cliente, String ipServidor) {
         super();
         this.servidor = servidor;
         this.cliente = cliente;
+        this.ipServidor = ipServidor;
 
         tracoBranco = Estilos.criarTexturaCor(Color.WHITE).getRegion();
 
@@ -151,12 +153,13 @@ public class LobbyScreen extends BaseScreen {
 
     private void construirColunaEsquerda(Table col) {
         Table pHost = criarPainelBase();
-        pHost.add(criarRotulo("SEU IP PARA CONVITE (HOST)", sSub, 0.7f)).left().padBottom(20).row();
+        String texto = (servidor != null) ? "SEU IP PARA CONVITE (HOST)" : "CÓDIGO DA SALA (IP)";
+        pHost.add(criarRotulo(texto, sSub, 0.7f)).left().padBottom(20).row();
 
         Table boxIp = new Table();
         boxIp.setBackground(sInput.background);
 
-        final String ipReal = (servidor != null) ? servidor.obterIPLocal() : "Vejo isso depois";
+        final String ipReal = (servidor != null) ? servidor.obterIPLocal() : ipServidor;
         Label lblIp = criarRotulo("............", sTexto, 0.85f);
         lblIp.setAlignment(Align.center);
 
@@ -193,7 +196,18 @@ public class LobbyScreen extends BaseScreen {
         GerenciadorAcessibilidade.aplicarFoco(inputIp);
 
         pConectar.add(inputIp).growX().height(70).padBottom(25).row();
-        pConectar.add(criarBotaoFino("CONECTAR")).width(350).height(65).row();
+        TextButton btnConectar = criarBotaoFino("CONECTAR");
+        btnConectar.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                cliente.fechar();
+                Cliente cliente2 = new Cliente(inputIp.getText());
+                LobbyScreen lobbyScreen = new LobbyScreen(null, cliente2, inputIp.getText());
+                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
+                cliente2.setTelaLobby(lobbyScreen);
+            }
+        });
+        pConectar.add(btnConectar).width(350).height(65).row();
         col.add(pConectar).growX().row();
     }
 
@@ -208,22 +222,22 @@ public class LobbyScreen extends BaseScreen {
             Color.DARK_GRAY : new Color(cFundo.r * 0.5f, cFundo.g * 0.5f, cFundo.b * 0.5f, 1f);
 
         TextButton btnIniciar = criarBotaoAcao("INICIAR PARTIDA", 12, cFundo, cSombra);
-        btnIniciar.addListener(new ClickListener() {
-            public void clicked(InputEvent e, float x, float y) {
-                GameScreen telaJogo = new GameScreen();
-//                telaJogo.setCliente(cliente);
-//                cliente.setGameScreen(telaJogo);
 
-                if (servidor != null) {
+        if (servidor != null){
+            btnIniciar.addListener(new ClickListener() {
+                public void clicked(InputEvent e, float x, float y) {
+                    GameScreen telaJogo = new GameScreen();
+
                     System.out.println("Isso esta acontecendo");
                     telaJogo.setServidor(servidor);
                     System.out.println("Enviando packetComecarJogo");
                     servidor.botaoInicioClicado(cliente.idCliente());
                     servidor.decidirQuemComeca();
+                    ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaJogo);
                 }
-                ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaJogo);
-            }
-        });
+            });
+        }
+
 
         col.add(btnIniciar).width(450).height(85).center().padTop(30);
     }

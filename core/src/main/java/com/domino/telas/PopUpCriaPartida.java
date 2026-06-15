@@ -234,7 +234,7 @@ public class PopUpCriaPartida {
                     Cliente cliente = new Cliente("localhost");
                     cliente.setServidor(servidor);
                     fecharEFecharRecursos();
-                    LobbyScreen lobbyScreen = new LobbyScreen(servidor, cliente);
+                    LobbyScreen lobbyScreen = new LobbyScreen(servidor, cliente, null);
                     ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
                     cliente.setTelaLobby(lobbyScreen);
                 } catch (IOException e) {
@@ -281,7 +281,7 @@ public class PopUpCriaPartida {
                         System.out.println("Conectando ao IP: " + campoIp.getText() + " e indo para o Lobby...");
                         Cliente cliente = new Cliente(campoIp.getText());
                         fecharEFecharRecursos();
-                        LobbyScreen lobbyScreen = new LobbyScreen(null, cliente);
+                        LobbyScreen lobbyScreen = new LobbyScreen(null, cliente, campoIp.getText());
                         ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
                         cliente.setTelaLobby(lobbyScreen);
                     }

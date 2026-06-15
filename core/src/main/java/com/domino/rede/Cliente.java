@@ -20,6 +20,7 @@ public class Cliente {
     public boolean minhaVez = false;
     private List<Integer> jogadoresConectados;
     private Servidor servidor;
+    private int quantidadeDeJogadores;
 
     public Cliente (String enderecoIP){
         this.enderecoIP = enderecoIP;
@@ -83,6 +84,7 @@ public class Cliente {
                     PacketLobby packetLobby = (PacketLobby) objeto;
 
                     jogadoresConectados = packetLobby.idJogadoresConectados;
+                    quantidadeDeJogadores = jogadoresConectados.size();
 
                     if(lobbyScreen != null){
 
@@ -108,7 +110,7 @@ public class Cliente {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            LobbyScreen telaLobby = new LobbyScreen(servidor, Cliente.this);
+                            LobbyScreen telaLobby = new LobbyScreen(servidor, Cliente.this, servidor.obterIPLocal());
                             setTelaLobby(telaLobby);
                             ((com.badlogic.gdx.Game) Gdx.app.getApplicationListener()).setScreen(telaLobby);
                         }
@@ -169,7 +171,7 @@ public class Cliente {
 
     public void enviarJogada(PacketJogada jogada){
         cliente.sendTCP(jogada);
-        minhaVez = false;
+        if(quantidadeDeJogadores != 1) minhaVez = false;
     }
 
     public void enviarQuantidadePecas(PacketQuantidadePecas quantidade){

@@ -26,7 +26,7 @@ public class CadastroScreen extends BaseScreen {
     public CadastroScreen() {
         super();
 
-        //Texturas específicas tela de login
+        //Texturas específicas tela de cadastro
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
         texEmail = new Texture(Gdx.files.internal("Email.png"));
@@ -115,7 +115,11 @@ public class CadastroScreen extends BaseScreen {
                 } else {
                     System.out.println("Não foi possível realizar o registro");
                 }
+                PopUpMensagem popUp = new PopUpMensagem(stage);
                 //Adicionar função para adicionar usuario e senha no banco
+                popUp.showSucesso("Cadastrado com sucesso!");
+                //Caso algo der errado ao adicionar usuario e senha no banco
+                popUp.showErro("Erro ao cadastrar");
             }
         });
         cartaoCadastro.add(botaoCadastrar).width(180).height(60).padBottom(15).center().row();
