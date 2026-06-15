@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Timer;
 import com.domino.bd.ConnectionFactory;
 import com.domino.controladores.ControladorLogin;
 import com.domino.controladores.ControladorRegistro;
@@ -114,7 +115,7 @@ public class CadastroScreen extends BaseScreen {
                 PopUpMensagem popUp = new PopUpMensagem(stage);
                 if (sucesso) {
                     System.out.println("Usuário registrado com sucesso.");
-                    popUp.showErro("Cadastrado com sucesso!");
+                    popUp.showSucesso("Cadastrado com sucesso!");
                     ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
                 } else {
                     popUp.showErro("Erro ao cadastrar");
