@@ -66,8 +66,20 @@ public class ConnectionFactory {
 
             System.out.println("🔗 Conectando ao MongoDB: " + mongoUri.substring(0, Math.min(50, mongoUri.length())) + "...");
 
+            // Para Android: converter mongodb+srv:// para mongodb:// se necessário
+            // (Android não tem suporte nativo a DNS SRV lookup)
+            String connectionUri = mongoUri;
+            if (mongoUri.startsWith("mongodb+srv://")) {
+                System.out.println("⚠️  Detectado MongoDB Atlas (srv). Tentando com DNS direto...");
+                connectionUri = mongoUri.replace("mongodb+srv://", "mongodb://");
+                // Remover parâmetros que requerem DNS SRV
+                if (!connectionUri.contains("retryWrites")) {
+                    connectionUri += "?retryWrites=false";
+                }
+            }
+
             // Configuração do cliente MongoDB com timeouts
-            ConnectionString connString = new ConnectionString(mongoUri);
+            ConnectionString connString = new ConnectionString(connectionUri);
             MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connString)
                 .applyToSocketSettings(builder ->
@@ -106,6 +118,9 @@ public class ConnectionFactory {
 
     public static ConnectionFactory getInstance() {
         if (instanciaBD == null) {
+            System.err.println("⚠️  AVISO: ConnectionFactory.getInstance() chamado antes de initializeWith()");
+            System.err.println("   Isso pode causar database = null no Android!");
+            System.err.println("   Certifique-se de chamar AndroidConnectionFactory.initialize() ANTES de usar o app");
             instanciaBD = new ConnectionFactory();
         }
         return instanciaBD;

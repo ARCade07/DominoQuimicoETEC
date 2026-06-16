@@ -35,9 +35,19 @@ public class TeacherScreen extends BaseScreen {
         texConfig = new Texture(Gdx.files.internal("configuracoes.png"));
         texSair = new Texture(Gdx.files.internal("sair.png"));
 
-        ConnectionFactory conexao = ConnectionFactory.getInstance();
-        this.usuarioDao = new UsuarioDao(conexao);
-        this.ranking = new ControladorRanking(usuarioDao);
+        // IMPORTANTE: Inicializar DAO em background para não travar a thread GL
+        // A conexão com MongoDB é bloqueante e não deve ser feita na thread principal de renderização
+        // MUDANÇA: Antes isso era feito no construtor (síncrono), agora é assíncrono (ver BaseScreen.executeAsync)
+        executeAsync(() -> {
+            try {
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+                this.usuarioDao = new UsuarioDao(conexao);
+                this.ranking = new ControladorRanking(usuarioDao);
+                System.out.println("✓ Teacher inicializado com sucesso");
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao inicializar Teacher: " + e.getMessage());
+            }
+        });
 
         montarTela();
     }

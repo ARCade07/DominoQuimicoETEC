@@ -24,24 +24,58 @@ task extractNatives {
       'natives-x86_64': 'x86_64'
     ]
 
+    println("\n📥 Iniciando extração de bibliotecas nativas...")
+    println("Arquivos disponíveis em nativesDownload:")
+    configurations.nativesDownload.files.each { file ->
+      println("  - ${file.name} (${file.size()} bytes)")
+    }
+
+    def extractedCount = 0
     configurations.nativesDownload.files.each { file ->
       abis.each { classifier, abiFolder ->
         if (file.name.contains(classifier)) {
-          println("📦 Extraindo ${classifier}: ${file.name}")
+          def targetDir = new File("${projectDir}/src/main/jniLibs/${abiFolder}")
+          targetDir.mkdirs()
+
+          println("\n📦 Extraindo ${classifier}:")
+          println("  De: ${file.name}")
+          println("  Para: src/main/jniLibs/${abiFolder}/")
+
           copy {
             from zipTree(file)
-            into "src/main/jniLibs/${abiFolder}"
+            into targetDir
             include '**/*.so'
           }
-          println("✅ Extraído para ${abiFolder}/")
+
+          // Verificar se algo foi extraído
+          def libsInFolder = fileTree(targetDir).include('**/*.so').files
+          if (libsInFolder.empty) {
+            println("  ⚠️  Aviso: Nenhum .so encontrado!")
+          } else {
+            println("  ✅ Extraído com sucesso:")
+            libsInFolder.each { lib ->
+              println("    - ${lib.name}")
+            }
+            extractedCount++
+          }
         }
       }
     }
 
     // Listar o que foi extraído
-    println("\n📂 JNI Libs extraídos:")
-    fileTree('src/main/jniLibs').include('**/*.so').each {
-      println("  - ${it.path}")
+    println("\n📂 Resumo final de JNI Libs:")
+    def allSos = fileTree('src/main/jniLibs').include('**/*.so').files
+    if (allSos.empty) {
+      println("  ❌ NENHUM .SO ENCONTRADO! O app NÃO FUNCIONARÁ!")
+    } else {
+      allSos.each { lib ->
+        println("  ✅ ${lib.path}")
+      }
+    }
+
+    if (extractedCount == 0) {
+      println("\n❌ ERRO: Nenhuma biblioteca nativa foi extraída!")
+      println("   Verifique se as dependências gdx-platform estão corretas em nativesDownload")
     }
   }
 }
@@ -95,16 +129,29 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
   // Android native libraries - CRÍTICAS para libGDX funcionar
-  // Adicionar também à configuração de download para extração
+  // libGDX core natives
   nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
+  // FreeType natives (para suporte a fontes TTF)
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
+  // Implementation dependencies
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+  implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
 
   // Android support libraries
   implementation "androidx.appcompat:appcompat:1.6.1"

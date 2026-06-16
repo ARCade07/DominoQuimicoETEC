@@ -19,6 +19,11 @@ public class AndroidLauncher extends AndroidApplication {
     android.util.Log.d("ChemDom", "========================================");
 
     try {
+      // Configurar MongoDB para funcionar no Android (desabilitar JNDI)
+      android.util.Log.d("ChemDom", "⚙️  Configurando MongoDB para Android...");
+      com.domino.bd.AndroidMongoDBConfig.initialize();
+      android.util.Log.d("ChemDom", "✓ Configuração do MongoDB completa");
+
       // Inicializar a conexão com o banco de dados antes de criar a app
       android.util.Log.d("ChemDom", "📱 Inicializando conexão com BD...");
       AndroidConnectionFactory.initialize(this);

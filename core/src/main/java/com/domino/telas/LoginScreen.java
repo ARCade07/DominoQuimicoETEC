@@ -32,18 +32,45 @@ public class LoginScreen extends BaseScreen {
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
 
-        ConnectionFactory conexao = ConnectionFactory.getInstance();
-
-        // Verificar conexão com o banco de dados
-        if (!conexao.isConnected()) {
-            System.err.println("⚠ Aviso: Conexão com o banco de dados pode estar indisponível");
-            System.err.println("Status: " + conexao.getStatus());
-        }
-
-        this.usuarioDao = new UsuarioDao(conexao);
-        this.login = new ControladorLogin(this.usuarioDao);
-
+        // IMPORTANTE: Inicializar DAO e controlador em background para não travar a thread GL
+        // A conexão com MongoDB é bloqueante e não deve ser feita na thread principal de renderização
+        // Isso mantém a UI responsiva enquanto o banco de dados é inicializado em paralelo
+        initializeDatabaseAsync();
         montarTela();
+    }
+
+    /**
+     * Inicializa a conexão com o banco de dados em uma thread separada.
+     *
+     * MOTIVO: Em versões anteriores, ConnectionFactory.getInstance() era chamado no construtor,
+     * bloqueando a thread GL (thread de renderização do libGDX). Isso causava uma tela preta
+     * enquanto aguardava a conexão com o MongoDB Atlas.
+     *
+     * SOLUÇÃO: Executa a inicialização em uma daemon thread background, mantendo a interface
+     * responsiva e permitindo a renderização enquanto a conexão é estabelecida.
+     */
+    private void initializeDatabaseAsync() {
+        Thread dbThread = new Thread(() -> {
+            try {
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+
+                // Verificar conexão com o banco de dados
+                if (!conexao.isConnected()) {
+                    System.err.println("⚠ Aviso: Conexão com o banco de dados pode estar indisponível");
+                    System.err.println("Status: " + conexao.getStatus());
+                }
+
+                this.usuarioDao = new UsuarioDao(conexao);
+                this.login = new ControladorLogin(this.usuarioDao);
+
+                System.out.println("✓ Login inicializado com sucesso");
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao inicializar Login: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        dbThread.setDaemon(true);
+        dbThread.start();
     }
 
     private void montarTela() {

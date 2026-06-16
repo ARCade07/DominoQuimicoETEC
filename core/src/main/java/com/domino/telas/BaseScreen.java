@@ -19,6 +19,16 @@ public abstract class BaseScreen implements Screen {
         inputManager = InputManager.getInstance();
     }
 
+    /**
+     * Executa uma tarefa em background para não bloquear a thread GL.
+     * Use para inicializar banco de dados e DAOs.
+     */
+    protected void executeAsync(Runnable task) {
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
     @Override
     public void show() {
         // Garante que a tela receba os inputs ao ser exibida
