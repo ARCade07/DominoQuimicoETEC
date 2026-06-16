@@ -33,18 +33,6 @@ public enum Tipo {
         public List<Tipo> getConexoes(){
             return List.of(Tipo.ACIDO, Tipo.BASE, Tipo.OXIDO, Tipo.SAL, Tipo.AGUA);
         }
-    },
-    OXIDO("Óxido") {
-        @Override
-        public Tipo getConexoes() {
-            return Tipo.OXIDO;
-        }
-    },
-    SAL("Sal") {
-        @Override
-        public Tipo getConexoes() {
-            return Tipo.SAL;
-        }
     };
 
     private final String nome;
