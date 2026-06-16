@@ -33,20 +33,38 @@ public class ConnectionFactory {
             if (externalMongoUri != null && externalDatabaseName != null) {
                 mongoUri = externalMongoUri;
                 databaseName = externalDatabaseName;
-                System.out.println("Usando configurações externas de conexão");
+                System.out.println("📱 Usando configurações externas de conexão (Android)");
             } else {
-                Dotenv dotenv = Dotenv.load();
-                mongoUri = dotenv.get("MONGO_URI");
-                databaseName = dotenv.get("DATABASE_NAME");
+                try {
+                    Dotenv dotenv = Dotenv.load();
+                    mongoUri = dotenv.get("MONGO_URI");
+                    databaseName = dotenv.get("DATABASE_NAME");
 
-                if (mongoUri == null || databaseName == null) {
-                    throw new IllegalStateException(
-                        "MONGO_URI ou DATABASE_NAME não configuradas. " +
-                        "Configure via .env ou AndroidConnectionFactory.initialize()"
-                    );
+                    if (mongoUri == null || mongoUri.isEmpty() ||
+                        databaseName == null || databaseName.isEmpty()) {
+                        throw new IllegalStateException(
+                            "MONGO_URI ou DATABASE_NAME não configuradas no .env"
+                        );
+                    }
+                    System.out.println("📄 Usando configurações de .env");
+                } catch (Exception dotenvError) {
+                    System.err.println("⚠️  Aviso: Não conseguiu carregar .env: " + dotenvError.getMessage());
+                    System.err.println("   Esperando configuração via AndroidConnectionFactory.initialize()");
+                    isConnected = false;
+                    database = null;
+                    return;
                 }
-                System.out.println("Usando configurações de .env");
             }
+
+            // Validar configurações
+            if (mongoUri == null || mongoUri.isEmpty()) {
+                throw new IllegalStateException("MONGO_URI está vazio");
+            }
+            if (databaseName == null || databaseName.isEmpty()) {
+                throw new IllegalStateException("DATABASE_NAME está vazio");
+            }
+
+            System.out.println("🔗 Conectando ao MongoDB: " + mongoUri.substring(0, Math.min(50, mongoUri.length())) + "...");
 
             // Configuração do cliente MongoDB com timeouts
             ConnectionString connString = new ConnectionString(mongoUri);
@@ -67,15 +85,20 @@ public class ConnectionFactory {
             // Selecionando o banco de dados
             database = mongoClient.getDatabase(databaseName);
 
-            // Teste simples de conexão
-            database.listCollectionNames().first();
-
-            isConnected = true;
-            System.out.println("✓ Conexão estabelecida com sucesso ao MongoDB!");
+            // Teste simples de conexão (não bloqueia se falhar)
+            try {
+                database.listCollectionNames().first();
+                isConnected = true;
+                System.out.println("✅ Conexão estabelecida com sucesso ao MongoDB!");
+            } catch (Exception testError) {
+                System.err.println("⚠️  Cliente criado mas conexão de teste falhou: " + testError.getMessage());
+                isConnected = false;
+                // Ainda assim deixar database disponível para tentativa posterior
+            }
 
         } catch (Exception e) {
             isConnected = false;
-            System.err.println("✗ Erro ao conectar ao MongoDB: " + e.getMessage());
+            System.err.println("❌ Erro ao conectar ao MongoDB: " + e.getMessage());
             e.printStackTrace();
             database = null;
         }

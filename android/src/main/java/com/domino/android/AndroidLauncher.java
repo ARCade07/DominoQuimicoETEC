@@ -14,16 +14,33 @@ public class AndroidLauncher extends AndroidApplication {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Inicializar a conexão com o banco de dados antes de criar a app
-    AndroidConnectionFactory.initialize(this);
+    try {
+      // Log de inicialização
+      android.util.Log.d("ChemDom", "========================================");
+      android.util.Log.d("ChemDom", "🎮 ChemDom iniciando...");
+      android.util.Log.d("ChemDom", "========================================");
 
-    AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-    config.useCompass = false;
-    config.useAccelerometer = false;
+      // Inicializar a conexão com o banco de dados antes de criar a app
+      android.util.Log.d("ChemDom", "📱 Inicializando conexão com BD...");
+      AndroidConnectionFactory.initialize(this);
+      android.util.Log.d("ChemDom", "✓ Inicialização de BD concluída");
 
-    gestureProcessor = new AndroidGestureProcessor(this);
+      AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+      config.useCompass = false;
+      config.useAccelerometer = false;
 
-    initialize(new Main(), config);
+      gestureProcessor = new AndroidGestureProcessor(this);
+
+      android.util.Log.d("ChemDom", "🚀 Criando aplicação Main...");
+      initialize(new Main(), config);
+      android.util.Log.d("ChemDom", "✓ Aplicação iniciada com sucesso!");
+
+    } catch (Exception e) {
+      android.util.Log.e("ChemDom", "❌ Erro fatal ao inicializar: " + e.getMessage(), e);
+      e.printStackTrace();
+      // Não re-lançar para evitar crash imediato
+      // A app será inicializada mas o BD pode estar indisponível
+    }
   }
 
   @Override
