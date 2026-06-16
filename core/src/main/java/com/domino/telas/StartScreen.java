@@ -34,12 +34,22 @@ public class StartScreen extends BaseScreen {
         texPlay = new Texture(Gdx.files.internal("play.png"));
         texConfig = new Texture(Gdx.files.internal("configuracoes.png"));
         texSair = new Texture(Gdx.files.internal("sair.png"));
-        texUser = new Texture(Gdx.files.internal("user.png"));
+        texUser = new Texture(Gdx.files.internal("User.png"));
         texTutorial = new Texture(Gdx.files.internal("tutorial.png"));
 
-        ConnectionFactory conexao = ConnectionFactory.getInstance();
-        this.usuarioDao = new UsuarioDao(conexao);
-        this.ranking = new ControladorRanking(usuarioDao);
+        // IMPORTANTE: Inicializar DAO em background para não travar a thread GL
+        // A conexão com MongoDB é bloqueante e não deve ser feita na thread principal de renderização
+        // MUDANÇA: Antes isso era feito no construtor (síncrono), agora é assíncrono (ver BaseScreen.executeAsync)
+        executeAsync(() -> {
+            try {
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+                this.usuarioDao = new UsuarioDao(conexao);
+                this.ranking = new ControladorRanking(usuarioDao);
+                System.out.println("✓ Start inicializado com sucesso");
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao inicializar Start: " + e.getMessage());
+            }
+        });
 
         montarTela();
     }

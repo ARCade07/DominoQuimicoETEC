@@ -1,0 +1,171 @@
+apply plugin: 'com.android.application'
+
+repositories {
+  mavenCentral()
+  google()
+  mavenLocal()
+}
+
+// Configuração para resolver as dependências nativas
+configurations {
+  nativesDownload {
+    canBeResolved = true
+    canBeConsumed = false
+  }
+}
+
+// Tarefa para extrair as bibliotecas nativas ANTES de compilar
+task extractNatives {
+  doLast {
+    def abis = [
+      'natives-armeabi-v7a': 'armeabi-v7a',
+      'natives-arm64-v8a': 'arm64-v8a',
+      'natives-x86': 'x86',
+      'natives-x86_64': 'x86_64'
+    ]
+
+    println("\n📥 Iniciando extração de bibliotecas nativas...")
+    println("Arquivos disponíveis em nativesDownload:")
+    configurations.nativesDownload.files.each { file ->
+      println("  - ${file.name} (${file.size()} bytes)")
+    }
+
+    def extractedCount = 0
+    configurations.nativesDownload.files.each { file ->
+      abis.each { classifier, abiFolder ->
+        if (file.name.contains(classifier)) {
+          def targetDir = new File("${projectDir}/src/main/jniLibs/${abiFolder}")
+          targetDir.mkdirs()
+
+          println("\n📦 Extraindo ${classifier}:")
+          println("  De: ${file.name}")
+          println("  Para: src/main/jniLibs/${abiFolder}/")
+
+          copy {
+            from zipTree(file)
+            into targetDir
+            include '**/*.so'
+          }
+
+          // Verificar se algo foi extraído
+          def libsInFolder = fileTree(targetDir).include('**/*.so').files
+          if (libsInFolder.empty) {
+            println("  ⚠️  Aviso: Nenhum .so encontrado!")
+          } else {
+            println("  ✅ Extraído com sucesso:")
+            libsInFolder.each { lib ->
+              println("    - ${lib.name}")
+            }
+            extractedCount++
+          }
+        }
+      }
+    }
+
+    // Listar o que foi extraído
+    println("\n📂 Resumo final de JNI Libs:")
+    def allSos = fileTree('src/main/jniLibs').include('**/*.so').files
+    if (allSos.empty) {
+      println("  ❌ NENHUM .SO ENCONTRADO! O app NÃO FUNCIONARÁ!")
+    } else {
+      allSos.each { lib ->
+        println("  ✅ ${lib.path}")
+      }
+    }
+
+    if (extractedCount == 0) {
+      println("\n❌ ERRO: Nenhuma biblioteca nativa foi extraída!")
+      println("   Verifique se as dependências gdx-platform estão corretas em nativesDownload")
+    }
+  }
+}
+
+android {
+  namespace "com.domino.android"
+  compileSdk 35
+
+  defaultConfig {
+    applicationId "com.domino.android"
+    minSdk 24
+    targetSdk 35
+    versionCode 1
+    versionName "1.0.0"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_21
+    targetCompatibility JavaVersion.VERSION_21
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  sourceSets {
+    main {
+      assets.srcDirs += [rootProject.file('assets').path]
+      // Especificar onde estão os JNI libs
+      jniLibs.srcDirs = ['src/main/jniLibs']
+    }
+  }
+
+  packaging {
+    resources {
+      excludes += 'META-INF/proguard/androidx-*.pro'
+      excludes += 'META-INF/NOTICE.md'
+      excludes += 'META-INF/LICENSE.md'
+      excludes += 'META-INF/NOTICE'
+      excludes += 'META-INF/LICENSE'
+      excludes += 'META-INF/native-image/**'
+    }
+  }
+}
+
+dependencies {
+  // libGDX core and backend
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+
+  // Android native libraries - CRÍTICAS para libGDX funcionar
+  // libGDX core natives
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+  // FreeType natives (para suporte a fontes TTF)
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  nativesDownload "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
+  // Implementation dependencies
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+  implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
+  // Android support libraries
+  implementation "androidx.appcompat:appcompat:1.6.1"
+  implementation "androidx.lifecycle:lifecycle-runtime:2.6.2"
+
+  // Project modules
+  implementation project(':core')
+
+  // Clean up conflicts
+  configurations.all {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+  }
+}
+
+// Executar extractNatives antes de qualquer tarefa de build
+preBuild.dependsOn extractNatives

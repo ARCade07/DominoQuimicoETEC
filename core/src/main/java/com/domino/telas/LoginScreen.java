@@ -32,11 +32,45 @@ public class LoginScreen extends BaseScreen {
         texUsuario = new Texture(Gdx.files.internal("User.png"));
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
 
-        ConnectionFactory conexao = ConnectionFactory.getInstance();
-        this.usuarioDao = new UsuarioDao(conexao);
-        this.login = new ControladorLogin(this.usuarioDao);
-
+        // IMPORTANTE: Inicializar DAO e controlador em background para não travar a thread GL
+        // A conexão com MongoDB é bloqueante e não deve ser feita na thread principal de renderização
+        // Isso mantém a UI responsiva enquanto o banco de dados é inicializado em paralelo
+        initializeDatabaseAsync();
         montarTela();
+    }
+
+    /**
+     * Inicializa a conexão com o banco de dados em uma thread separada.
+     *
+     * MOTIVO: Em versões anteriores, ConnectionFactory.getInstance() era chamado no construtor,
+     * bloqueando a thread GL (thread de renderização do libGDX). Isso causava uma tela preta
+     * enquanto aguardava a conexão com o MongoDB Atlas.
+     *
+     * SOLUÇÃO: Executa a inicialização em uma daemon thread background, mantendo a interface
+     * responsiva e permitindo a renderização enquanto a conexão é estabelecida.
+     */
+    private void initializeDatabaseAsync() {
+        Thread dbThread = new Thread(() -> {
+            try {
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+
+                // Verificar conexão com o banco de dados
+                if (!conexao.isConnected()) {
+                    System.err.println("⚠ Aviso: Conexão com o banco de dados pode estar indisponível");
+                    System.err.println("Status: " + conexao.getStatus());
+                }
+
+                this.usuarioDao = new UsuarioDao(conexao);
+                this.login = new ControladorLogin(this.usuarioDao);
+
+                System.out.println("✓ Login inicializado com sucesso");
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao inicializar Login: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        dbThread.setDaemon(true);
+        dbThread.start();
     }
 
     private void montarTela() {
@@ -101,31 +135,54 @@ public class LoginScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 String emailDigitado = campoUsername.getText();
                 String senhaDigitada = campoSenha.getText();
-                //Teste para ver se funcionou o clicker (tirar depois)
-
-                boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
-                System.out.println("Clicou em Entrar!");
-                //Adicionar função para verificar usuario e senha no banco
                 PopUpMensagem popUp = new PopUpMensagem(stage);
-                if (sucesso) {
 
-                    Usuario usuarioLogado = login.getUsuarioLogado();
-                    Sessao.setUsuario(usuarioLogado);
-                    String papel = usuarioLogado.getRole();
-
-                    System.out.println("Login efetuado com sucesso como " + papel);
-                    popUp.showSucesso("Login efetuado com sucesso como " + papel);
-                    if (papel != null && (papel.equalsIgnoreCase("Professor"))){
-                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
-                    } else {
-                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
-                    }
-                } else {
-                    popUp.showErro("Erro: E-mail ou senha incorretos!");
-                    System.out.println("Erro: E-mail ou senha incorretos!");
-                    campoSenha.setText("");
+                // Verificar conexão antes de tentar login.
+                // NÃO bloquear esta thread (é a thread de render do libGDX) tentando reconectar:
+                // a conexão real é estabelecida em background (initializeDatabaseAsync).
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+                if (!conexao.isConnected()) {
+                    String status = conexao.getStatus();
+                    System.err.println("❌ Tentativa de login sem conexão com BD. Status: " + status);
+                    popUp.showErro("Erro: Sem conexão com o servidor.\nAguarde alguns segundos e tente novamente.");
+                    return;
                 }
 
+                try {
+                    boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
+                    System.out.println("Clicou em Entrar!");
+
+                    if (sucesso) {
+                        Usuario usuarioLogado = login.getUsuarioLogado();
+                        Sessao.setUsuario(usuarioLogado);
+                        String papel = usuarioLogado.getRole();
+
+                        System.out.println("✓ Login efetuado com sucesso como " + papel);
+                        popUp.showSucesso("Login efetuado com sucesso como " + papel);
+                        if (papel != null && (papel.equalsIgnoreCase("Professor"))) {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                        } else {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                        }
+                    } else {
+                        popUp.showErro("Erro: E-mail ou senha incorretos!");
+                        System.out.println("❌ Erro: E-mail ou senha incorretos!");
+                        campoSenha.setText("");
+                    }
+                } catch (com.mongodb.MongoTimeoutException e) {
+                    System.err.println("⏱️  Erro de timeout ao conectar ao banco de dados: " + e.getMessage());
+                    popUp.showErro("Erro de conexão com o servidor (timeout).\nVerifique sua internet e tente novamente.");
+                    campoSenha.setText("");
+                } catch (com.mongodb.MongoSocketException e) {
+                    System.err.println("🔌 Erro de socket ao conectar ao banco de dados: " + e.getMessage());
+                    popUp.showErro("Erro ao conectar ao servidor.\nVerifique sua conexão de internet e tente novamente.");
+                    campoSenha.setText("");
+                } catch (Exception e) {
+                    System.err.println("❌ Erro inesperado durante login: " + e.getMessage());
+                    e.printStackTrace();
+                    popUp.showErro("Erro inesperado. Tente novamente.");
+                    campoSenha.setText("");
+                }
             }
         });
         cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(15).center().row();

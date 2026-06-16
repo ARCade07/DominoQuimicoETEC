@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">ChemDom</string>
+  <!-- Configuração do MongoDB - MongoDB Atlas -->
+  <!-- Android não consegue resolver registros DNS SRV (usados por mongodb+srv://).
+       Por isso usamos aqui a connection string "longa", com os hosts reais do
+       replica set do Atlas (obtidos via `nslookup -type=SRV _mongodb._tcp.poligera.qx9tlbw.mongodb.net`
+       e `nslookup -type=TXT poligera.qx9tlbw.mongodb.net`), em vez de mongodb+srv://. -->
+  <string name="mongo_uri">mongodb://poligera:iPEsC90lg0EpxXpB@ac-6un94t7-shard-00-00.qx9tlbw.mongodb.net:27017,ac-6un94t7-shard-00-01.qx9tlbw.mongodb.net:27017,ac-6un94t7-shard-00-02.qx9tlbw.mongodb.net:27017/?ssl=true&amp;replicaSet=atlas-aul2ec-shard-0&amp;authSource=admin&amp;retryWrites=true&amp;w=majority&amp;appName=CHENDOM</string>
+  <string name="database_name">CHEMDOM</string>
+</resources>
