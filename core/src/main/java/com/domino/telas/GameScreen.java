@@ -164,6 +164,7 @@ public class GameScreen implements Screen {
 
                         if(pecasLogicasNaMao.isEmpty()){
                             pacote.ultimaJogada = true;
+                            pontuacao += 100;
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
@@ -272,6 +273,7 @@ public class GameScreen implements Screen {
 
                         if(pecasLogicasNaMao.isEmpty()){
                             pacote.ultimaJogada = true;
+                            pontuacao += 100;
 
                             PacketPontuacao pontuacaoFinal = new PacketPontuacao();
                             pontuacaoFinal.pontuacao = pontuacao;
