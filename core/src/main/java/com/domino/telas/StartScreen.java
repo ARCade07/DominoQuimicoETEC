@@ -43,6 +43,11 @@ public class StartScreen extends BaseScreen {
         montarTela();
     }
 
+    public void recarregarTela() {
+        stage.clear();
+        montarTela();
+    }
+
     private void montarTela() {
         //Fundo
         Table fundo = new Table();
@@ -74,6 +79,8 @@ public class StartScreen extends BaseScreen {
 
         Button botaoConfig = criarBotao(texConfig, "Configuracoes", () -> {
             System.out.println("Lógica para abrir Configurações");
+            PopUpAcessibilidade popUpAcessibilidade = new PopUpAcessibilidade(stage, this::recarregarTela);
+            popUpAcessibilidade.show();
         });
 
         Button botaoPontuacao = criarBotao(texUser, "Pontuação", () -> {
@@ -113,12 +120,11 @@ public class StartScreen extends BaseScreen {
         Label.LabelStyle estiloLabel = new Label.LabelStyle(Estilos.estiloTextoNormal);
         estiloLabel.fontColor = GerenciadorAcessibilidade.getCorTextoPadrao();
 
-        Label labelTexto = new Label(texto, Estilos.estiloTextoNormal);
+        Label labelTexto = new Label(texto, estiloLabel);
 
         float escalaBase = 2f / Estilos.MULTIPLICADOR_HD;
         labelTexto.setFontScale(escalaBase * GerenciadorAcessibilidade.getEscalaFonteUsuario());
 
-        labelTexto.setFontScale(2f / Estilos.MULTIPLICADOR_HD);
         botao.add(labelTexto).expandX().padLeft(-25);
 
         botao.addListener(new ClickListener() {
