@@ -6,11 +6,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -45,8 +46,6 @@ public class GameScreen implements Screen {
 
     //Texturas
     private Texture texturaBasePeca;
-    private Texture imagemMonte;
-    private Texture libgdx;
 
     // Camada de Comunicação em Rede
     private Cliente cliente;
@@ -323,8 +322,6 @@ public class GameScreen implements Screen {
 
     private void inicilizarTexturas(){
         this.texturaBasePeca = new Texture("pecafinal.png");
-        this.imagemMonte = new Texture("monte.png");
-        this.libgdx = new Texture("libgdx.png");
     }
 
     private void inicializarPecas(){
@@ -353,15 +350,24 @@ public class GameScreen implements Screen {
 
         // CRIANDO O MONTE
         // Botão do monte
-        Button botaoMonte = new Button(Estilos.estiloBotaoGrupo);
-        botaoMonte.add(new Image(libgdx));
+        final ImageTextButton botaoMonte = new ImageTextButton(String.valueOf(monte.size()), Estilos.estiloBotaoMonte);
+        botaoMonte.getLabel().setFontScale(1.2f / Estilos.MULTIPLICADOR_HD);
 
-        botaoMonte.setSize(150, 203);
-        botaoMonte.setPosition(80, (stage.getHeight()/2));
+        botaoMonte.setSize(200, 230);
+        botaoMonte.setPosition(80, (stage.getHeight() / 2));
+
+        botaoMonte.clearChildren();
+        botaoMonte.add(botaoMonte.getImage()).row();
+        botaoMonte.add(botaoMonte.getLabel()).padTop(1f);
+
         botaoMonte.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y){
                 // Para debug
                 System.out.println("Clicou no monte");
+
+                if (monte.isEmpty()) {
+                    return;
+                }
 
                 if (cliente != null && !cliente.minhaVez){
                     System.out.println("Não pode comprar o monte se não for sua vez");
@@ -371,7 +377,14 @@ public class GameScreen implements Screen {
                 // Pegando uma peça aleatória do monte
                 Random random = new Random();
                 int num = random.nextInt(monte.size());
-                Peca pecaDoMonte = monte.get(num);
+                Peca pecaDoMonte = monte.remove(num);
+                botaoMonte.setText(String.valueOf(monte.size()));
+
+                //Some o botão do monte se não tiver mais peças
+                if (monte.isEmpty()) {
+                    botaoMonte.setVisible(false);
+                }
+
                 // Coloca na mão do jogador
                 pecasLogicasNaMao.add(pecaDoMonte);
 

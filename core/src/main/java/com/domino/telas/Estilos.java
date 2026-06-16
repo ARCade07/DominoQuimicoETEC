@@ -25,6 +25,7 @@ public class Estilos {
     public static Label.LabelStyle estiloTextoPeca;
     public static Button.ButtonStyle estiloBotaoGrupo;
     public static TextButton.TextButtonStyle estiloBotaoEntrar;
+    public static ImageTextButton.ImageTextButtonStyle estiloBotaoMonte;
     public static TextField.TextFieldStyle estiloCampoTexto;
     public static TextField.TextFieldStyle estiloCampoSemFundo;
 
@@ -64,6 +65,13 @@ public class Estilos {
         estiloBotaoEntrar.up = criarBordaArredondadaTextura(Color.valueOf("7D0000"), Color.valueOf("7D0000"), 8, 2);
         estiloBotaoEntrar.over = criarBordaArredondadaTextura(Color.valueOf("957474"), Color.valueOf("957474"), 8, 2);
         estiloBotaoEntrar.down = criarBordaArredondadaTextura(Color.valueOf("500000"), Color.valueOf("500000"), 8, 2);
+
+        estiloBotaoMonte = new ImageTextButton.ImageTextButtonStyle();
+        estiloBotaoMonte.font = fonteNegrito;
+        estiloBotaoMonte.fontColor = Color.WHITE;
+        TextureRegionDrawable imagemMonte = new TextureRegionDrawable(new Texture("monte.png"));
+        estiloBotaoMonte.imageUp = imagemMonte;
+        estiloBotaoMonte.imageDown = imagemMonte;
 
         // 5. Estilo de Campo de Texto
         estiloCampoTexto = new TextField.TextFieldStyle();
