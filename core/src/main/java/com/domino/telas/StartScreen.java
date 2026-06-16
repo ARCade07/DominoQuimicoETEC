@@ -2,6 +2,7 @@ package com.domino.telas;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -114,7 +115,14 @@ public class StartScreen extends BaseScreen {
     }
 
     private Button criarBotao(Texture icone, String texto, Runnable acao) {
-        Button botao = new Button(Estilos.estiloBotaoGrupo);
+        Button.ButtonStyle estiloDinamico = new Button.ButtonStyle();
+        Color corBorda = GerenciadorAcessibilidade.getCorBordaForte();
+
+        estiloDinamico.up = Estilos.criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoNormal(), corBorda, 8, 2);
+        estiloDinamico.over = Estilos.criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoHover(), corBorda, 8, 2);
+        estiloDinamico.down = Estilos.criarBordaArredondadaTextura(GerenciadorAcessibilidade.getCorFundoBotaoDown(), corBorda, 8, 2);
+
+        Button botao = new Button(estiloDinamico);
         botao.add(new Image(icone)).size(55, 55).padLeft(15).padRight(10);
 
         Label.LabelStyle estiloLabel = new Label.LabelStyle(Estilos.estiloTextoNormal);
