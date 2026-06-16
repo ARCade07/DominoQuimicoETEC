@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">ChemDom</string>
+  <!-- Configuração do MongoDB - IMPORTANTE: Alterar para seu servidor real -->
+  <string name="mongo_uri">mongodb://localhost:27017</string>
+  <string name="database_name">domino_db</string>
+</resources>

@@ -33,6 +33,13 @@ public class LoginScreen extends BaseScreen {
         texSenha = new Texture(Gdx.files.internal("Cadeado.png"));
 
         ConnectionFactory conexao = ConnectionFactory.getInstance();
+
+        // Verificar conexão com o banco de dados
+        if (!conexao.isConnected()) {
+            System.err.println("⚠ Aviso: Conexão com o banco de dados pode estar indisponível");
+            System.err.println("Status: " + conexao.getStatus());
+        }
+
         this.usuarioDao = new UsuarioDao(conexao);
         this.login = new ControladorLogin(this.usuarioDao);
 
@@ -101,31 +108,43 @@ public class LoginScreen extends BaseScreen {
             public void clicked(InputEvent event, float x, float y) {
                 String emailDigitado = campoUsername.getText();
                 String senhaDigitada = campoSenha.getText();
-                //Teste para ver se funcionou o clicker (tirar depois)
-
-                boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
-                System.out.println("Clicou em Entrar!");
-                //Adicionar função para verificar usuario e senha no banco
                 PopUpMensagem popUp = new PopUpMensagem(stage);
-                if (sucesso) {
 
-                    Usuario usuarioLogado = login.getUsuarioLogado();
-                    Sessao.setUsuario(usuarioLogado);
-                    String papel = usuarioLogado.getRole();
-
-                    System.out.println("Login efetuado com sucesso como " + papel);
-                    popUp.showSucesso("Login efetuado com sucesso como " + papel);
-                    if (papel != null && (papel.equalsIgnoreCase("Professor"))){
-                        ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
-                    } else {
-                        ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
-                    }
-                } else {
-                    popUp.showErro("Erro: E-mail ou senha incorretos!");
-                    System.out.println("Erro: E-mail ou senha incorretos!");
-                    campoSenha.setText("");
+                // Verificar conexão antes de tentar login
+                ConnectionFactory conexao = ConnectionFactory.getInstance();
+                if (!conexao.isConnected()) {
+                    popUp.showErro("Erro: Sem conexão com o servidor.\nTente novamente mais tarde.");
+                    System.err.println("❌ Tentativa de login sem conexão com BD");
+                    return;
                 }
 
+                try {
+                    boolean sucesso = login.fazerLogin(emailDigitado, senhaDigitada);
+                    System.out.println("Clicou em Entrar!");
+
+                    if (sucesso) {
+                        Usuario usuarioLogado = login.getUsuarioLogado();
+                        Sessao.setUsuario(usuarioLogado);
+                        String papel = usuarioLogado.getRole();
+
+                        System.out.println("✓ Login efetuado com sucesso como " + papel);
+                        popUp.showSucesso("Login efetuado com sucesso como " + papel);
+                        if (papel != null && (papel.equalsIgnoreCase("Professor"))) {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new TeacherScreen());
+                        } else {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new StartScreen());
+                        }
+                    } else {
+                        popUp.showErro("Erro: E-mail ou senha incorretos!");
+                        System.out.println("❌ Erro: E-mail ou senha incorretos!");
+                        campoSenha.setText("");
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Erro inesperado durante login: " + e.getMessage());
+                    e.printStackTrace();
+                    popUp.showErro("Erro inesperado. Tente novamente.");
+                    campoSenha.setText("");
+                }
             }
         });
         cartaoLogin.add(botaoEntrar).width(180).height(60).padBottom(15).center().row();
