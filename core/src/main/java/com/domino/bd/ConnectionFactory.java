@@ -66,25 +66,33 @@ public class ConnectionFactory {
 
             System.out.println("🔗 Conectando ao MongoDB: " + mongoUri.substring(0, Math.min(50, mongoUri.length())) + "...");
 
-            // Para Android: converter mongodb+srv:// para mongodb:// se necessário
-            // (Android não tem suporte nativo a DNS SRV lookup)
+            // mongodb+srv:// depende de registros DNS SRV/TXT para descobrir os hosts do
+            // replica set. O resolver padrão do Android não suporta esse tipo de consulta,
+            // então essa URI sempre falhará com UnknownHostException no Android.
+            // NÃO existe uma forma de "converter" mongodb+srv:// para mongodb:// em tempo de
+            // execução sem saber os hosts reais do replica set (o hostname base do +srv não
+            // possui registro A — só existe como alvo de consulta SRV). A correção correta é
+            // configurar mongo_uri (strings.xml) já no formato mongodb:// com os hosts reais,
+            // obtidos uma única vez com:
+            //   nslookup -type=SRV _mongodb._tcp.<host>
+            //   nslookup -type=TXT <host>
             String connectionUri = mongoUri;
             if (mongoUri.startsWith("mongodb+srv://")) {
-                System.out.println("⚠️  Detectado MongoDB Atlas (srv). Tentando com DNS direto...");
-                connectionUri = mongoUri.replace("mongodb+srv://", "mongodb://");
-                // Remover parâmetros que requerem DNS SRV
-                if (!connectionUri.contains("retryWrites")) {
-                    connectionUri += "?retryWrites=false";
-                }
+                System.err.println("❌ mongodb+srv:// não é suportado no Android (sem resolução de DNS SRV).");
+                System.err.println("   Configure mongo_uri em strings.xml usando mongodb:// com os hosts reais do replica set.");
             }
 
-            // Configuração do cliente MongoDB com timeouts
+            // Configuração do cliente MongoDB com timeouts maiores para Android
+            // Android pode ser mais lento em inicializar conexões
+            int timeoutSeconds = isAndroid() ? 20 : 10;
+            System.out.println("⏱️  Timeout configurado para: " + timeoutSeconds + " segundos");
+
             ConnectionString connString = new ConnectionString(connectionUri);
             MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connString)
                 .applyToSocketSettings(builder ->
-                    builder.connectTimeout(10, TimeUnit.SECONDS)
-                           .readTimeout(10, TimeUnit.SECONDS)
+                    builder.connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
+                           .readTimeout(timeoutSeconds, TimeUnit.SECONDS)
                 )
                 .applyToConnectionPoolSettings(builder ->
                     builder.maxConnectionIdleTime(30, TimeUnit.SECONDS)
@@ -104,6 +112,8 @@ public class ConnectionFactory {
                 System.out.println("✅ Conexão estabelecida com sucesso ao MongoDB!");
             } catch (Exception testError) {
                 System.err.println("⚠️  Cliente criado mas conexão de teste falhou: " + testError.getMessage());
+                System.err.println("   Isso pode ser normal em conexões lentas (ex: emulador Android).");
+                System.err.println("   A conexão pode ser estabelecida quando você tentar fazer uma operação.");
                 isConnected = false;
                 // Ainda assim deixar database disponível para tentativa posterior
             }
@@ -113,6 +123,19 @@ public class ConnectionFactory {
             System.err.println("❌ Erro ao conectar ao MongoDB: " + e.getMessage());
             e.printStackTrace();
             database = null;
+        }
+    }
+
+    /**
+     * Detecta se está rodando em Android (verificando propriedades do sistema)
+     */
+    private boolean isAndroid() {
+        try {
+            // Android tem essa propriedade configurada
+            String osName = System.getProperty("java.vendor");
+            return osName != null && osName.contains("Android");
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -154,7 +177,10 @@ public class ConnectionFactory {
     }
 
     /**
-     * Verifica se está conectado ao BD
+     * Verifica se está conectado ao BD.
+     * NÃO faz chamadas de rede aqui — isso é chamado da thread de clique/render do libGDX,
+     * e uma chamada bloqueante de rede nesse ponto pode travar a UI (ANR). A verificação real
+     * de conectividade ocorre em initializeConnection(), executada em background.
      */
     public boolean isConnected() {
         return isConnected;

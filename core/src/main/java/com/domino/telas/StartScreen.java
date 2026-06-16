@@ -33,7 +33,7 @@ public class StartScreen extends BaseScreen {
         texPlay = new Texture(Gdx.files.internal("play.png"));
         texConfig = new Texture(Gdx.files.internal("configuracoes.png"));
         texSair = new Texture(Gdx.files.internal("sair.png"));
-        texUser = new Texture(Gdx.files.internal("user.png"));
+        texUser = new Texture(Gdx.files.internal("User.png"));
         texTutorial = new Texture(Gdx.files.internal("tutorial.png"));
 
         // IMPORTANTE: Inicializar DAO em background para não travar a thread GL

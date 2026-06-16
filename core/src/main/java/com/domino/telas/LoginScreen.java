@@ -137,11 +137,14 @@ public class LoginScreen extends BaseScreen {
                 String senhaDigitada = campoSenha.getText();
                 PopUpMensagem popUp = new PopUpMensagem(stage);
 
-                // Verificar conexão antes de tentar login
+                // Verificar conexão antes de tentar login.
+                // NÃO bloquear esta thread (é a thread de render do libGDX) tentando reconectar:
+                // a conexão real é estabelecida em background (initializeDatabaseAsync).
                 ConnectionFactory conexao = ConnectionFactory.getInstance();
                 if (!conexao.isConnected()) {
-                    popUp.showErro("Erro: Sem conexão com o servidor.\nTente novamente mais tarde.");
-                    System.err.println("❌ Tentativa de login sem conexão com BD");
+                    String status = conexao.getStatus();
+                    System.err.println("❌ Tentativa de login sem conexão com BD. Status: " + status);
+                    popUp.showErro("Erro: Sem conexão com o servidor.\nAguarde alguns segundos e tente novamente.");
                     return;
                 }
 
@@ -166,6 +169,14 @@ public class LoginScreen extends BaseScreen {
                         System.out.println("❌ Erro: E-mail ou senha incorretos!");
                         campoSenha.setText("");
                     }
+                } catch (com.mongodb.MongoTimeoutException e) {
+                    System.err.println("⏱️  Erro de timeout ao conectar ao banco de dados: " + e.getMessage());
+                    popUp.showErro("Erro de conexão com o servidor (timeout).\nVerifique sua internet e tente novamente.");
+                    campoSenha.setText("");
+                } catch (com.mongodb.MongoSocketException e) {
+                    System.err.println("🔌 Erro de socket ao conectar ao banco de dados: " + e.getMessage());
+                    popUp.showErro("Erro ao conectar ao servidor.\nVerifique sua conexão de internet e tente novamente.");
+                    campoSenha.setText("");
                 } catch (Exception e) {
                     System.err.println("❌ Erro inesperado durante login: " + e.getMessage());
                     e.printStackTrace();
