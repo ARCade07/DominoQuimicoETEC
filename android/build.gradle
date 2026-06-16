@@ -6,6 +6,46 @@ repositories {
   mavenLocal()
 }
 
+// Configuração para resolver as dependências nativas
+configurations {
+  nativesDownload {
+    canBeResolved = true
+    canBeConsumed = false
+  }
+}
+
+// Tarefa para extrair as bibliotecas nativas ANTES de compilar
+task extractNatives {
+  doLast {
+    def abis = [
+      'natives-armeabi-v7a': 'armeabi-v7a',
+      'natives-arm64-v8a': 'arm64-v8a',
+      'natives-x86': 'x86',
+      'natives-x86_64': 'x86_64'
+    ]
+
+    configurations.nativesDownload.files.each { file ->
+      abis.each { classifier, abiFolder ->
+        if (file.name.contains(classifier)) {
+          println("📦 Extraindo ${classifier}: ${file.name}")
+          copy {
+            from zipTree(file)
+            into "src/main/jniLibs/${abiFolder}"
+            include '**/*.so'
+          }
+          println("✅ Extraído para ${abiFolder}/")
+        }
+      }
+    }
+
+    // Listar o que foi extraído
+    println("\n📂 JNI Libs extraídos:")
+    fileTree('src/main/jniLibs').include('**/*.so').each {
+      println("  - ${it.path}")
+    }
+  }
+}
+
 android {
   namespace "com.domino.android"
   compileSdk 35
@@ -32,6 +72,8 @@ android {
   sourceSets {
     main {
       assets.srcDirs += [rootProject.file('assets').path]
+      // Especificar onde estão os JNI libs
+      jniLibs.srcDirs = ['src/main/jniLibs']
     }
   }
 
@@ -52,7 +94,13 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
-  // Android native libraries - MUST be included for libGDX to work
+  // Android native libraries - CRÍTICAS para libGDX funcionar
+  // Adicionar também à configuração de download para extração
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+  nativesDownload "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
@@ -71,3 +119,6 @@ dependencies {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
   }
 }
+
+// Executar extractNatives antes de qualquer tarefa de build
+preBuild.dependsOn extractNatives
