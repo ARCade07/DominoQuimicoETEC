@@ -9,10 +9,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class ConnectionFactory {
 
+    private static ConnectionFactory instanciaBD;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
-    public ConnectionFactory(){
+    private ConnectionFactory(){
         try {
             Dotenv dotenv = Dotenv.load();
             String connectionString = dotenv.get("MONGO_URI");
@@ -33,6 +34,20 @@ public class ConnectionFactory {
         } catch (Exception e) {
             System.err.println("Erro ao conectar ao MongoDB: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public static ConnectionFactory getInstance(){
+        if (instanciaBD == null) {
+            instanciaBD = new ConnectionFactory();
+        }
+        return instanciaBD;
+    }
+
+    public void fecharConexao(){
+        if (mongoClient != null) {
+            mongoClient.close();
+            System.out.println("Conexão com o banco encerrada.");
         }
     }
 

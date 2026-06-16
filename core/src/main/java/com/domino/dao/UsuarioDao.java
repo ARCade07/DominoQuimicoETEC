@@ -4,16 +4,19 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.domino.bd.ConnectionFactory;
 import com.domino.modelos.Estatisticas;
 import com.domino.modelos.Usuario;
+import com.domino.telas.RankingScreen;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.*;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class UsuarioDao {
     // Onde os documentos BSON serão guardados:
@@ -91,6 +94,20 @@ public class UsuarioDao {
         return null;
     }
 
+    public boolean redefinirSenha(String email, String novaSenhaDigitada) {
+        String hashSenha = BCrypt.withDefaults().hashToString(12, novaSenhaDigitada.toCharArray());
+
+        var atualizacoes = Updates.combine(
+            Updates.set("senha", hashSenha),
+            Updates.unset("tokenRecuperacao"),
+            Updates.unset("tokenExpiracao")
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+
+        return resultado.getModifiedCount() > 0;
+    }
+
     public Usuario buscarPorEmail(String email) {
         Document doc = docsUsuarios.find(Filters.eq("email", email)).first();
 
@@ -101,11 +118,35 @@ public class UsuarioDao {
         return converterDocumentoParaUsuario(doc);
     }
 
-    public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros) {
+    public boolean salvarTokenRecuperacao(String email, String tokenRecuperacao){
+        long tempo = TimeUnit.MINUTES.toMillis(15);
+        long expiracao = System.currentTimeMillis() + tempo;
+
+        var atualizacoes = Updates.combine(
+            Updates.set("tokenRecuperacao", tokenRecuperacao),
+            Updates.set("tokenExpiracao", expiracao)
+        );
+
+        UpdateResult resultado = docsUsuarios.updateOne(Filters.eq("email", email), atualizacoes);
+
+        return resultado.getMatchedCount() > 0;
+    }
+
+    public boolean validarToken(String email, String tokenDigitado) {
+        Usuario u = buscarPorEmail(email);
+
+        if (u != null && tokenDigitado.equals(u.getTokenRecuperacao())) {
+            return System.currentTimeMillis() <= u.getTokenExpiracao();
+        }
+        return false;
+    }
+
+    public void registrarPartida(ObjectId idUsuario, boolean ganhou, int quantAcertos, int quantErros, int pontuacao) {
         var atualizacoes = Updates.combine(
             Updates.inc("estatisticas.partidasJogadas", 1),
             Updates.inc("estatisticas.acertos", quantAcertos),
-            Updates.inc("estatisticas.erros", quantErros)
+            Updates.inc("estatisticas.erros", quantErros),
+            Updates.inc("estatisticas.pontuacao", pontuacao)
         );
 
         if (ganhou) {
@@ -119,6 +160,27 @@ public class UsuarioDao {
     }
 
     // metodo para converter BSON (Documento) para Objeto java
+    public List<Usuario> buscarTopJogadores(int limite) {
+        List<Usuario> ranking = new ArrayList<>();
+        FindIterable<Document> resultados = docsUsuarios.find(Filters.eq("role", "ALUNO"))
+            .sort(Sorts.descending("estatisticas.pontuacao"))
+            .limit(limite);
+
+        for (Document doc : resultados) {
+            ranking.add(converterDocumentoParaUsuario(doc));
+        }
+
+        return ranking;
+    }
+
+    public int buscarPosicaoJogador(int pontuacaoJogador) {
+        var filtro = Filters.and(Filters.eq("role", "ALUNO"), Filters.gt("estatisticas.pontuacao", pontuacaoJogador));
+
+        long quantidadeNaFrente = docsUsuarios.countDocuments(filtro);
+
+        return (int) quantidadeNaFrente + 1;
+    }
+
     private Usuario converterDocumentoParaUsuario(Document doc) {
         Usuario u = new Usuario();
 
@@ -127,7 +189,12 @@ public class UsuarioDao {
         u.setNome(doc.getString("nome"));
         u.setEmail(doc.getString("email"));
         u.setSenha(doc.getString("senha"));
+        u.setRole(doc.getString("role"));
         u.setTokenSessao(doc.getString("tokenSessao"));
+        u.setTokenRecuperacao(doc.getString("tokenRecuperacao"));
+
+        Long expiracao = doc.getLong("tokenExpiracao");
+        if (expiracao != null) u.setTokenExpiracao(expiracao);
 
         // Pega o sub-documento de estatísticas do bd
         Document docEstat = (Document) doc.get("estatisticas");
@@ -140,7 +207,7 @@ public class UsuarioDao {
             estat.setPartidasPerdidas(docEstat.getInteger("partidasPerdidas", 0));
             estat.setErros(docEstat.getInteger("erros", 0));
             estat.setAcertos(docEstat.getInteger("acertos", 0));
-
+            estat.setPontuacao(docEstat.getInteger("pontuacao", 0));
             u.setEstat(estat);
         }
         return u;

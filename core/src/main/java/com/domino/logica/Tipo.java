@@ -1,17 +1,37 @@
 package com.domino.logica;
 
+import java.util.List;
+
 public enum Tipo {
 
     ACIDO("Ácido") {
         @Override
-        public Tipo getConexoes() {
-            return Tipo.ACIDO;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.ACIDO, Tipo.AGUA);
         }
     },
     BASE("Base") {
         @Override
-        public Tipo getConexoes() {
-            return Tipo.BASE;
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.BASE, Tipo.AGUA);
+        }
+    },
+    OXIDO("Óxido"){
+        @Override
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.OXIDO, Tipo.AGUA);
+        }
+    },
+    SAL("Sal"){
+        @Override
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.SAL, Tipo.AGUA);
+        }
+    },
+    AGUA("Água"){
+        @Override
+        public List<Tipo> getConexoes(){
+            return List.of(Tipo.ACIDO, Tipo.BASE, Tipo.OXIDO, Tipo.SAL, Tipo.AGUA);
         }
     },
     OXIDO("Óxido") {
@@ -33,31 +53,9 @@ public enum Tipo {
         this.nome = nome;
     }
 
-    public String getNome() {
-        return this.nome;
+    public static Tipo fromString(String tipo1) {
+        return Tipo.valueOf(tipo1.toUpperCase());
     }
 
-    public abstract Tipo getConexoes();
-
-    /**
-     * Converte a String vinda do MongoDB para o Enum oficial correspondente.
-     * Busca correspondência tanto pelo nome da constante quanto pelo nome amigável.
-     */
-    public static Tipo fromString(String texto) {
-        if (texto == null || texto.trim().isEmpty()) {
-            throw new IllegalArgumentException("O tipo vindo do banco de dados está nulo ou vazio.");
-        }
-
-        String textoLimpo = texto.trim();
-
-        for (Tipo tipo : Tipo.values()) {
-            // Verifica se o banco enviou o identificador exato (ex: "ACIDO")
-            // ou a string amigável com acento (ex: "Ácido"), ignorando maiúsculas/minúsculas.
-            if (tipo.name().equalsIgnoreCase(textoLimpo) || tipo.getNome().equalsIgnoreCase(textoLimpo)) {
-                return tipo;
-            }
-        }
-
-        throw new IllegalArgumentException("Tipo químico desconhecido encontrado no banco: " + texto);
-    }
+    public abstract List<Tipo> getConexoes();
 }

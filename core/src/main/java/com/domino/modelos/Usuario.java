@@ -11,6 +11,8 @@ public class Usuario {
     private String role;
     private Estatisticas estat;
     private String tokenSessao;
+    private String tokenRecuperacao;
+    private long tokenExpiracao;
 
     // Construtor vazio para o objeto ser recriado quando foi lido do bd
     public Usuario(){
@@ -19,11 +21,10 @@ public class Usuario {
     }
 
     // O próprio bd gerá o id
-    public Usuario(String nome, String email, String senha, String role) {
+    public Usuario(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.role = role;
         this.estat = new Estatisticas();
     }
 
@@ -81,5 +82,21 @@ public class Usuario {
 
     public void setTokenSessao(String tokenSessao) {
         this.tokenSessao = tokenSessao;
+    }
+
+    public String getTokenRecuperacao() {
+        return tokenRecuperacao;
+    }
+
+    public void setTokenRecuperacao(String tokenRecuperacao) {
+        this.tokenRecuperacao = tokenRecuperacao;
+    }
+
+    public long getTokenExpiracao() {
+        return tokenExpiracao;
+    }
+
+    public void setTokenExpiracao(long tokenExpiracao) {
+        this.tokenExpiracao = tokenExpiracao;
     }
 }

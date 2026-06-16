@@ -1,50 +1,105 @@
 package com.domino.rede;
 
-import com.domino.rede.packets.PacketJogada;
+import com.domino.rede.packets.*;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Servidor {
     private Server servidor;
     private List<Integer> jogadoresConectados = new ArrayList<>();
+    private Map<Integer, Integer> pontuacaoFinalJogadores = new HashMap<>();
 
     public  Servidor () throws IOException {
         // instancia o servidor
         servidor = new Server();
         // inicia a thread do servidor e coloca ele para escutar nas respectivas portas
         servidor.start();
-        servidor.bind(54555, 54777);
 
         // registros das classe que serão serializadas utilizando o kryo
         Registro.registrarClasses(servidor.getKryo());
+
+        servidor.bind(54555, 54777);
+
+
 
         servidor.addListener(new Listener(){
             @Override
             public void connected(Connection connection){
                 jogadoresConectados.add(connection.getID());
                 System.out.println("Jogador " + connection.getID() + " conectou!");
+                PacketLobby packetLobby = new PacketLobby();
+                packetLobby.idJogadoresConectados = jogadoresConectados;
+                servidor.sendToAllTCP(packetLobby);
+            }
+            @Override
+            public void disconnected(Connection connection){
+                int idJogadorQueSaiu = connection.getID();
+
+                jogadoresConectados.remove(Integer.valueOf(idJogadorQueSaiu));
+
+                PacketLobby packetLobby = new PacketLobby();
+                packetLobby.idJogadoresConectados = jogadoresConectados;
+
+                servidor.sendToAllTCP(packetLobby);
+
             }
             @Override
             public void received(Connection connection, Object object) {
                 if (object instanceof PacketJogada) {
                     PacketJogada jogada = (PacketJogada) object;
 
-                    // pega quem enviou a jogada
-                    int jogadorAtual = jogadoresConectados.indexOf(connection.getID());
-                    // calcula, através do array de jogadoresConectados, quem será o próximo a jogar
-                    int proximoAJogar = (jogadorAtual + 1) % jogadoresConectados.size();
-                    int idProximoAJogar = jogadoresConectados.get(proximoAJogar);
-                    // envia pela rede o  id do próximo jogador
-                    jogada.proximoAJogar = idProximoAJogar;
+                    if(!jogada.ultimaJogada){
+                        // pega quem enviou a jogada
+                        int jogadorAtual = jogadoresConectados.indexOf(connection.getID());
+                        // calcula, através do array de jogadoresConectados, quem será o próximo a jogar
+                        int proximoAJogar = (jogadorAtual + 1) % jogadoresConectados.size();
+                        int idProximoAJogar = jogadoresConectados.get(proximoAJogar);
+                        // envia pela rede o  id do próximo jogador
+                        jogada.proximoAJogar = idProximoAJogar;
+                    }
+                    else jogada.proximoAJogar = -1;
 
                     // envia a jogada para todos os jogadores, menos o que enviou
                     servidor.sendToAllExceptTCP(connection.getID(), jogada);
+                }
+
+                if(object instanceof PacketQuantidadePecas){
+                    PacketQuantidadePecas quantidadePecas = (PacketQuantidadePecas) object;
+
+                    int quemEnviou = connection.getID();
+
+                    quantidadePecas.jogador = quemEnviou;
+                    servidor.sendToAllExceptTCP(quemEnviou, quantidadePecas);
+                }
+
+                if(object instanceof PacketPontuacao){
+                    PacketPontuacao packetPontuacao = (PacketPontuacao) object;
+                    int pontuacaoFinal = packetPontuacao.pontuacao;
+                    int idJogador = connection.getID();
+
+                    pontuacaoFinalJogadores.put(idJogador, pontuacaoFinal);
+
+                    if(pontuacaoFinalJogadores.size() == jogadoresConectados.size()){
+                        // utiliza entry para acessar o mapa como um conjunto de pares para poder ordenar depois
+                        List<Map.Entry<Integer, Integer>> pontuacaoFinalJogadoresOrdenada = new ArrayList<>(pontuacaoFinalJogadores.entrySet());
+
+                        pontuacaoFinalJogadoresOrdenada.sort(Map.Entry.<Integer,Integer>comparingByValue().reversed());
+
+                        PacketResultadoJogo packetResultadoJogo = new PacketResultadoJogo();
+                        for(Map.Entry<Integer, Integer> entry : pontuacaoFinalJogadoresOrdenada){
+
+                            PacketResultadoJogador resultado = new PacketResultadoJogador(entry.getKey(),entry.getValue());
+
+                            packetResultadoJogo.resultadoFinal.add(resultado);
+                        }
+
+                        servidor.sendToAllTCP(packetResultadoJogo);
+                    }
                 }
             }
         });
@@ -58,6 +113,38 @@ public class Servidor {
             System.out.println("Erro ao obter seu IP : " + e.getMessage());
             return "FALHA";
         }
+    }
+
+    public void removerJogador(int idJogador){
+        for(Connection conexao : servidor.getConnections()){
+            if(conexao.getID() == idJogador){
+                conexao.close();
+                break;
+            }
+        }
+    }
+
+    public void botaoJogarNovamente (){
+        PacketVoltaProLobby voltaProLobby = new PacketVoltaProLobby();
+        servidor.sendToAllTCP(voltaProLobby);
+    }
+
+    public void botaoInicioClicado(int idHost){
+        PacketComecarJogo packetComecarJogo = new PacketComecarJogo();
+//        servidor.sendToAllExceptTCP(idHost, packetComecarJogo);
+        servidor.sendToAllTCP(packetComecarJogo);
+    }
+
+    public void decidirQuemComeca(){
+        Random random = new Random();
+
+        int indiceAleatorio = random.nextInt(jogadoresConectados.size());
+        int quemComeca = jogadoresConectados.get(indiceAleatorio);
+
+        PacketPrimeiroJogador primeiroJogador = new PacketPrimeiroJogador();
+
+
+        servidor.sendToTCP(quemComeca, primeiroJogador);
     }
 
     public void fechar() {

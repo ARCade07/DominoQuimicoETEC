@@ -1,11 +1,12 @@
 package com.domino.modelos;
 
 public class Estatisticas {
-    int partidasJogadas;
-    int partidasGanhas;
-    int partidasPerdidas;
-    int erros;
-    int acertos;
+    private int partidasJogadas;
+    private int partidasGanhas;
+    private int partidasPerdidas;
+    private int erros;
+    private int acertos;
+    private int pontuacao;
 
     public int getPartidasJogadas() {
         return partidasJogadas;
@@ -45,5 +46,13 @@ public class Estatisticas {
 
     public void setAcertos(int acertos) {
         this.acertos = acertos;
+    }
+
+    public int getPontuacao() {
+        return pontuacao;
+    }
+
+    public void setPontuacao(int pontuacao) {
+        this.pontuacao = pontuacao;
     }
 }

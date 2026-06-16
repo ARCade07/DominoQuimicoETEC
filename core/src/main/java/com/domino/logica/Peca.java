@@ -1,5 +1,7 @@
 package com.domino.logica;
 
+import java.util.List;
+
 public class Peca {
     private final Tipo tipo1;
     private final Tipo tipo2;
@@ -18,7 +20,9 @@ public class Peca {
         this.info2 = info2;
         this.tipo2 = tipo2;
 
-        if (info1.equals(info2)) this.isBucha = true;
+        // Mudança nas regras: sem bucha no jogo
+        //if (info1.equals(info2)) this.isBucha = true;
+        this.isBucha = false;
     }
 
     public String getInfo1() {
@@ -47,10 +51,10 @@ public class Peca {
         return this.tipo2;
     }
 
-    public Tipo getConexoes1(){
+    public List<Tipo> getConexoes1(){
         return this.tipo1.getConexoes();
     }
-    public Tipo getConexoes2(){
+    public List<Tipo> getConexoes2(){
         return this.tipo2.getConexoes();
     }
 
