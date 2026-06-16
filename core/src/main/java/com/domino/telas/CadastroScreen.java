@@ -14,6 +14,7 @@ import com.domino.controladores.ControladorLogin;
 import com.domino.controladores.ControladorRegistro;
 import com.domino.dao.UsuarioDao;
 import com.domino.modelos.Usuario;
+import com.domino.rede.Cliente;
 
 public class CadastroScreen extends BaseScreen {
 
@@ -116,7 +117,18 @@ public class CadastroScreen extends BaseScreen {
                 if (sucesso) {
                     System.out.println("Usuário registrado com sucesso.");
                     popUp.showSucesso("Cadastrado com sucesso!");
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            Timer.schedule(new Timer.Task() {
+                                @Override
+                                public void run() {
+                                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                                }
+                            }, 3.0f);
+                        }
+                    });
+
                 } else {
                     popUp.showErro("Erro ao cadastrar");
                     System.out.println("Não foi possível realizar o registro");
